@@ -180,6 +180,9 @@ construire, `npm start` pour démarrer, sonde sur `/health`, déploiement
 déclenché seulement quand les vérifications passent (`autoDeployTrigger:
 checksPass`).
 
+La marche à suivre complète, avec la liste de vérification après mise en
+ligne, est dans [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 Pour déployer votre propre instance :
 
 1. forkez ce dépôt ;
