@@ -146,9 +146,9 @@ export const es: Messages = {
   'action.waitingAnswerShort': 'debe responder',
 
   // --- Registro común --------------------------------------------------------
-  'pool.title': 'Estrellas reveladas',
-  'pool.reserve': 'Reserva: quedan {count} estrellas',
-  'pool.reserveColor': '{count} estrella(s) {color} en la reserva',
+  'pool.title': 'Registro común',
+  'pool.reserve': 'Cielo: quedan {count} estrellas por revelar',
+  'pool.reserveColor': '{count} estrella(s) de la {color} aún en el cielo',
   'pool.selectable': 'elegir esta estrella para una pista',
 
   // --- Soportes y estrellas ---------------------------------------------------
@@ -200,7 +200,7 @@ export const es: Messages = {
   'log.player-disconnected': '{name} se ha desconectado.',
   'log.game-over-winner': '¡CONSTELACIÓN! ¡{name} gana la partida!',
   'log.game-over-draw': 'Los dos jugadores han fallado: no gana nadie.',
-  'log.game-over-reserve-empty': 'La reserva está vacía: la partida termina sin ganador.',
+  'log.game-over-reserve-empty': 'El cielo se ha agotado: la observación termina sin ganador.',
 
   // --- Diálogo de pista ----------------------------------------------------
   'hint.title': 'Pedir una pista sobre la estrella {tile}',
@@ -304,8 +304,8 @@ export const es: Messages = {
   'error.NOT_YOUR_TURN': 'No es tu turno.',
   'error.WRONG_PHASE': 'Esta acción no es posible ahora mismo.',
   'error.INVALID_COLOR': 'Constelación no válido.',
-  'error.COLOR_EXHAUSTED': 'No queda ninguna estrella de esa constelación en la reserva.',
-  'error.TILE_NOT_PUBLIC': 'Esa estrella no está en la registro común.',
+  'error.COLOR_EXHAUSTED': 'Esa constelación ya no tiene ninguna estrella en el cielo.',
+  'error.TILE_NOT_PUBLIC': 'Esa estrella no está en el registro común.',
   'error.INVALID_POSITION': 'Posición no válida.',
   'error.INVALID_SLOT': 'Hueco no válido.',
   'error.NOT_RESPONDER': 'No te toca responder a ti.',
@@ -340,7 +340,7 @@ export const es: Messages = {
   'howto.5.title': '5. Después pide una pista',
   'howto.5.text': 'Elige cualquier estrella pública y luego:',
   'howto.5.note':
-    'La estrella elegida sale del centro: pasa a tu soporte y ya no puede usarse para otra pista.',
+    'La estrella elegida sale del registro: pasa a tu bóveda y ya no puede usarse para otra pista.',
   'howto.5.classify':
     'SITUAR: tu rival coloca esa estrella entre tus 5 estrellas secretas (6 posiciones posibles: antes de la 1.ª, entre dos estrellas o después de la 5.ª).',
   'howto.5.compare':
@@ -364,7 +364,7 @@ export const es: Messages = {
   'onboarding.2.text': 'Ves sus números: tu rival, en cambio, no ve los suyos.',
   'onboarding.3.title': 'La registro común, en el centro',
   'onboarding.3.text':
-    'Las estrellas reveladas esperan ahí; la que se usa para una pista pasa luego a un soporte.',
+    'Las estrellas reveladas esperan ahí; la que se usa para una pista pasa luego a una bóveda.',
   'onboarding.4.title': 'SITUAR',
   'onboarding.4.text':
     'Tu rival coloca una estrella pública entre tus 5 estrellas: 6 posiciones posibles.',

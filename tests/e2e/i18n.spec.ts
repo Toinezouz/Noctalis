@@ -20,7 +20,7 @@ const TEXT = {
     yourTurn: 'À TON TOUR',
     turnOf: (name: string) => `Tour de ${name}`,
     step1: 'Étape 1 / 2',
-    choosingColor: (name: string) => `${name} choisit une couleur`,
+    choosingColor: (name: string) => `${name} choisit une constellation`,
     logTurn1: (name: string) => `Tour 1 : au tour de ${name}`,
     logRevealed: 'a révélé l’étoile',
     logAnswers: 'répond',
