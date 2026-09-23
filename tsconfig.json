@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["node"],
+    "noEmit": true,
+    "paths": {
+      "@gotfive/shared": ["./shared/src/index.ts"]
+    }
+  },
+  "include": ["tests/**/*.ts", "tests/**/*.tsx", "*.config.ts", "eslint.config.js"]
+}

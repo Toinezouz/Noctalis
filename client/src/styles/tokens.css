@@ -1,0 +1,200 @@
+/* ==========================================================================
+   GOT FIVE! - Design system : jetons de conception
+   Esprit : jeu de societe familial, retro-pop, chaleureux, cartonne.
+   ========================================================================== */
+
+:root {
+  /* --- Couleurs de marque ------------------------------------------------ */
+  --c-cream: #fff4e2;
+  --c-cream-deep: #f8e3c2;
+  --c-cream-shadow: #e9cfa8;
+  --c-paper: #fffaf1;
+  --c-ink: #2b1141;
+  --c-ink-soft: #5b4270;
+  --c-violet: #6a2bae;
+  --c-violet-dark: #4a1a80;
+  --c-magenta: #c2158a;
+  --c-gold: #ffc93c;
+
+  /* --- Couleurs des 5 familles de tuiles --------------------------------- */
+  --t-green: #2fb061;
+  --t-green-dark: #1f8548;
+  --t-pink: #f05a9c;
+  --t-pink-dark: #c73c7b;
+  --t-blue: #2aa7e0;
+  --t-blue-dark: #1b7fae;
+  --t-red: #e8453c;
+  --t-red-dark: #b82f28;
+  --t-orange: #f79020;
+  --t-orange-dark: #c96c0c;
+
+  /* --- Surfaces et traits ------------------------------------------------
+     Ces jetons existent pour que le theme sombre n'ait qu'a les redefinir :
+     aucun composant ne doit jamais ecrire une teinte en dur. */
+  /* Surface survolee / fond de champ de saisie. */
+  --c-surface-hi: #fff;
+  --c-field: #fff;
+  /* Texte pose sur un aplat vif (or, orange, tuile) : toujours sombre. */
+  --c-on-vivid: #2b1141;
+  /* Traits et aplats discrets, poses sur une surface. */
+  --c-line: rgba(43, 17, 65, 0.16);
+  --c-line-soft: rgba(43, 17, 65, 0.08);
+  --c-wash: rgba(43, 17, 65, 0.12);
+  /* Reflets blancs (papier lustre). Discrets en sombre, sinon ca delave. */
+  --c-gloss: rgba(255, 255, 255, 0.6);
+  --c-gloss-panel: rgba(255, 255, 255, 0.72);
+  --c-gloss-wash: rgba(255, 255, 255, 0.5);
+  /* Grain du fond de page. */
+  --c-dot: rgba(43, 17, 65, 0.05);
+  /* Bandeau de jeu, colle en haut de l'ecran (legerement translucide). */
+  --c-bar: rgba(255, 244, 226, 0.94);
+  /* Rayons decoratifs de l'accueil : discrets sur fond sombre. */
+  --c-rays: rgba(255, 201, 60, 0.28);
+  /* Voile du panneau lateral de la fiche (au-dessus de la table). */
+  --c-veil: rgba(255, 244, 226, 0.96);
+  /* Bulle de notification. */
+  --c-toast-bg: #2b1141;
+  --c-toast-fg: #fff;
+  /* Support en bois des joueurs. */
+  --rack-face: linear-gradient(180deg, #f6e0bd, #e8c79a);
+  --rack-line-rgb: 148, 103, 55;
+  --rack-gloss: rgba(255, 255, 255, 0.65);
+  --rack-slot: rgba(255, 255, 255, 0.35);
+  --rack-slot-filled: rgba(255, 255, 255, 0.6);
+  /* Base des ombres portees : l'encre en clair, le noir en sombre. */
+  --shadow-rgb: 43, 17, 65;
+
+  /* --- Etats ------------------------------------------------------------- */
+  --c-success: #2fb061;
+  --c-danger: #e8453c;
+  --c-warning: #f79020;
+  --c-info: #2aa7e0;
+
+  /* --- Typographie ------------------------------------------------------- */
+  --font-title: 'Fredoka Variable', 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Nunito Variable', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-xs: 0.72rem;
+  --fs-sm: 0.85rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.2rem;
+  --fs-xl: 1.6rem;
+  --fs-2xl: 2.2rem;
+  --fs-3xl: clamp(2.4rem, 8vw, 4.4rem);
+
+  /* --- Espacements ------------------------------------------------------- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+
+  /* --- Rayons ------------------------------------------------------------ */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-pill: 999px;
+
+  /* --- Ombres (rendu carton / objet pose sur la table) ------------------- */
+  --sh-tile: 0 2px 0 rgba(var(--shadow-rgb), 0.35), 0 6px 12px rgba(var(--shadow-rgb), 0.18);
+  --sh-tile-raised: 0 6px 0 rgba(var(--shadow-rgb), 0.3), 0 14px 22px rgba(var(--shadow-rgb), 0.22);
+  --sh-panel: 0 4px 0 var(--c-cream-shadow), 0 12px 28px rgba(var(--shadow-rgb), 0.16);
+  --sh-modal: 0 24px 60px rgba(var(--shadow-rgb), 0.38);
+  --sh-inset: inset 0 2px 6px rgba(var(--shadow-rgb), 0.18);
+
+  /* --- Mouvement --------------------------------------------------------- */
+  --mo-fast: 120ms;
+  --mo-base: 220ms;
+  --mo-slow: 420ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- Profondeur -------------------------------------------------------- */
+  --z-table: 1;
+  --z-sticky: 50;
+  --z-panel: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+
+  /* --- Dimensions de jeu ------------------------------------------------- */
+  --tile-w: clamp(46px, 8.5vw, 72px);
+  --tile-h: calc(var(--tile-w) * 1.32);
+  --slot-w: clamp(26px, 4.6vw, 40px);
+}
+
+
+/* ==========================================================================
+   Theme sombre
+   `data-theme` est pose sur <html> par le client (et par un petit script
+   dans index.html, avant le premier rendu, pour eviter un flash clair).
+   Seules les surfaces et l'encre changent : les 5 couleurs de tuiles restent
+   identiques, sans quoi la fiche de deduction ne correspondrait plus au
+   plateau.
+   ========================================================================== */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --c-cream: #191029;
+  --c-cream-deep: #221633;
+  --c-cream-shadow: #0d0817;
+  --c-paper: #241934;
+  --c-ink: #f6eeff;
+  --c-ink-soft: #bcabd6;
+  --c-violet: #a377e6;
+  --c-violet-dark: #7d4fd0;
+  --c-magenta: #ef62b9;
+
+  --c-surface-hi: #32234a;
+  --c-field: #150e23;
+  --c-line: rgba(255, 255, 255, 0.18);
+  --c-line-soft: rgba(255, 255, 255, 0.09);
+  --c-wash: rgba(255, 255, 255, 0.1);
+  --c-gloss: rgba(255, 255, 255, 0.07);
+  --c-gloss-panel: rgba(255, 255, 255, 0.05);
+  --c-gloss-wash: rgba(255, 255, 255, 0.04);
+  --c-dot: rgba(255, 255, 255, 0.05);
+  --c-bar: rgba(25, 16, 41, 0.94);
+  --c-rays: rgba(255, 201, 60, 0.1);
+  --c-veil: rgba(25, 16, 41, 0.97);
+  --c-toast-bg: #32234a;
+  --c-toast-fg: #f6eeff;
+
+  --rack-face: linear-gradient(180deg, #6d5132, #47331e);
+  --rack-line-rgb: 232, 199, 154;
+  --rack-gloss: rgba(255, 255, 255, 0.12);
+  --rack-slot: rgba(255, 255, 255, 0.08);
+  --rack-slot-filled: rgba(255, 255, 255, 0.16);
+
+  /* Sur fond sombre, une ombre coloree ne se voit pas : on passe au noir. */
+  --shadow-rgb: 0, 0, 0;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* Couleur -> variables, pour ne jamais recopier une teinte dans un composant. */
+[data-color='green'] {
+  --tile-face: var(--t-green);
+  --tile-edge: var(--t-green-dark);
+}
+[data-color='pink'] {
+  --tile-face: var(--t-pink);
+  --tile-edge: var(--t-pink-dark);
+}
+[data-color='blue'] {
+  --tile-face: var(--t-blue);
+  --tile-edge: var(--t-blue-dark);
+}
+[data-color='red'] {
+  --tile-face: var(--t-red);
+  --tile-edge: var(--t-red-dark);
+}
+[data-color='orange'] {
+  --tile-face: var(--t-orange);
+  --tile-edge: var(--t-orange-dark);
+}

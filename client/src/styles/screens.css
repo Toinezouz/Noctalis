@@ -1,0 +1,514 @@
+/* ==========================================================================
+   Ecrans : accueil, lobby, regles, tutoriel, dialogues, fin de partie
+   ========================================================================== */
+
+/* --- Accueil --------------------------------------------------------------- */
+
+.home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  padding: var(--sp-5) var(--sp-4) var(--sp-7);
+}
+
+.home__hero {
+  position: relative;
+  text-align: center;
+  padding: var(--sp-5) var(--sp-3);
+  /* Les rayons restent derriere le titre et ne debordent pas sur la carte. */
+  overflow: hidden;
+  border-radius: var(--r-xl);
+}
+
+.home__rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(560px, 120vw);
+  height: min(560px, 120vw);
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--c-rays) 0deg 9deg,
+    transparent 9deg 18deg
+  );
+  border-radius: 50%;
+  z-index: -1;
+  animation: gf-rays 60s linear infinite;
+  mask-image: radial-gradient(circle, #000 35%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle, #000 35%, transparent 70%);
+}
+
+.home__tagline {
+  font-family: var(--font-title);
+  font-size: var(--fs-xl);
+  color: var(--c-magenta);
+  margin: var(--sp-2) 0 var(--sp-2);
+}
+
+.home__sub {
+  max-width: 46ch;
+  margin: 0 auto;
+}
+
+.home__card {
+  width: min(460px, 100%);
+}
+
+/* --- Lobby ----------------------------------------------------------------- */
+
+.lobby {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-4);
+}
+
+.lobby__card {
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.lobby__code {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+
+.lobby__char {
+  display: grid;
+  place-items: center;
+  width: clamp(44px, 12vw, 62px);
+  height: clamp(54px, 15vw, 76px);
+  border-radius: var(--r-md);
+  background: var(--c-violet);
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  box-shadow: 0 5px 0 var(--c-violet-dark);
+}
+
+.lobby__players {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.lobby__player {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px dashed rgba(var(--shadow-rgb), 0.2);
+}
+
+.lobby__player.is-ready {
+  border-style: solid;
+  border-color: var(--t-green);
+  background: rgba(47, 176, 97, 0.12);
+}
+
+.lobby__avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--c-magenta);
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: var(--fs-lg);
+}
+
+.lobby__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: stretch;
+}
+
+/* --- Regles et tutoriel ---------------------------------------------------- */
+
+.howto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: howto;
+}
+
+.howto h3 {
+  font-size: var(--fs-lg);
+  color: var(--c-violet);
+  margin-bottom: var(--sp-1);
+}
+
+.howto__row {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  padding: var(--sp-2) 0;
+}
+
+.onboarding {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.onboarding__icon {
+  font-size: 3rem;
+}
+
+.onboarding__dots {
+  display: flex;
+  gap: 6px;
+  margin-top: var(--sp-2);
+}
+
+.onboarding__dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(var(--shadow-rgb), 0.2);
+}
+
+.onboarding__dots span.is-active {
+  background: var(--c-violet);
+  transform: scale(1.2);
+}
+
+/* --- Dialogues ------------------------------------------------------------- */
+
+.hint-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.hint-dialog__choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+.hint-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  border: 3px solid var(--c-violet);
+  background: var(--c-paper);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 5px 0 rgba(106, 43, 174, 0.35);
+  transition: transform var(--mo-fast) var(--ease-out);
+}
+
+.hint-choice:hover:not(:disabled) {
+  transform: translateY(-3px);
+  background: var(--c-surface-hi);
+}
+
+.hint-choice:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hint-choice__title {
+  font-family: var(--font-title);
+  font-size: var(--fs-xl);
+  color: var(--c-magenta);
+}
+
+.hint-choice__text {
+  font-size: var(--fs-sm);
+  color: var(--c-ink-soft);
+}
+
+.hint-dialog__rack,
+.dialog-tile-row {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: var(--sp-2) 0;
+}
+
+.slot-picker {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 2px;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: var(--sp-3) 0;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 720px) {
+  .slot-picker {
+    justify-content: center;
+  }
+}
+
+.slot-picker__cell {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.slot-picker__slot {
+  display: grid;
+  place-items: center;
+  width: clamp(34px, 9vw, 46px);
+  min-height: clamp(48px, 13vw, 70px);
+  border-radius: var(--r-md);
+  border: 3px dashed var(--c-violet);
+  background: rgba(106, 43, 174, 0.08);
+  color: var(--c-violet);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform var(--mo-fast) var(--ease-out);
+}
+
+.slot-picker__slot:hover:not(:disabled) {
+  transform: translateY(-3px);
+  background: rgba(106, 43, 174, 0.16);
+}
+
+.slot-picker__slot.is-selected {
+  border-style: solid;
+  background: var(--c-gold);
+}
+
+.compare-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  flex-wrap: wrap;
+}
+
+.compare-dialog__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+
+.compare-dialog__vs {
+  font-family: var(--font-title);
+  font-size: var(--fs-2xl);
+  color: var(--c-violet);
+}
+
+.guess-dialog__inputs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+}
+
+.guess-dialog__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--sp-2) 2px;
+  border-radius: var(--r-md);
+  background: var(--tile-face, rgba(255, 255, 255, 0.8));
+  border: 2px solid rgba(var(--shadow-rgb), 0.2);
+  box-shadow: 0 3px 0 rgba(var(--shadow-rgb), 0.16);
+}
+
+.guess-dialog__input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: clamp(1.2rem, 5vw, 1.9rem);
+  font-weight: 600;
+}
+
+.guess-dialog__cell[data-color] .guess-dialog__input {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.45);
+}
+
+.guess-dialog__input:focus {
+  outline: none;
+}
+
+.guess-dialog__cell:focus-within {
+  outline: 3px solid var(--c-violet);
+  outline-offset: 2px;
+}
+
+.guess-dialog__preview {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* --- Fin de partie --------------------------------------------------------- */
+
+.game-over {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  background: rgba(var(--shadow-rgb), 0.6);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+
+.game-over__card {
+  width: min(760px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  text-align: center;
+  animation: gf-pop-in var(--mo-slow) var(--ease-bounce) both;
+}
+
+.game-over__title {
+  margin-bottom: var(--sp-2);
+}
+
+.game-over__result {
+  font-family: var(--font-title);
+  font-size: var(--fs-xl);
+  color: var(--c-magenta);
+  margin-bottom: var(--sp-4);
+}
+
+.game-over__reveal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-4);
+}
+
+.game-over__player h3 {
+  font-size: var(--fs-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  justify-content: center;
+}
+
+.game-over__tiles {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.game-over__guesses {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-4) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--fs-sm);
+  color: var(--c-ink-soft);
+}
+
+.game-over__actions {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--sp-5);
+}
+
+.game-over__confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.game-over__confetti span {
+  position: absolute;
+  top: -10vh;
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  animation: gf-confetti 2.8s linear infinite;
+}
+
+@media (max-width: 560px) {
+  .guess-dialog__inputs {
+    gap: 4px;
+  }
+
+  .game-over__actions .btn {
+    width: 100%;
+  }
+
+  .modal {
+    padding: var(--sp-4) var(--sp-3);
+  }
+
+  .slot-picker__slot {
+    width: 30px;
+    min-height: 52px;
+    font-size: var(--fs-md);
+  }
+
+  .slot-picker .tile--sm {
+    --tile-w: 34px;
+  }
+
+  .hint-choice {
+    padding: var(--sp-3);
+  }
+
+  .compare-dialog {
+    gap: var(--sp-3);
+  }
+}
+
+/* Preferences de l'accueil : langue et theme, cote a cote puis empiles. */
+.home__prefs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3) var(--sp-5);
+}
+
+/* Sur un telephone, chaque groupe prend sa ligne plutot que de se couper. */
+@media (max-width: 460px) {
+  .home__prefs {
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+}

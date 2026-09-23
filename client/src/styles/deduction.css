@@ -1,0 +1,340 @@
+/* ==========================================================================
+   Fiche de deduction : carton imprime, encre, feutre effacable
+   ========================================================================== */
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background:
+    linear-gradient(var(--c-gloss-wash), var(--c-gloss-wash)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(var(--shadow-rgb), 0.035) 0 1px,
+      transparent 1px 4px
+    ),
+    var(--c-paper);
+  border-radius: var(--r-lg);
+  border: 2px solid var(--c-line-soft);
+  box-shadow: var(--sh-panel);
+}
+
+.sheet--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-panel);
+  border-radius: 0;
+  overflow-y: auto;
+  padding: var(--sp-3);
+  padding-bottom: max(var(--sp-5), env(safe-area-inset-bottom));
+}
+
+.sheet__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.sheet__title {
+  font-family: var(--font-title);
+  font-size: var(--fs-lg);
+  color: var(--c-violet);
+  margin: 0;
+}
+
+.sheet__subtitle {
+  margin: 0;
+  font-size: var(--fs-xs);
+}
+
+/* --- Les 5 hypotheses ------------------------------------------------------ */
+
+.sheet-guess {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: rgba(106, 43, 174, 0.07);
+  border: 2px dashed rgba(106, 43, 174, 0.28);
+}
+
+.sheet-guess__cells {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-2);
+}
+
+.sheet-guess__cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-2) 2px;
+  border-radius: var(--r-md);
+  background: var(--tile-face, var(--c-field));
+  border: 2px solid var(--c-line);
+  box-shadow: 0 2px 0 rgba(var(--shadow-rgb), 0.18);
+  transition: background var(--mo-base) var(--ease-out);
+}
+
+.sheet-guess__input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: clamp(1.1rem, 4.4vw, 1.8rem);
+  font-weight: 600;
+  color: var(--c-ink);
+  padding: 0;
+}
+
+.sheet-guess__cell[data-color] .sheet-guess__input {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.45);
+}
+
+.sheet-guess__input:focus {
+  outline: none;
+}
+
+.sheet-guess__cell:focus-within {
+  outline: 3px solid var(--c-violet);
+  outline-offset: 2px;
+}
+
+.sheet-guess__points {
+  display: flex;
+  gap: 3px;
+  min-height: 7px;
+}
+
+.sheet-guess__arrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-ink-soft);
+}
+
+.sheet-guess__arrow-line {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(106, 43, 174, 0.25), var(--c-violet));
+  position: relative;
+}
+
+.sheet-guess__arrow-line::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 8px solid var(--c-violet);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+/* --- La grille 1-60 -------------------------------------------------------- */
+
+.sheet__grid-wrap {
+  overflow-x: auto;
+  padding-bottom: var(--sp-1);
+}
+
+.sheet__columns {
+  display: grid;
+  grid-template-columns: 18px repeat(12, minmax(var(--cell-size, 40px), 1fr));
+  gap: 4px;
+  font-size: var(--fs-xs);
+  color: var(--c-ink-soft);
+  text-align: center;
+  padding-left: 22px;
+  margin-bottom: 2px;
+}
+
+.sheet__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100%;
+}
+
+.sheet__row {
+  display: grid;
+  grid-template-columns: 18px repeat(12, minmax(var(--cell-size, 40px), 1fr));
+  gap: 4px;
+  align-items: center;
+}
+
+.sheet__row-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheet__row-chip {
+  width: 12px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  background: var(--tile-face);
+  box-shadow: inset 0 -2px 0 var(--tile-edge);
+}
+
+.sheet__row-label[data-color='green'] {
+  --tile-face: var(--t-green);
+  --tile-edge: var(--t-green-dark);
+}
+.sheet__row-label[data-color='pink'] {
+  --tile-face: var(--t-pink);
+  --tile-edge: var(--t-pink-dark);
+}
+.sheet__row-label[data-color='blue'] {
+  --tile-face: var(--t-blue);
+  --tile-edge: var(--t-blue-dark);
+}
+.sheet__row-label[data-color='red'] {
+  --tile-face: var(--t-red);
+  --tile-edge: var(--t-red-dark);
+}
+.sheet__row-label[data-color='orange'] {
+  --tile-face: var(--t-orange);
+  --tile-edge: var(--t-orange-dark);
+}
+
+/* --- Une case -------------------------------------------------------------- */
+
+.sheet-cell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
+  min-height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px;
+  border: 2px solid var(--c-line);
+  border-radius: var(--r-sm);
+  background: var(--tile-face);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: inset 0 -3px 0 rgba(var(--shadow-rgb), 0.16);
+  transition:
+    transform var(--mo-fast) var(--ease-out),
+    filter var(--mo-fast) var(--ease-out);
+}
+
+.sheet-cell:hover {
+  transform: translateY(-2px) scale(1.04);
+  filter: saturate(1.15);
+  z-index: 2;
+}
+
+.sheet-cell:active {
+  transform: scale(0.96);
+}
+
+.sheet-cell__number {
+  font-family: var(--font-title);
+  font-size: clamp(0.9rem, 2.6vw, 1.15rem);
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.4);
+}
+
+.sheet-cell__points {
+  display: flex;
+  gap: 2px;
+}
+
+.sheet-cell__dot,
+.sheet-guess__points .sheet-cell__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 1px rgba(var(--shadow-rgb), 0.35);
+}
+
+.sheet-cell__revealed {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  box-shadow: 0 0 0 2px rgba(var(--shadow-rgb), 0.25);
+}
+
+.sheet-cell.is-crossed {
+  filter: saturate(0.72) brightness(0.95);
+}
+
+/* Croix au feutre : trait epais, legerement irregulier et translucide. */
+.sheet-cell__cross {
+  position: absolute;
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  pointer-events: none;
+  animation: gf-pop-in 160ms var(--ease-bounce) both;
+}
+
+.sheet-cell__stroke {
+  fill: none;
+  stroke: rgba(30, 10, 48, 0.82);
+  stroke-width: 4.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0.2 3.4;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 1px rgba(30, 10, 48, 0.35));
+}
+
+.sheet-cell__stroke--second {
+  stroke: rgba(30, 10, 48, 0.7);
+  stroke-width: 4.1;
+}
+
+.sheet__legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  box-shadow: 0 0 0 2px rgba(var(--shadow-rgb), 0.2);
+  vertical-align: middle;
+}
+
+.sheet__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sheet__legend {
+  font-size: var(--fs-xs);
+  margin: 0;
+}
+
+.sheet__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .sheet__grid-wrap {
+    --cell-size: 42px;
+  }
+}

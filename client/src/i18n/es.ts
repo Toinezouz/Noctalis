@@ -1,0 +1,364 @@
+/**
+ * Textos espanoles de l'interface. Les cles sont exactement celles du
+ * francais (`Messages` l'impose a la compilation).
+ */
+import type { Messages } from './fr.js';
+
+export const es: Messages = {
+  // --- Generico ------------------------------------------------------------
+  'app.title': 'GOT FIVE! — El juego de lógica y deducción',
+  'common.cancel': 'Cancelar',
+  'common.back': 'Volver',
+  'common.close': 'Cerrar',
+  'common.understood': 'Entendido',
+  'common.you': '(tú)',
+  'common.online': 'en línea',
+  'common.offline': 'desconectado',
+  'common.loading': 'Un momento…',
+  'common.point': 'punto',
+  'common.points': 'puntos',
+
+  // --- Colores -------------------------------------------------------------
+  'color.green': 'verde',
+  'color.pink': 'rosa',
+  'color.blue': 'azul',
+  'color.red': 'rojo',
+  'color.orange': 'naranja',
+
+  // --- Huecos de ORDENAR ---------------------------------------------------
+  'slot.0': 'Antes de la 1.ª',
+  'slot.1': 'Entre la 1.ª y la 2.ª',
+  'slot.2': 'Entre la 2.ª y la 3.ª',
+  'slot.3': 'Entre la 3.ª y la 4.ª',
+  'slot.4': 'Entre la 4.ª y la 5.ª',
+  'slot.5': 'Después de la 5.ª',
+
+  // --- Inicio --------------------------------------------------------------
+  'home.tagline': 'El juego de lógica y deducción',
+  'home.pitch':
+    'Versión en línea para 2 jugadores: tus 5 fichas están ocultas para ti, pero no para tu rival. ¡Dedúcelas antes que él!',
+  'home.create': 'Crear una partida',
+  'home.join': 'Unirse a una partida',
+  'home.help': '¿Cómo se juega?',
+  'home.connected': 'Conectado al servidor',
+  'home.connecting': 'Conectando con el servidor…',
+  'home.createTitle': 'Crear una partida',
+  'home.joinTitle': 'Unirse a una partida',
+  'home.nameLabel': 'Tu apodo',
+  'home.nameHint': 'De {min} a {max} caracteres',
+  'home.codeLabel': 'Código de la partida',
+  'home.codeHint': '{length} caracteres, sin espacios',
+  'home.submitCreate': 'Crear la partida',
+  'home.submitJoin': 'Unirse',
+  'home.language': 'Idioma',
+
+  // --- Sala de espera ------------------------------------------------------
+  'lobby.share': 'Comparte este código con tu rival',
+  'lobby.copy': 'Copiar el código',
+  'lobby.copied': '¡Copiado!',
+  'lobby.waitingPlayer': 'Esperando…',
+  'lobby.waitingHint': 'El segundo jugador debe introducir el código',
+  'lobby.host': 'Anfitrión',
+  'lobby.guest': 'Invitado',
+  'lobby.start': 'Empezar la partida',
+  'lobby.waitingSecond': 'Esperando al segundo jugador…',
+  'lobby.waitingHost': 'El anfitrión va a empezar la partida…',
+  'lobby.leave': 'Salir',
+
+  // --- Barra de juego ------------------------------------------------------
+  'header.roomCode': 'Código de la partida:',
+  'header.gotFive': 'GOT FIVE!',
+  'header.sheet': 'Hoja',
+  'header.soundOn': 'Silenciar',
+  'header.soundOff': 'Activar el sonido',
+  'header.help': 'Cómo se juega',
+  'header.quit': 'Salir de la partida',
+  'header.online': 'En línea',
+  'header.reconnecting': 'Reconectando…',
+  'header.language': 'Cambiar de idioma',
+
+  // --- Indicador de turno --------------------------------------------------
+  // --- Tema ------------------------------------------------------------------
+  'theme.label': 'Tema',
+  'theme.auto': 'Automático',
+  'theme.light': 'Claro',
+  'theme.dark': 'Oscuro',
+  'theme.current': 'Tema: {mode}. Haz clic para cambiar.',
+
+  // --- Ruleta de apertura --------------------------------------------------
+  'roulette.question': '¿Quién empieza?',
+  'roulette.drawing': 'La ruleta gira… decide la suerte.',
+  'roulette.landed': '¡Empieza {name}!',
+  'roulette.youStart': 'La suerte te elige: abres la partida.',
+  'roulette.opponentStarts': '{name} abre la partida. Tú justo después.',
+  'roulette.skip': 'Saltar la animación',
+  'roulette.go': '¡Vamos!',
+
+  'turn.counter': 'Turno {turn}',
+  'turn.gameOver': 'Partida terminada',
+  'turn.gameOverDetail': 'Mira el resultado más abajo.',
+  'turn.mustAnswer': '¡Te toca responder!',
+  'turn.mustClassify': '{name} espera a que ordenes la ficha.',
+  'turn.mustCompare': '{name} espera tu respuesta SÍ / NO.',
+  'turn.hintAsked': 'Pista solicitada',
+  'turn.of': 'Turno de {name}',
+  'turn.waitingClassify': '{name} debe ordenar la ficha…',
+  'turn.waitingCompare': '{name} debe responder SÍ o NO…',
+  'turn.eliminated': 'Estás eliminado',
+  'turn.eliminatedDetail': '{name} termina la partida. Todavía puedes responder a sus pistas.',
+  'turn.yours': '¡TE TOCA!',
+  'turn.yoursReveal': 'Paso 1 de 2: revela una ficha eligiendo un color.',
+  'turn.yoursHint': 'Paso 2 de 2: elige una ficha pública y luego ORDENAR o COMPARAR.',
+  'turn.othersReveal': '{name} está eligiendo un color…',
+  'turn.othersHint': '{name} está preparando su pista…',
+
+  // --- Panel de acción -----------------------------------------------------
+  'action.gameOver': 'La partida ha terminado.',
+  'action.eliminated':
+    'Ya has gastado tu intento de GOT FIVE!. Sigues respondiendo a las pistas de {name}.',
+  'action.waitingReveal': '{name} está eligiendo un color para revelar…',
+  'action.waitingHint': '{name} está eligiendo una ficha y un tipo de pista…',
+  'action.waitingAnswer': '{name} debe responder…',
+  'action.step1': 'Paso 1 / 2',
+  'action.step1Title': 'Revela una ficha',
+  'action.step1Hint': 'Elige un color: el servidor saca al azar una ficha todavía disponible.',
+  'action.step2': 'Paso 2 / 2',
+  'action.step2Title': 'Pide una pista',
+  'action.step2Hint':
+    'Haz clic en cualquier ficha revelada y elige después ORDENAR o COMPARAR.',
+  'action.step2Selected': 'Ficha {tile} seleccionada: elige ORDENAR o COMPARAR.',
+  'action.revealColor': 'Revelar una ficha {color} (quedan {count})',
+  'action.waitingClassifyShort': 'debe ordenar la ficha',
+  'action.waitingAnswerShort': 'debe responder',
+
+  // --- Zona pública --------------------------------------------------------
+  'pool.title': 'Fichas reveladas',
+  'pool.reserve': 'Reserva: quedan {count} fichas',
+  'pool.reserveColor': '{count} ficha(s) {color} en la reserva',
+  'pool.selectable': 'elegir esta ficha para una pista',
+
+  // --- Soportes y fichas ---------------------------------------------------
+  'tile.label': 'Ficha {number}, {color}, {points}',
+  'tile.tilted': 'respuesta NO',
+  'tile.back': 'Mi ficha {position} de 5, {color}, número desconocido',
+  'tile.positionOf': 'posición {position} de {name}',
+  'tile.comparePosition': 'comparar con esta posición',
+  'rack.small': 'pequeño',
+  'rack.big': 'grande',
+  'rack.slotEmpty': '{slot} ficha de {name}: ninguna ficha colocada',
+  'rack.slotFilled': '{slot} ficha de {name}: {count} ficha(s): {tiles}',
+  'rack.compareGroup': 'Comparaciones en la posición {position} de {name}',
+  'rack.compareYes': 'comparada con la posición {position}: SÍ, mismos puntos',
+  'rack.compareNo': 'comparada con la posición {position}: NO, puntos distintos',
+  'rack.opponentZone': 'Zona de {name}',
+  'rack.myZone': 'Mi zona',
+  'rack.waitingOpponent': 'Esperando a un rival…',
+
+  // --- Panel lateral -------------------------------------------------------
+  'side.players': 'Jugadores',
+  'side.history': 'Historial',
+  'side.openSheet': 'Abrir mi hoja de deducción',
+  'side.gameInfo': 'Información de la partida',
+  'status.eliminated': 'Eliminado',
+  'status.gotFiveUsed': 'GOT FIVE! usado',
+  'status.publicZone': 'Zona pública',
+
+  // --- Historial -----------------------------------------------------------
+  'log.title': 'Historial de la partida',
+  'log.empty': 'Nada por ahora.',
+  'log.game-started': '¡Empieza la partida! Hay {count} fichas en el centro.',
+  'log.starting-player': 'Sorteo: empieza {name}.',
+  'log.turn-start': 'Turno {turn}: le toca a {name}.',
+  'log.tile-revealed': '{name} ha revelado la ficha {tile}.',
+  'log.classify-requested': '{name} pide a {opponent} que ORDENE la ficha {tile}.',
+  'log.compare-requested':
+    '{name} pide a {opponent} que COMPARE la ficha {tile} con su posición {position}.',
+  'log.classify-answered': '{name} ha colocado la ficha {tile}: {slot} ficha de {owner}.',
+  'log.compare-answered.yes':
+    '{name} responde SÍ: la ficha {tile} tiene los mismos puntos que la posición {position}.',
+  'log.compare-answered.no':
+    '{name} responde NO: la ficha {tile} no tiene los mismos puntos que la posición {position}.',
+  'log.guess-correct': '{name} intenta GOT FIVE! con {numbers}: ¡exacto!',
+  'log.guess-wrong': '{name} intenta GOT FIVE! con {numbers}: fallo.',
+  'log.player-eliminated': '{name} queda eliminado: {opponent} es el único jugador que sigue.',
+  'log.player-left': '{name} ha salido de la partida.',
+  'log.player-connected': '{name} se ha reconectado.',
+  'log.player-disconnected': '{name} se ha desconectado.',
+  'log.game-over-winner': 'GOT FIVE! ¡{name} gana la partida!',
+  'log.game-over-draw': 'Los dos jugadores han fallado: no gana nadie.',
+  'log.game-over-reserve-empty': 'La reserva está vacía: la partida termina sin ganador.',
+
+  // --- Diálogo de pista ----------------------------------------------------
+  'hint.title': 'Pedir una pista sobre la ficha {tile}',
+  'hint.classify': 'ORDENAR',
+  'hint.classifyText':
+    '{name} coloca esta ficha entre tus 5 fichas secretas: antes de la 1.ª, entre dos fichas o después de la 5.ª.',
+  'hint.compare': 'COMPARAR',
+  'hint.compareText':
+    '{name} dice SÍ o NO: ¿esta ficha tiene los mismos puntos que una de tus posiciones?',
+  'hint.choosePosition':
+    'Elige la posición que quieres comparar. Solo cuentan los puntos, nunca el color.',
+  'hint.confirmCompare': 'Pedir la comparación',
+
+  // --- Diálogo ORDENAR (respuesta) -----------------------------------------
+  'classify.title': '{name} te pide ORDENAR la ficha {tile}',
+  'classify.instruction':
+    'Coloca la ficha {tile} en el lugar correcto entre las fichas de {name}, que solo tú ves.',
+  'classify.choose': 'Elige una posición',
+  'classify.confirm': 'Confirmar: {slot}',
+  'classify.pickerLabel': 'Elige la posición de la ficha',
+  'classify.slotAria': '{slot}: colocar aquí la ficha {tile}',
+
+  // --- Diálogo COMPARAR (respuesta) ----------------------------------------
+  'compare.title': '{name} te pide COMPARAR',
+  'compare.publicTile': 'Ficha pública',
+  'compare.positionOf': 'Posición {position} de {name}',
+  'compare.question':
+    '¿Mismos puntos? La respuesta exacta es {answer}. Confírmala para enviarla.',
+  'compare.answer': 'Responder {answer}',
+  'compare.yes': 'SÍ',
+  'compare.no': 'NO',
+
+  // --- Diálogo GOT FIVE! ---------------------------------------------------
+  'guess.title': 'GOT FIVE! — tu intento final',
+  'guess.warning':
+    'Un solo intento por jugador. Si los 5 números son exactos, ganas de inmediato. Un solo error y quedas eliminado.',
+  'guess.inputAria': 'Número {index} de 5',
+  'guess.submit': '¡Lo intento!',
+  'guess.confirm': '¿Confirmas estos {count} números entre 1 y {max}?',
+  'guess.errorCount': 'Hacen falta exactamente {count} números.',
+  'guess.errorRange': 'Cada número debe ser un entero entre 1 y {max}.',
+  'guess.errorOrder': 'Los números deben ir en orden creciente, sin repeticiones.',
+  'guess.errorColors': 'Tu propuesta debe incluir una ficha de cada color.',
+
+  // --- Hoja de deducción ---------------------------------------------------
+  'sheet.title': 'Mi hoja de deducción',
+  'sheet.subtitle': 'Privada: ni el servidor ni tu rival la ven.',
+  'sheet.close': 'Volver al juego',
+  'sheet.gridLabel': 'Cuadrícula de los {count} números',
+  'sheet.rowLabel': 'Fila {color}',
+  'sheet.cellLabel': 'Número {number}, {color}, {points}, {state}',
+  'sheet.cellCrossed': 'eliminado',
+  'sheet.cellAvailable': 'no eliminado',
+  'sheet.cellRevealed': 'ya revelada en el centro',
+  'sheet.guessAria': 'Hipótesis número {index} de {count}',
+  'sheet.legend':
+    'Haz clic en un número para tacharlo y vuelve a hacer clic para restaurarlo. Las fichas ya reveladas en el centro llevan una marca:',
+  'sheet.legendEnd': 'tú decides qué eliminar.',
+  'sheet.crossedCount': '{count} / {total} tachados',
+  'sheet.useForGotFive': 'Usar para GOT FIVE!',
+  'sheet.reset': 'Borrar mis deducciones',
+  'sheet.resetTitle': '¿Borrar toda la hoja?',
+  'sheet.resetText':
+    'Se restaurarán todos los números tachados y se borrarán las 5 hipótesis. La partida en curso no cambia.',
+  'sheet.resetConfirm': 'Borrar todo',
+  'sheet.smaller': 'más pequeño',
+  'sheet.bigger': 'más grande',
+
+  // --- Fin de la partida ---------------------------------------------------
+  'over.winnerYou': 'Victoria de {name}: ¡enhorabuena, eres tú!',
+  'over.winnerOther': '¡{name} ha ganado!',
+  'over.draw': 'Nadie gana esta partida.',
+  'over.guessLine': '{name} ha intentado {numbers}:',
+  'over.guessOk': 'exacto',
+  'over.guessKo': 'fallo',
+  'over.replay': 'Jugar otra vez',
+  'over.waitingReplay': 'Esperando a tu rival…',
+  'over.home': 'Volver al inicio',
+  'over.opponentWantsReplay': '¡Tu rival quiere jugar otra vez!',
+  'over.opponentLeft': 'Tu rival ha salido de la partida.',
+
+  // --- Notificaciones ------------------------------------------------------
+  'toast.revealed': '{name} ha revelado la ficha {tile}.',
+  'toast.yourAnswer': '¡Te toca responder!',
+  'toast.wrongClassify':
+    'Atención: tu colocación era incorrecta, el servidor ha puesto la ficha en su sitio.',
+  'toast.compareResult': 'Respuesta: {answer} (ficha {tile} / posición {position}).',
+  'toast.yourTurn': '¡Te toca!',
+  'toast.turnOf': 'Turno de {name}.',
+  'toast.guessFailedMine': '¡Fallo! Tu intento de GOT FIVE! se ha consumido.',
+  'toast.guessFailedOther': '{name} se ha equivocado y queda eliminado.',
+  'toast.joined': '¡{name} se ha unido a la partida!',
+  'toast.reconnected': '{name} ha vuelto.',
+  'toast.opponentLeft': '{name} se ha desconectado. La partida te espera.',
+  'banner.offline': 'Conexión perdida — reconectando automáticamente…',
+  'banner.opponentOffline':
+    '{name} se ha desconectado. La partida se conserva, puede volver en cualquier momento.',
+
+  // --- Errores del servidor ------------------------------------------------
+  'error.PLAYER_NOT_FOUND': 'Ya no estás en esta partida.',
+  'error.NOT_YOUR_TURN': 'No es tu turno.',
+  'error.WRONG_PHASE': 'Esta acción no es posible ahora mismo.',
+  'error.INVALID_COLOR': 'Color no válido.',
+  'error.COLOR_EXHAUSTED': 'No queda ninguna ficha de ese color en la reserva.',
+  'error.TILE_NOT_PUBLIC': 'Esa ficha no está en la zona pública.',
+  'error.INVALID_POSITION': 'Posición no válida.',
+  'error.INVALID_SLOT': 'Hueco no válido.',
+  'error.NOT_RESPONDER': 'No te toca responder a ti.',
+  'error.GUESS_ALREADY_USED': 'Ya has usado tu intento de GOT FIVE!.',
+  'error.INVALID_GUESS': 'Propuesta no válida.',
+  'error.PLAYER_ELIMINATED': 'Ya has usado tu intento de GOT FIVE!.',
+  'error.GAME_OVER': 'La partida ha terminado.',
+  'error.NOT_ENOUGH_PLAYERS': 'Hacen falta dos jugadores.',
+  'error.ROOM_NOT_FOUND': 'Esta partida no existe (o ha caducado).',
+  'error.ROOM_FULL': 'Esta partida ya está completa.',
+  'error.ROOM_FINISHED': 'Esta partida ya ha terminado.',
+  'error.NAME_TAKEN': 'Ese apodo ya está en uso en esta partida.',
+  'error.BAD_TOKEN': 'Sesión caducada: únete a la partida con el código.',
+  'error.SERVER_BUSY': 'El servidor está saturado, inténtalo dentro de un momento.',
+  'error.INVALID_NAME': 'Apodo no válido.',
+  'error.INVALID_CODE': 'Código de partida no válido.',
+  'error.network': 'El servidor no responde. Inténtalo de nuevo.',
+
+  // --- Reglas --------------------------------------------------------------
+  'howto.title': 'Cómo se juega a GOT FIVE!',
+  'howto.1.title': '1. Tus 5 fichas están ocultas… para ti',
+  'howto.1.text':
+    'Ves su color y su posición, nunca su número. Tu rival, en cambio, las ve enteras.',
+  'howto.2.title': '2. Una ficha de cada color, de menor a mayor',
+  'howto.2.text':
+    'Las 60 fichas van del 1 al 60. El número determina el color y la cantidad de puntos (1, 2 o 3 puntos, debajo del número).',
+  'howto.3.title': '3. Al principio se revelan 5 fichas en el centro',
+  'howto.3.text': 'Una de cada color. Siguen visibles hasta el final de la partida.',
+  'howto.4.title': '4. En tu turno: revela una ficha',
+  'howto.4.text':
+    'Eliges un color, el servidor saca al azar una ficha disponible y pasa a la zona pública.',
+  'howto.5.title': '5. Después pide una pista',
+  'howto.5.text': 'Elige cualquier ficha pública y luego:',
+  'howto.5.note':
+    'La ficha elegida sale del centro: pasa a tu soporte y ya no puede usarse para otra pista.',
+  'howto.5.classify':
+    'ORDENAR: tu rival coloca esa ficha entre tus 5 fichas secretas (6 posiciones posibles: antes de la 1.ª, entre dos fichas o después de la 5.ª).',
+  'howto.5.compare':
+    'COMPARAR: señalas una de tus posiciones y tu rival responde SÍ o NO según si la ficha tiene los mismos puntos que tu ficha secreta. El color no cuenta. Una respuesta NO inclina la ficha.',
+  'howto.6.title': '6. Anota tus deducciones',
+  'howto.6.text':
+    'Tu hoja del 1 al 60 es privada: tacha los números imposibles con un clic y escribe arriba tus 5 hipótesis. Nada se tacha solo: el razonamiento es tuyo.',
+  'howto.7.title': '7. Canta GOT FIVE!',
+  'howto.7.text':
+    'En cuanto creas conocer tus 5 números, inténtalo — en tu turno o en el de tu rival. Un solo intento por jugador: si aciertas, ganas; si fallas, quedas eliminado.',
+
+  // --- Tutorial ------------------------------------------------------------
+  'onboarding.title': 'En 20 segundos',
+  'onboarding.skip': 'Saltar',
+  'onboarding.next': 'Siguiente',
+  'onboarding.play': '¡A jugar!',
+  'onboarding.step': 'Paso {current} de {total}',
+  'onboarding.1.title': 'Tus fichas, abajo',
+  'onboarding.1.text': 'Ves su color y su posición, nunca su número: ahí está el reto.',
+  'onboarding.2.title': 'Las fichas del rival, arriba',
+  'onboarding.2.text': 'Ves sus números: tu rival, en cambio, no ve los suyos.',
+  'onboarding.3.title': 'La zona pública, en el centro',
+  'onboarding.3.text':
+    'Las fichas reveladas esperan ahí; la que se usa para una pista pasa luego a un soporte.',
+  'onboarding.4.title': 'ORDENAR',
+  'onboarding.4.text':
+    'Tu rival coloca una ficha pública entre tus 5 fichas: 6 posiciones posibles.',
+  'onboarding.5.title': 'COMPARAR',
+  'onboarding.5.text': 'SÍ o NO: ¿la ficha tiene los mismos puntos que una de tus posiciones?',
+  'onboarding.6.title': 'Tu hoja de deducción',
+  'onboarding.6.text':
+    'Tacha los números imposibles y anota tus hipótesis. Es totalmente privada.',
+  'onboarding.7.title': 'GOT FIVE!',
+  'onboarding.7.text': 'Un solo intento: canta tus 5 números cuando estés seguro.',
+};
