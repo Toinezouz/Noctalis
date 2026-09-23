@@ -9,8 +9,8 @@ on a pull request.
 You need **Node.js 20 or later**.
 
 ```bash
-git clone https://github.com/Toinezouz/Noctalis.git
-cd Noctalis
+git clone https://github.com/Toinezouz/Umbrastra.git
+cd Umbrastra
 npm install
 npm run dev
 ```

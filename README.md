@@ -8,7 +8,7 @@ browser. Free, open source, no account, no ads.
 *Umbra* is the shadow and *astra* the stars: the stars in the shadow are
 yours. (Until version 1.3, the game was called NOCTALIS.)
 
-[![CI](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml/badge.svg)](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml)
+[![CI](https://github.com/Toinezouz/Umbrastra/actions/workflows/ci.yml/badge.svg)](https://github.com/Toinezouz/Umbrastra/actions/workflows/ci.yml)
 [![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
 **▶ [Play now at umbrastra.onrender.com](https://umbrastra.onrender.com)**
@@ -142,7 +142,7 @@ Render sets by itself.
 ### How the code is organised
 
 ```
-Noctalis/
+Umbrastra/
 ├── shared/          the game engine — no React, no Socket.IO
 │   └── src/
 │       ├── data/        the 60 stars, single source of truth
@@ -178,8 +178,8 @@ the sounds are synthesised on the fly. See [docs/ASSETS.md](docs/ASSETS.md).
 You need **Node.js 20 or later**.
 
 ```bash
-git clone https://github.com/Toinezouz/Noctalis.git
-cd Noctalis
+git clone https://github.com/Toinezouz/Umbrastra.git
+cd Umbrastra
 npm install
 npm run dev
 ```

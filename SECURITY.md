@@ -8,7 +8,7 @@ before it is fixed.
 
 Use **GitHub Security Advisories** instead: the *Security* tab of the
 repository, then *Report a vulnerability*
-([direct link](https://github.com/Toinezouz/Noctalis/security/advisories/new)).
+([direct link](https://github.com/Toinezouz/Umbrastra/security/advisories/new)).
 It opens a private discussion with the maintainer and lets us publish an
 advisory once the fix is live.
 

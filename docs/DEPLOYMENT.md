@@ -52,10 +52,9 @@ link previews now say UMBRASTRA.
   `noctalis.onrender.com` stop working at that point. If the name
   `umbrastra` is already taken on `onrender.com`, Render adds a suffix to the
   address: the links in the README must then be updated to the real one.
-- **The GitHub repository** is still `Toinezouz/Noctalis`. Renaming it is
-  done on GitHub (Settings → General → Repository name), and GitHub then
-  redirects the old address, clones included. The links in the README,
-  `package.json` and `client/src/lib/project.ts` will be updated after that.
+- **The GitHub repository** is now `Toinezouz/Umbrastra`. GitHub redirects
+  the old address (`Toinezouz/Noctalis`), clones and remotes included, but
+  the links in the project point to the new one.
 
 Browsers keep their saved settings: `noctalis:*` storage keys are carried
 over to `umbrastra:*` on the first visit (`migrateLegacyStorage`).

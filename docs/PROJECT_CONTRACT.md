@@ -70,7 +70,7 @@ The name NOCTALIS was already in wide use (see `PROJECT_IDENTITY.md`).
 | storage keys `noctalis:*` | `umbrastra:*`, carried over once by `migrateLegacyStorage()` | new name, nobody loses their settings |
 | every displayed `NOCTALIS` | `UMBRASTRA` | new name |
 | Render service `noctalis` (`noctalis.onrender.com`) | `umbrastra` (`umbrastra.onrender.com`), a new service | an `onrender.com` address never changes; see `DEPLOYMENT.md`, *The name change* |
-| — | unchanged for now: GitHub repository `Toinezouz/Noctalis` | renamed on GitHub by its owner |
+| GitHub repository `Toinezouz/Noctalis` | `Toinezouz/Umbrastra` (GitHub redirects the old address) | new name |
 
 ## 1. Data types (`@umbrastra/shared`)
 

@@ -9,7 +9,7 @@ export const PROJECT_NAME = 'UMBRASTRA';
 export const PROJECT_VERSION = '1.4.0';
 
 export const GITHUB_OWNER = 'Toinezouz';
-export const GITHUB_REPO = 'Noctalis';
+export const GITHUB_REPO = 'Umbrastra';
 export const GITHUB_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}`;
 
 /**
