@@ -1,4 +1,4 @@
-import { MIN_PLAYERS, getTileByNumber, type PublicGameState } from '@noctalis/shared';
+import { MIN_PLAYERS, getTileByNumber, type PublicGameState } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Tile } from '../../components/game/Tile.js';

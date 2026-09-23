@@ -1,5 +1,5 @@
 /**
- * Types describing the NOCTALIS material: 60 stars, their constellations and
+ * Types describing the UMBRASTRA material: 60 stars, their constellations and
  * their brightness. The data itself lives in `shared/src/data/tiles.ts`, the
  * single source of truth of the game.
  */

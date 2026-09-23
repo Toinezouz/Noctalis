@@ -1,4 +1,4 @@
-import { type GameState, type PlayerSeed, type Rng, createGame, createSeededRng } from '@noctalis/shared';
+import { type GameState, type PlayerSeed, type Rng, createGame, createSeededRng } from '@umbrastra/shared';
 
 /** The two players of the test scenarios: Alice hosts. */
 export const PLAYER_SEEDS: PlayerSeed[] = [

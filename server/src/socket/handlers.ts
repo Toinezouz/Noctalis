@@ -29,7 +29,7 @@ import {
   validateNumberList,
   validateRoomCode,
   validateTileNumber,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { RateLimiter, RATE_LIMITS } from '../security/rateLimit.js';
 import type { JoinError, Room, RoomManager } from '../rooms/RoomManager.js';
 

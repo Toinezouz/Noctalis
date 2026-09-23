@@ -1,4 +1,4 @@
-import type { TileColor } from '@noctalis/shared';
+import type { TileColor } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { ConstellationSigil } from './ConstellationSigil.js';
 

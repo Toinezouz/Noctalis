@@ -1,4 +1,4 @@
-# NOCTALIS technical contract
+# UMBRASTRA technical contract
 
 > **Source of truth for signatures.** Every name, signature and event listed
 > here is fixed. A file that departs from it is at fault, not the contract.
@@ -13,9 +13,9 @@
 
 | Before | After | Why |
 | --- | --- | --- |
-| `@gotfive/shared` · `@gotfive/server` · `@gotfive/client` | `@noctalis/shared` · `@noctalis/server` · `@noctalis/client` | identity |
+| `@gotfive/shared` · `@gotfive/server` · `@gotfive/client` | `@umbrastra/shared` · `@umbrastra/server` · `@umbrastra/client` | identity |
 | `GameOverReason = 'got-five'` | `GameOverReason = 'constellation'` | identity, value sent over the network |
-| `gotfive:*` storage keys | `noctalis:*` | identity |
+| `gotfive:*` storage keys | `umbrastra:*` | identity |
 | `data-testid="got-five-button"` | `data-testid="announce-button"` | identity |
 | `data-testid="got-five-input-N"` | `data-testid="announce-input-N"` | identity |
 | prop `gotFiveDisabled` | `announceDisabled` | identity |
@@ -38,7 +38,7 @@ The rest of the engine keeps its names: they describe mechanisms, not a brand.
 
 ### 1.2 — invite links and link previews
 
-Additions only; no signature of `@noctalis/shared` changes.
+Additions only; no signature of `@umbrastra/shared` changes.
 
 | Before | After | Why |
 | --- | --- | --- |
@@ -60,7 +60,18 @@ or dark, and a first visit starts dark. A stored `'auto'` becomes `'dark'`.
 | `data-testid` `theme-auto`, `theme-cycle` | `theme-toggle` (game header) | same |
 | key `theme.auto` | removed | same |
 
-## 1. Data types (`@noctalis/shared`)
+### 1.4 — the game becomes UMBRASTRA
+
+The name NOCTALIS was already in wide use (see `PROJECT_IDENTITY.md`).
+
+| Before | After | Why |
+| --- | --- | --- |
+| `@noctalis/shared` · `@noctalis/server` · `@noctalis/client`, root package `noctalis` | `@umbrastra/*`, `umbrastra` | new name |
+| storage keys `noctalis:*` | `umbrastra:*`, carried over once by `migrateLegacyStorage()` | new name, nobody loses their settings |
+| every displayed `NOCTALIS` | `UMBRASTRA` | new name |
+| — | unchanged for now: Render service `noctalis` (and its address), GitHub repository `Toinezouz/Noctalis` | see `DEPLOYMENT.md`, *The name change* |
+
+## 1. Data types (`@umbrastra/shared`)
 
 ```ts
 type TileColor = 'green' | 'pink' | 'blue' | 'red' | 'orange';
@@ -288,7 +299,7 @@ Render uses.
 ## 11. Server
 
 ```ts
-function createNoctalisServer(options: ServerOptions): NoctalisServer;
+function createUmbrastraServer(options: ServerOptions): UmbrastraServer;
 
 interface ServerOptions {
   env?: string;
@@ -298,7 +309,7 @@ interface ServerOptions {
   strictLeakCheck?: boolean;
   logRefusals?: boolean;
 }
-interface NoctalisServer { app; httpServer; io; rooms: RoomManager; close(): Promise<void> }
+interface UmbrastraServer { app; httpServer; io; rooms: RoomManager; close(): Promise<void> }
 
 class Room {
   readonly code: string;
@@ -396,9 +407,9 @@ function applyTheme(theme: Theme): void;
 
 | Key | Content |
 | --- | --- |
-| `noctalis:session` | reconnection credentials (never a game secret) |
-| `noctalis:prefs` | name, sound, tutorial seen, language, theme |
-| `noctalis:sheet:<code>:<playerId>` | personal star chart |
+| `umbrastra:session` | reconnection credentials (never a game secret) |
+| `umbrastra:prefs` | name, sound, tutorial seen, language, theme |
+| `umbrastra:sheet:<code>:<playerId>` | personal star chart |
 
 ## 17. Environment variables
 

@@ -1,5 +1,8 @@
 # Migration audit
 
+> The project was called **NOCTALIS** up to version 1.3 and was renamed
+> **UMBRASTRA** in 1.4. This record keeps the name used at the time.
+
 > A record of how NOCTALIS 1.0 was derived from an earlier personal project
 > (GOT FIVE!): what the copy kept, what it replaced, and why. Versions after
 > 1.0 (tables of up to four, English, the astrolabe look) are described in

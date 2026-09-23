@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { COLOR_ORDER, SHEET_GRID, TILE_COUNT } from '@noctalis/shared';
+import { COLOR_ORDER, SHEET_GRID, TILE_COUNT } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { IconButton } from '../../components/ui/IconButton.js';

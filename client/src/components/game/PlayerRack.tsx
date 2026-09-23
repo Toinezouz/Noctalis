@@ -1,4 +1,4 @@
-import type { ClassifyResult, CompareResult, Tile as TileData, TileColor } from '@noctalis/shared';
+import type { ClassifyResult, CompareResult, Tile as TileData, TileColor } from '@umbrastra/shared';
 import { Paravent } from './Paravent.js';
 import { Rack } from './Rack.js';
 

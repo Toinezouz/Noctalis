@@ -1,13 +1,25 @@
-# Project identity — NOCTALIS
+# Project identity — UMBRASTRA
 
 ## Name
 
-**NOCTALIS**
+**UMBRASTRA**
 
-An invented word, from Latin *nox / noctis* (the night). The same in every
-language: nothing to translate, nothing to decline. It has no link, in sound
-or in meaning, with the game whose technical architecture this project
-started from.
+An invented word made of two Latin ones: *umbra*, the shadow, and *astra*,
+the stars. **The stars in the shadow**: that is the whole game, where your own
+five stars stay hidden from you while everyone else's shine in plain sight.
+
+It reads the same in English, French and Spanish, with nothing to translate
+or decline, and it has no link, in sound or in meaning, with the game whose
+technical architecture this project started from.
+
+### Why not NOCTALIS any more
+
+The game was called NOCTALIS up to version 1.3. A search in September 2026
+showed the name was already widely used: an independent game studio on
+itch.io, a French digital agency, a bat museum in Germany (open since 2006),
+a novel series and several musicians. UMBRASTRA had no such use as a game,
+app or brand in that search. That search was not a trademark clearance:
+check the trademark registers (INPI, EUIPO) before any commercial use.
 
 ## Tagline
 
@@ -134,7 +146,7 @@ matters for colour-blind players.
 
 ## Positioning
 
-NOCTALIS is an **independent open-source project**. It is not affiliated with
+UMBRASTRA is an **independent open-source project**. It is not affiliated with
 any publisher, reuses no protected content, and does not present itself as
 the official version of any existing game. It reuses the technical
 architecture of an earlier personal project by the same author, which this

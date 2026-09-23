@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#070b1a" />
     <meta
       name="description"
-      content="NOCTALIS - an online deduction game for 2 to 4 people. Free and open source."
+      content="UMBRASTRA - an online deduction game for 2 to 4 people. Free and open source."
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!--
@@ -16,8 +16,8 @@
     -->
     <!-- preview:start -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="NOCTALIS" />
-    <meta property="og:title" content="NOCTALIS - Find your constellation before anyone else" />
+    <meta property="og:site_name" content="UMBRASTRA" />
+    <meta property="og:title" content="UMBRASTRA - Find your constellation before anyone else" />
     <meta
       property="og:description"
       content="You can see everyone's stars except your own. A free online deduction game for 2 to 4 people: no sign-up, no ads."
@@ -25,7 +25,7 @@
     <meta property="og:image" content="/og-image.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <!-- preview:end -->
-    <title>NOCTALIS - Find your constellation before anyone else</title>
+    <title>UMBRASTRA - Find your constellation before anyone else</title>
     <script>
       /*
         The chosen theme is set BEFORE the first paint: without it, someone
@@ -36,7 +36,10 @@
       */
       (function () {
         try {
-          var raw = window.localStorage.getItem('noctalis:prefs');
+          // 'noctalis:prefs': the name of the game up to version 1.3.
+          var raw =
+            window.localStorage.getItem('umbrastra:prefs') ||
+            window.localStorage.getItem('noctalis:prefs');
           if (raw && JSON.parse(raw).theme === 'light') {
             document.documentElement.dataset.theme = 'light';
             var meta = document.querySelector('meta[name="theme-color"]');

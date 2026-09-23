@@ -1,5 +1,5 @@
 import { randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
-import { ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH } from '@noctalis/shared';
+import { ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH } from '@umbrastra/shared';
 
 /** Opaque identifier (player, internal room...). */
 export function createId(prefix: string): string {

@@ -13,19 +13,19 @@ import {
   PREVIEW_END,
   PREVIEW_START,
 } from '../../server/src/http/preview.js';
-import { createNoctalisServer, type NoctalisServer } from '../../server/src/createServer.js';
+import { createUmbrastraServer, type UmbrastraServer } from '../../server/src/createServer.js';
 import { buildInviteLink, readInviteCode } from '../../client/src/lib/invite.js';
 
 const TEMPLATE = `<!doctype html><html><head>
     ${PREVIEW_START}
     <meta property="og:title" content="default" />
     ${PREVIEW_END}
-    <title>NOCTALIS</title></head><body><div id="root"></div></body></html>`;
+    <title>UMBRASTRA</title></head><body><div id="root"></div></body></html>`;
 
 describe('Invite links (client side)', () => {
   it('builds a link that carries the code and the language', () => {
-    const link = buildInviteLink('https://noctalis.example', 'AB7K9', 'fr');
-    expect(link).toBe('https://noctalis.example/?join=AB7K9&lang=fr');
+    const link = buildInviteLink('https://umbrastra.example', 'AB7K9', 'fr');
+    expect(link).toBe('https://umbrastra.example/?join=AB7K9&lang=fr');
     expect(readInviteCode(new URL(link).search)).toBe('AB7K9');
   });
 
@@ -40,20 +40,20 @@ describe('Invite links (client side)', () => {
 
 describe('Link preview tags', () => {
   it('uses absolute addresses when the origin is known', () => {
-    const tags = buildPreviewTags({ origin: 'https://noctalis.example', lang: 'en', inviteCode: null });
-    expect(tags).toContain('<meta property="og:image" content="https://noctalis.example/og-image.jpg" />');
-    expect(tags).toContain('<meta property="og:url" content="https://noctalis.example/" />');
+    const tags = buildPreviewTags({ origin: 'https://umbrastra.example', lang: 'en', inviteCode: null });
+    expect(tags).toContain('<meta property="og:image" content="https://umbrastra.example/og-image.jpg" />');
+    expect(tags).toContain('<meta property="og:url" content="https://umbrastra.example/" />');
     expect(tags).toContain('<meta name="twitter:card" content="summary_large_image" />');
   });
 
   it('gives invite links their own card, in the language of the person sharing', () => {
-    const fr = buildPreviewTags({ origin: 'https://noctalis.example', lang: 'fr', inviteCode: 'AB7K9' });
-    expect(fr).toContain('content="Une partie de NOCTALIS t’attend"');
+    const fr = buildPreviewTags({ origin: 'https://umbrastra.example', lang: 'fr', inviteCode: 'AB7K9' });
+    expect(fr).toContain('content="Une partie d’UMBRASTRA t’attend"');
     expect(fr).toContain('Code de la partie : AB7K9.');
-    expect(fr).toContain('<meta property="og:url" content="https://noctalis.example/?join=AB7K9" />');
+    expect(fr).toContain('<meta property="og:url" content="https://umbrastra.example/?join=AB7K9" />');
     expect(fr).toContain('content="fr_FR"');
     const es = buildPreviewTags({ origin: null, lang: 'es', inviteCode: 'AB7K9' });
-    expect(es).toContain('Te espera una partida de NOCTALIS');
+    expect(es).toContain('Te espera una partida de UMBRASTRA');
     // Without a trusted origin, no og:url and a relative image.
     expect(es).not.toContain('og:url');
     expect(es).toContain('content="/og-image.jpg"');
@@ -79,7 +79,7 @@ describe('Link preview tags', () => {
   it('replaces only the block between the markers', () => {
     const html = renderIndexHtml(TEMPLATE, { origin: null, lang: 'en', inviteCode: null });
     expect(html).not.toContain('content="default"');
-    expect(html).toContain('<title>NOCTALIS</title>');
+    expect(html).toContain('<title>UMBRASTRA</title>');
     expect(html.indexOf(PREVIEW_START)).toBeLessThan(html.indexOf('og:title'));
     expect(html.indexOf('og:title')).toBeLessThan(html.indexOf(PREVIEW_END));
     // A page without markers is served as is.
@@ -107,19 +107,19 @@ describe('Public origin', () => {
 });
 
 describe('The server fills in the preview', () => {
-  let server: NoctalisServer;
+  let server: UmbrastraServer;
   let base = '';
   let dist = '';
 
   beforeAll(async () => {
-    dist = mkdtempSync(path.join(tmpdir(), 'noctalis-dist-'));
+    dist = mkdtempSync(path.join(tmpdir(), 'umbrastra-dist-'));
     writeFileSync(path.join(dist, 'index.html'), TEMPLATE);
     writeFileSync(path.join(dist, 'og-image.jpg'), 'not really a jpeg');
-    server = createNoctalisServer({
+    server = createUmbrastraServer({
       env: 'test',
       serveClient: true,
       clientDist: dist,
-      publicUrl: 'https://noctalis.example',
+      publicUrl: 'https://umbrastra.example',
     });
     await new Promise<void>((resolve) => {
       server.httpServer.listen(0, () => {
@@ -139,14 +139,14 @@ describe('The server fills in the preview', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toContain('text/html');
     const html = await res.text();
-    expect(html).toContain('content="https://noctalis.example/og-image.jpg"');
+    expect(html).toContain('content="https://umbrastra.example/og-image.jpg"');
     expect(html).toContain('Find your constellation before anyone else');
   });
 
   it('serves an invite link with its own card', async () => {
     const html = await (await fetch(`${base}/?join=ab7k9&lang=fr`)).text();
     expect(html).toContain('Code de la partie : AB7K9.');
-    expect(html).toContain('content="https://noctalis.example/?join=AB7K9"');
+    expect(html).toContain('content="https://umbrastra.example/?join=AB7K9"');
   });
 
   it('ignores a malformed invite', async () => {

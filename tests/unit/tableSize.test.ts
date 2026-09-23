@@ -23,7 +23,7 @@ import {
   submitGuess,
   toPlayerPrivateState,
   toPublicGameState,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 
 const NAMES = ['Alice', 'Bob', 'Chloe', 'Dany'];
 

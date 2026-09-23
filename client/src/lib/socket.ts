@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-import type { Ack, ClientToServerEvents, ServerToClientEvents } from '@noctalis/shared';
+import type { Ack, ClientToServerEvents, ServerToClientEvents } from '@umbrastra/shared';
 
 export type GameClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 

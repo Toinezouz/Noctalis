@@ -1,4 +1,4 @@
-import { getTileByNumber } from '@noctalis/shared';
+import { getTileByNumber } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';

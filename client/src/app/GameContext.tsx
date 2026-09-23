@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { seatsAfter } from '@noctalis/shared';
+import { seatsAfter } from '@umbrastra/shared';
 import type {
   Ack,
   GameError,
@@ -21,7 +21,7 @@ import type {
   RoomState,
   StatePayload,
   TileColor,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { useI18n, type MessageKey } from '../i18n/index.js';
 import { emitWithAck, getSocket } from '../lib/socket.js';
 import { clearSession, loadSession, saveSession } from '../lib/storage.js';

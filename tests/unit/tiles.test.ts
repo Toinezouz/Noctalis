@@ -11,7 +11,7 @@ import {
   isValidTileNumber,
   pointsForNumber,
   tilesOfColor,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 
 /** Reference mapping of the chart: expected constellation for each number. */
 const EXPECTED_COLORS: Record<string, number[]> = {

@@ -28,7 +28,7 @@ export interface CreateServerOptions {
   env?: string;
 }
 
-export interface NoctalisServer {
+export interface UmbrastraServer {
   httpServer: HttpServer;
   io: GameServer;
   rooms: RoomManager;
@@ -36,7 +36,7 @@ export interface NoctalisServer {
   close: () => Promise<void>;
 }
 
-export function createNoctalisServer(options: CreateServerOptions = {}): NoctalisServer {
+export function createUmbrastraServer(options: CreateServerOptions = {}): UmbrastraServer {
   const env = options.env ?? process.env['NODE_ENV'] ?? 'development';
   const origins = options.origins ?? true;
   const strictLeakCheck = options.strictLeakCheck ?? env !== 'production';

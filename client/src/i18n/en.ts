@@ -12,7 +12,7 @@
  */
 export const en = {
   // --- General ------------------------------------------------------------
-  'app.title': 'NOCTALIS — Find your constellation before anyone else',
+  'app.title': 'UMBRASTRA — Find your constellation before anyone else',
   'common.cancel': 'Cancel',
   'common.back': 'Back',
   'common.close': 'Close',
@@ -70,7 +70,7 @@ export const en = {
   'lobby.linkCopied': 'Link copied!',
   'lobby.copyFailed': 'Copying did not work: select the link and copy it yourself.',
   'lobby.orCode': 'or give them the code',
-  'lobby.shareText': 'Come and play NOCTALIS with me! Code: {code}',
+  'lobby.shareText': 'Come and play UMBRASTRA with me! Code: {code}',
   'lobby.freeSeat': 'Free seat',
   'lobby.neededSeat': 'Needed to start',
   'lobby.optionalSeat': 'Open to one more',
@@ -96,12 +96,12 @@ export const en = {
   // --- Support, footer and about -----------------------------------------
   'support.link': 'Support the project',
   'support.text':
-    'NOCTALIS is free and open source. If you enjoy it, you can support its development on GitHub. It is entirely optional: the whole game stays open to everyone, with no account, no ads and nothing to buy.',
+    'UMBRASTRA is free and open source. If you enjoy it, you can support its development on GitHub. It is entirely optional: the whole game stays open to everyone, with no account, no ads and nothing to buy.',
   'footer.code': 'Source code',
   'footer.about': 'About',
-  'about.title': 'About NOCTALIS',
+  'about.title': 'About UMBRASTRA',
   'about.description':
-    'NOCTALIS is an online deduction game for two to four people. Everyone can see everyone else’s stars, never their own — and the first to name their five stars wins.',
+    'UMBRASTRA is an online deduction game for two to four people. Everyone can see everyone else’s stars, never their own — and the first to name their five stars wins.',
   'about.openSource':
     'It is an independent, open project: the rules, the drawings and the code are original, and anyone can read them, improve them or build on them.',
   'about.codeLabel': 'Code',
@@ -335,7 +335,7 @@ export const en = {
   'error.network': 'No answer. Check your connection and try again.',
 
   // --- Rules --------------------------------------------------------------
-  'howto.title': 'How to play NOCTALIS',
+  'howto.title': 'How to play UMBRASTRA',
   'howto.intro':
     'Everyone gets five secret stars. The twist: you can see everybody’s stars except your own. Your goal is to work out your five stars, from the clues the others give you, and be the first to name them.',
   'howto.stars.title': 'Sixty stars, five constellations',

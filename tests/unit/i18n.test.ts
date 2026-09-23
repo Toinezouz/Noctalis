@@ -3,7 +3,7 @@ import { en } from '../../client/src/i18n/en.js';
 import { fr } from '../../client/src/i18n/fr.js';
 import { es } from '../../client/src/i18n/es.js';
 import { detectLanguage, interpolate, LANGUAGES } from '../../client/src/i18n/index.js';
-import { COLOR_ORDER, CLASSIFY_SLOT_COUNT } from '@noctalis/shared';
+import { COLOR_ORDER, CLASSIFY_SLOT_COUNT } from '@umbrastra/shared';
 
 const CATALOGUES = { en, fr, es } as const;
 type Key = keyof typeof en;

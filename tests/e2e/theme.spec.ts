@@ -58,7 +58,7 @@ test.describe('Light and dark themes', () => {
   test('an old "automatic" setting becomes the default theme', async ({ browser }) => {
     const page = await openHome(browser, 'light');
     await page.evaluate(() => {
-      window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'auto' }));
+      window.localStorage.setItem('umbrastra:prefs', JSON.stringify({ theme: 'auto' }));
     });
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');

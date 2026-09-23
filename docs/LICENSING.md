@@ -7,7 +7,7 @@ later version. The full text is in [`LICENSE`](../LICENSE).
 
 ## Why this one
 
-NOCTALIS is a game **played over a network**. That is exactly the situation
+UMBRASTRA is a game **played over a network**. That is exactly the situation
 the AGPL was written for, and what sets it apart from the ordinary GPL.
 
 With a plain GPL, someone could take this code, modify it, host it online and
@@ -18,7 +18,7 @@ other people, you must offer them the corresponding source code.
 In practice, for this project:
 
 - any improvement deployed publicly comes back to the community;
-- nobody can turn NOCTALIS into a closed or paid service;
+- nobody can turn UMBRASTRA into a closed or paid service;
 - the spirit of the project — free, no account, no ads, supported only
   through GitHub Sponsors — is protected by the licence itself, not just by a
   promise.
@@ -48,7 +48,7 @@ Details are in [`ASSETS.md`](ASSETS.md).
 
 ## Where the code comes from
 
-NOCTALIS reuses the technical architecture of an earlier personal project by
+UMBRASTRA reuses the technical architecture of an earlier personal project by
 the same author (rules engine, authoritative server, public/private split,
 design system). The identity, texts, drawings and vocabulary of the game are
 entirely original and made for this project.

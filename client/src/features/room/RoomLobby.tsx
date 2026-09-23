@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MAX_PLAYERS, MIN_PLAYERS, type RoomState } from '@noctalis/shared';
+import { MAX_PLAYERS, MIN_PLAYERS, type RoomState } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Panel } from '../../components/ui/Panel.js';
@@ -50,7 +50,7 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
     }
     try {
       await navigator.share({
-        title: 'NOCTALIS',
+        title: 'UMBRASTRA',
         text: t('lobby.shareText', { code: room.code }),
         url: inviteLink,
       });

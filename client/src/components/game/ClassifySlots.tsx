@@ -1,4 +1,4 @@
-import { getTileByNumber, type ClassifyResult } from '@noctalis/shared';
+import { getTileByNumber, type ClassifyResult } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { TileStack } from './TileStack.js';
 import { Tile } from './Tile.js';

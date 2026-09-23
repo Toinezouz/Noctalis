@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SECRET_TILE_COUNT, TILE_COUNT } from '@noctalis/shared';
+import { SECRET_TILE_COUNT, TILE_COUNT } from '@umbrastra/shared';
 import {
   clearDeduction,
   deductionKey,

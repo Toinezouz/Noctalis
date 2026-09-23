@@ -1,4 +1,4 @@
-import { COLOR_ORDER } from '@noctalis/shared';
+import { COLOR_ORDER } from '@umbrastra/shared';
 import { ConstellationSigil } from '../game/ConstellationSigil.js';
 
 /**

@@ -11,7 +11,7 @@ import {
   getPlayer,
   reassignResponder,
   setPlayerConnected,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { createId, createRoomCode, createToken, safeCompare } from '../security/tokens.js';
 
 export interface RoomPlayer {

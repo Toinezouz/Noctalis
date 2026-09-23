@@ -5,7 +5,7 @@ import {
   type CompareResult,
   type Tile as TileData,
   type TileColor,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { ClassifySlot } from './ClassifySlots.js';
 import { CompareArea } from './CompareArea.js';

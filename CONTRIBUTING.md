@@ -1,4 +1,4 @@
-# Contributing to NOCTALIS
+# Contributing to UMBRASTRA
 
 Thanks for stopping by! Every kind of help is welcome: a bug fix, a
 translation, an accessibility improvement, a rule idea, a second pair of eyes

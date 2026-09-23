@@ -1,13 +1,13 @@
 # Asset inventory
 
-Every resource published with NOCTALIS, where it comes from, and its licence.
+Every resource published with UMBRASTRA, where it comes from, and its licence.
 A resource of uncertain origin would not be published.
 
 ## Drawings
 
 | Asset | Kind | Origin | Licence | Location |
 | --- | --- | --- | --- | --- |
-| NOCTALIS mark | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/BrandMark.tsx` |
+| UMBRASTRA mark | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/BrandMark.tsx` |
 | Favicon | SVG | drawn for this project | AGPL-3.0-or-later | `client/public/favicon.svg` |
 | Constellation figures (5) | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/game/ConstellationSigil.tsx` |
 | Line icons | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/Icon.tsx` |
@@ -35,10 +35,10 @@ part of the game.
 | --- | --- | --- |
 | `client/public/og-image.jpg` | 1200 × 630 card shown by chat apps and social networks when a link is shared | AGPL-3.0-or-later |
 
-It is a composition made for this project: the favicon, the NOCTALIS name
+It is a composition made for this project: the favicon, the UMBRASTRA name
 set in Cinzel, five CSS medallions, and `docs/images/table-dark.png` in
 perspective, rendered with the project's own Chromium (Playwright) and saved
-as a JPEG (quality 86, about 65 KB, well under the size limits of chat apps).
+as a JPEG (quality 86, about 63 KB, well under the size limits of chat apps).
 
 ## Fonts
 

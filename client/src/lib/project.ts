@@ -3,10 +3,10 @@
  * the About dialog read these constants, never a copied URL.
  */
 
-export const PROJECT_NAME = 'NOCTALIS';
+export const PROJECT_NAME = 'UMBRASTRA';
 
 /** Displayed version. Follows `package.json`. */
-export const PROJECT_VERSION = '1.3.0';
+export const PROJECT_VERSION = '1.4.0';
 
 export const GITHUB_OWNER = 'Toinezouz';
 export const GITHUB_REPO = 'Noctalis';

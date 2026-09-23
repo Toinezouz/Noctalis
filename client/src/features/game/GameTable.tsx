@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { pickResponder, type TileColor } from '@noctalis/shared';
+import { pickResponder, type TileColor } from '@umbrastra/shared';
 import type { Theme } from '../../lib/theme.js';
 import { useGame } from '../../app/GameContext.js';
 import { useI18n } from '../../i18n/index.js';

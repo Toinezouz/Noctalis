@@ -7,14 +7,14 @@ import type {
   PlayerCredentials,
   StatePayload,
   TileColor,
-} from '@noctalis/shared';
-import { createNoctalisServer, type NoctalisServer } from '../../server/src/createServer.js';
+} from '@umbrastra/shared';
+import { createUmbrastraServer, type UmbrastraServer } from '../../server/src/createServer.js';
 
-let server: NoctalisServer;
+let server: UmbrastraServer;
 let url = '';
 
 beforeAll(async () => {
-  server = createNoctalisServer({ env: 'test', strictLeakCheck: true });
+  server = createUmbrastraServer({ env: 'test', strictLeakCheck: true });
   await new Promise<void>((resolve) => {
     server.httpServer.listen(0, () => {
       resolve();

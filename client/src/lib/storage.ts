@@ -1,4 +1,4 @@
-import type { PlayerCredentials } from '@noctalis/shared';
+import type { PlayerCredentials } from '@umbrastra/shared';
 import { DEFAULT_THEME, isTheme, type Theme } from './theme.js';
 
 /**
@@ -8,8 +8,35 @@ import { DEFAULT_THEME, isTheme, type Theme } from './theme.js';
  * guesses).
  */
 
-const SESSION_KEY = 'noctalis:session';
-const PREFS_KEY = 'noctalis:prefs';
+const SESSION_KEY = 'umbrastra:session';
+const PREFS_KEY = 'umbrastra:prefs';
+
+/**
+ * Up to version 1.3 the game was called NOCTALIS and stored everything under
+ * `noctalis:*`. Preferences and the current seat are carried over once, so
+ * nobody loses their name, language or theme with the new name.
+ */
+const LEGACY_KEYS: readonly (readonly [string, string])[] = [
+  ['noctalis:prefs', PREFS_KEY],
+  ['noctalis:session', SESSION_KEY],
+];
+
+export function migrateLegacyStorage(): void {
+  try {
+    const storage = window.localStorage;
+    for (const [legacy, current] of LEGACY_KEYS) {
+      const value = storage.getItem(legacy);
+      if (value !== null) {
+        if (storage.getItem(current) === null) {
+          storage.setItem(current, value);
+        }
+        storage.removeItem(legacy);
+      }
+    }
+  } catch {
+    /* storage unavailable: nothing to carry over */
+  }
+}
 
 function readJson<T>(key: string): T | null {
   try {
@@ -92,7 +119,7 @@ export function savePreferences(prefs: Partial<Preferences>): Preferences {
 
 /** Star chart key: one chart per (room, player). */
 export function deductionKey(roomCode: string, playerId: string): string {
-  return `noctalis:sheet:${roomCode}:${playerId}`;
+  return `umbrastra:sheet:${roomCode}:${playerId}`;
 }
 
 export interface StoredDeduction {

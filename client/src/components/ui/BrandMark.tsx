@@ -7,7 +7,7 @@ export interface BrandMarkProps {
 }
 
 /**
- * The NOCTALIS mark: a disc of night carrying stars joined by the lines of a
+ * The UMBRASTRA mark: a disc of night carrying stars joined by the lines of a
  * constellation, followed by the name. Drawn in SVG within the project, with
  * no dependency and no external resource.
  */
@@ -19,7 +19,7 @@ export function BrandMark({ size = 'sm', as = 'span', className = '' }: BrandMar
         className="brand__glyph"
         viewBox="0 0 64 64"
         role="img"
-        aria-label="NOCTALIS"
+        aria-label="UMBRASTRA"
         focusable="false"
       >
         <circle cx="32" cy="32" r="30" className="brand__disc" />
@@ -40,7 +40,7 @@ export function BrandMark({ size = 'sm', as = 'span', className = '' }: BrandMar
           className="brand__nova"
         />
       </svg>
-      <span className="brand__word">NOCTALIS</span>
+      <span className="brand__word">UMBRASTRA</span>
     </Tag>
   );
 }

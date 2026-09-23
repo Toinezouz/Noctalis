@@ -1,4 +1,4 @@
-import { COLOR_ORDER, type GamePhase, type TileColor } from '@noctalis/shared';
+import { COLOR_ORDER, type GamePhase, type TileColor } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { ConstellationSigil } from '../../components/game/ConstellationSigil.js';
 

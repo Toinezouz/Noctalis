@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { NAME_MAX_LENGTH, NAME_MIN_LENGTH, ROOM_CODE_LENGTH, validateName } from '@noctalis/shared';
+import { NAME_MAX_LENGTH, NAME_MIN_LENGTH, ROOM_CODE_LENGTH, validateName } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Field } from '../../components/ui/Field.js';

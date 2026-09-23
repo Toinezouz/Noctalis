@@ -7,8 +7,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { COLOR_LABELS } from '@noctalis/shared';
-import type { TileColor } from '@noctalis/shared';
+import { COLOR_LABELS } from '@umbrastra/shared';
+import type { TileColor } from '@umbrastra/shared';
 import { en, type MessageKey, type Messages } from './en.js';
 import { fr } from './fr.js';
 import { es } from './es.js';

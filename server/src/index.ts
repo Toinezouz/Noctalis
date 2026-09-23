@@ -1,4 +1,4 @@
-import { createNoctalisServer } from './createServer.js';
+import { createUmbrastraServer } from './createServer.js';
 
 const PORT = Number(process.env['PORT'] ?? 3001);
 const NODE_ENV = process.env['NODE_ENV'] ?? 'development';
@@ -23,7 +23,7 @@ const CLIENT_URLS = (process.env['CLIENT_URL'] ?? 'http://localhost:5173')
   .map(toOrigin)
   .filter(Boolean);
 
-const { httpServer, close } = createNoctalisServer({
+const { httpServer, close } = createUmbrastraServer({
   env: NODE_ENV,
   origins: NODE_ENV === 'production' ? CLIENT_URLS : true,
   roomTtlMs: ROOM_TTL_MS,
@@ -37,7 +37,7 @@ const { httpServer, close } = createNoctalisServer({
 const HOST = process.env['HOST'] ?? '0.0.0.0';
 
 httpServer.listen(PORT, HOST, () => {
-  console.log(`NOCTALIS — server ready on ${HOST}:${String(PORT)} (${NODE_ENV})`);
+  console.log(`UMBRASTRA — server ready on ${HOST}:${String(PORT)} (${NODE_ENV})`);
 });
 
 function shutdown(signal: string): void {

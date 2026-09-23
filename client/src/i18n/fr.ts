@@ -9,7 +9,7 @@ import type { Messages } from './en.js';
  */
 export const fr: Messages = {
   // --- Général -------------------------------------------------------------
-  'app.title': 'NOCTALIS — Devine ta constellation avant les autres',
+  'app.title': 'UMBRASTRA — Devine ta constellation avant les autres',
   'common.cancel': 'Annuler',
   'common.back': 'Retour',
   'common.close': 'Fermer',
@@ -67,7 +67,7 @@ export const fr: Messages = {
   'lobby.linkCopied': 'Lien copié !',
   'lobby.copyFailed': 'La copie n’a pas marché : sélectionne le lien et copie-le à la main.',
   'lobby.orCode': 'ou donne-leur le code',
-  'lobby.shareText': 'Viens jouer à NOCTALIS avec moi ! Code : {code}',
+  'lobby.shareText': 'Viens jouer à UMBRASTRA avec moi ! Code : {code}',
   'lobby.freeSeat': 'Place libre',
   'lobby.neededSeat': 'Il faut quelqu’un ici pour commencer',
   'lobby.optionalSeat': 'Place en plus, si l’envie vous prend',
@@ -93,12 +93,12 @@ export const fr: Messages = {
   // --- Soutien, pied de page et À propos -----------------------------------
   'support.link': 'Soutenir le projet',
   'support.text':
-    'NOCTALIS est libre et gratuit. Si le jeu te plaît, tu peux soutenir son développement sur GitHub. C’est entièrement facultatif : tout le jeu reste ouvert à tout le monde, sans compte, sans publicité et sans rien à acheter.',
+    'UMBRASTRA est libre et gratuit. Si le jeu te plaît, tu peux soutenir son développement sur GitHub. C’est entièrement facultatif : tout le jeu reste ouvert à tout le monde, sans compte, sans publicité et sans rien à acheter.',
   'footer.code': 'Code source',
   'footer.about': 'À propos',
-  'about.title': 'À propos de NOCTALIS',
+  'about.title': 'À propos d’UMBRASTRA',
   'about.description':
-    'NOCTALIS est un jeu de déduction en ligne, de deux à quatre personnes. Chacune voit les étoiles des autres, jamais les siennes — et la première à nommer ses cinq étoiles l’emporte.',
+    'UMBRASTRA est un jeu de déduction en ligne, de deux à quatre personnes. Chacune voit les étoiles des autres, jamais les siennes — et la première à nommer ses cinq étoiles l’emporte.',
   'about.openSource':
     'C’est un projet indépendant et ouvert : les règles, les dessins et le code sont originaux, et tout le monde peut les lire, les améliorer ou s’en inspirer.',
   'about.codeLabel': 'Code',
@@ -332,7 +332,7 @@ export const fr: Messages = {
   'error.network': 'Pas de réponse. Vérifie ta connexion et réessaie.',
 
   // --- Règles --------------------------------------------------------------
-  'howto.title': 'Comment jouer à NOCTALIS',
+  'howto.title': 'Comment jouer à UMBRASTRA',
   'howto.intro':
     'Chaque personne reçoit cinq étoiles secrètes. Toute la malice est là : tu vois les étoiles des autres, mais jamais les tiennes. À toi de les deviner grâce aux indices que la table te donne, et de les nommer avant tout le monde.',
   'howto.stars.title': 'Soixante étoiles, cinq constellations',

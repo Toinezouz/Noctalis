@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { TILES, getTileByNumber } from '@noctalis/shared';
+import { TILES, getTileByNumber } from '@umbrastra/shared';
 import { fr } from '../../client/src/i18n/fr.js';
 import { DeductionSheet } from '../../client/src/features/deduction/DeductionSheet.js';
 import { useDeductionSheet } from '../../client/src/features/deduction/deductionStore.js';

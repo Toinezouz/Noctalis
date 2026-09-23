@@ -150,7 +150,7 @@ function consumePublicTile(state: GameState, tileNumber: number): void {
 export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
   if (seeds.length < MIN_PLAYERS || seeds.length > MAX_PLAYERS) {
     throw new RangeError(
-      `NOCTALIS is played by ${String(MIN_PLAYERS)} to ${String(MAX_PLAYERS)} players.`,
+      `UMBRASTRA is played by ${String(MIN_PLAYERS)} to ${String(MAX_PLAYERS)} players.`,
     );
   }
 

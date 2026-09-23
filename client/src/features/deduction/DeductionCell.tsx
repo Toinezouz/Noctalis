@@ -1,4 +1,4 @@
-import { getTileByNumber } from '@noctalis/shared';
+import { getTileByNumber } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface DeductionCellProps {

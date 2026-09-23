@@ -1,4 +1,4 @@
-import type { Tile as TileData } from '@noctalis/shared';
+import type { Tile as TileData } from '@umbrastra/shared';
 import { Tile } from './Tile.js';
 
 export interface TileStackProps {

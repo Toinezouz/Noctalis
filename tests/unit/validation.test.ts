@@ -9,7 +9,7 @@ import {
   validateNumberList,
   validateRoomCode,
   validateTileNumber,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 
 describe('input validation and cleaning', () => {
   it('cleans names', () => {

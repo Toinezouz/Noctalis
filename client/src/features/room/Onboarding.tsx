@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { COLOR_ORDER, getTileByNumber } from '@noctalis/shared';
+import { COLOR_ORDER, getTileByNumber } from '@umbrastra/shared';
 import { useI18n, type MessageKey } from '../../i18n/index.js';
 import { Modal } from '../../components/ui/Modal.js';
 import { Button } from '../../components/ui/Button.js';

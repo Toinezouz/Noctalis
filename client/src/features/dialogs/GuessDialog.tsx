@@ -6,7 +6,7 @@ import {
   isValidTileNumber,
   validateGuessShape,
   type GuessIssue,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { useI18n, type MessageKey } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';

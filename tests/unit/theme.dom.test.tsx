@@ -5,7 +5,7 @@ import { I18nProvider } from '../../client/src/i18n/index.js';
 import { ThemeSwitch } from '../../client/src/components/ui/ThemeSwitch.js';
 import { applyTheme, THEME_COLORS } from '../../client/src/lib/theme.js';
 import type { Theme } from '../../client/src/lib/theme.js';
-import { loadPreferences } from '../../client/src/lib/storage.js';
+import { loadPreferences, migrateLegacyStorage } from '../../client/src/lib/storage.js';
 
 function show(value: Theme, onChange = (): void => {}, compact = false): void {
   render(
@@ -73,12 +73,29 @@ describe('Theme choice (component)', () => {
   });
 
   it('starts dark, and turns the old "automatic" setting into the default', () => {
-    window.localStorage.removeItem('noctalis:prefs');
+    window.localStorage.removeItem('umbrastra:prefs');
     expect(loadPreferences().theme).toBe('dark');
-    window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'auto', name: 'Kim' }));
+    window.localStorage.setItem('umbrastra:prefs', JSON.stringify({ theme: 'auto', name: 'Kim' }));
     expect(loadPreferences()).toMatchObject({ theme: 'dark', name: 'Kim' });
-    window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'light' }));
+    window.localStorage.setItem('umbrastra:prefs', JSON.stringify({ theme: 'light' }));
     expect(loadPreferences().theme).toBe('light');
-    window.localStorage.removeItem('noctalis:prefs');
+    window.localStorage.removeItem('umbrastra:prefs');
+  });
+
+  it('keeps the settings saved under the old name, NOCTALIS', () => {
+    window.localStorage.clear();
+    window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'light', name: 'Kim' }));
+    window.localStorage.setItem('noctalis:session', '{"roomCode":"AB7K9"}');
+    migrateLegacyStorage();
+    expect(loadPreferences()).toMatchObject({ theme: 'light', name: 'Kim' });
+    expect(window.localStorage.getItem('umbrastra:session')).toBe('{"roomCode":"AB7K9"}');
+    expect(window.localStorage.getItem('noctalis:prefs')).toBeNull();
+    expect(window.localStorage.getItem('noctalis:session')).toBeNull();
+
+    // Newer settings are never overwritten by old ones.
+    window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'dark' }));
+    migrateLegacyStorage();
+    expect(loadPreferences().theme).toBe('light');
+    window.localStorage.clear();
   });
 });

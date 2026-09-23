@@ -1,6 +1,6 @@
 # Deployment
 
-NOCTALIS deploys as **a single service**. The Express server serves the
+UMBRASTRA deploys as **a single service**. The Express server serves the
 built client, the API and Socket.IO at once: same origin, no CORS settings,
 no second service to pay for or keep an eye on.
 
@@ -28,14 +28,35 @@ No secret is needed: the project uses none.
 
 1. On [render.com](https://render.com), connect your GitHub account and allow
    access to the repository.
-2. **New → Blueprint**, then pick `Toinezouz/Noctalis` (or your fork).
-3. Render reads `render.yaml` and offers a Web Service called `noctalis`:
+2. **New → Blueprint**, then pick the repository (or your fork).
+3. Render reads `render.yaml` and offers a Web Service called `noctalis`
+   (see *The name change* below):
    - build: `npm ci --include=dev && npm run build`
    - start: `npm start`
    - probe: `/health`
    - automatic deploys **only once the checks pass**
      (`autoDeployTrigger: checksPass`)
 4. Confirm. The first build takes a few minutes.
+
+## The name change (1.4)
+
+The game was called NOCTALIS up to version 1.3. The code, the texts and the
+link previews now say UMBRASTRA, but two things outside the repository still
+carry the old name, on purpose:
+
+- **the Render service** is still called `noctalis`, and so is its address,
+  `noctalis.onrender.com`. On Render, the `onrender.com` address is chosen
+  when a service is created and never changes afterwards; renaming the
+  service in `render.yaml` would make the blueprint create a *second*
+  service rather than rename the first. `render.yaml` therefore keeps
+  `name: noctalis` until a new service is deliberately created;
+- **the GitHub repository** is still `Toinezouz/Noctalis`. Renaming it is
+  done on GitHub (Settings → General → Repository name), and GitHub then
+  redirects the old address, clones included. The links in the README,
+  `package.json` and `client/src/lib/project.ts` will be updated after that.
+
+Browsers keep their saved settings: `noctalis:*` storage keys are carried
+over to `umbrastra:*` on the first visit (`migrateLegacyStorage`).
 
 ## A trap worth knowing: `NODE_ENV` during the build
 
@@ -68,8 +89,9 @@ GET /health → {"status":"ok","rooms":1,"uptime":290.4,"env":"production"}
 GET /       → <title>NOCTALIS - Devine ta constellation avant lui</title>
 ```
 
-From version 1.1 on, the served title is
-`NOCTALIS - Find your constellation before anyone else`.
+From version 1.1 on, the served title was
+`NOCTALIS - Find your constellation before anyone else`; from version 1.4 on,
+it is `UMBRASTRA - Find your constellation before anyone else`.
 
 ## Checking that everything works
 
@@ -80,7 +102,7 @@ curl https://<your-service>.onrender.com/health
 
 # 2. The client is served
 curl -s https://<your-service>.onrender.com/ | grep -o '<title>.*</title>'
-# expected: <title>NOCTALIS - Find your constellation before anyone else</title>
+# expected: <title>UMBRASTRA - Find your constellation before anyone else</title>
 ```
 
 Then, in a browser:
@@ -102,7 +124,7 @@ To check the link preview, look at the tags the server writes:
 
 ```bash
 curl -s "https://<your-service>.onrender.com/?join=AB7K9&lang=fr" | grep 'og:'
-# expected: og:title "Une partie de NOCTALIS t’attend", and an og:image that
+# expected: og:title "Une partie d’UMBRASTRA t’attend", and an og:image that
 # starts with https://<your-service>.onrender.com/
 ```
 
@@ -158,7 +180,7 @@ platform able to run `npm ci --include=dev && npm run build` and then
 the service in a stateless way.
 
 Set `PUBLIC_URL` to the public address (for example
-`https://noctalis.example.org`) so that link previews use absolute URLs.
+`https://umbrastra.example.org`) so that link previews use absolute URLs.
 Without it, the server uses the address each request came in on, which works
 behind most proxies as long as they pass the `Host` and `X-Forwarded-Proto`
 headers along.

@@ -2,7 +2,7 @@
 
 ## Our pledge
 
-NOCTALIS is an open project. We want everyone to be able to take part,
+UMBRASTRA is an open project. We want everyone to be able to take part,
 whatever their experience, age, disability, appearance, gender identity or
 expression, sexual orientation, origin, religion or lack of one.
 

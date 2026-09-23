@@ -1,4 +1,4 @@
-import type { PublicPlayer } from '@noctalis/shared';
+import type { PublicPlayer } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface PlayerStatusProps {

@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@noctalis/shared': fileURLToPath(new URL('./shared/src/index.ts', import.meta.url)),
+      '@umbrastra/shared': fileURLToPath(new URL('./shared/src/index.ts', import.meta.url)),
     },
   },
   test: {

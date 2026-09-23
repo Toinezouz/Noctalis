@@ -13,7 +13,7 @@ import {
   submitGuess,
   toPlayerPrivateState,
   toPublicGameState,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { gameStartedByAlice } from './gameFixture.js';
 
 /** Reproducible game in which Alice opens. */

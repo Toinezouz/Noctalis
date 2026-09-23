@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { RoomState } from '@noctalis/shared';
+import type { RoomState } from '@umbrastra/shared';
 import { I18nProvider, type Language } from '../../client/src/i18n/index.js';
 import { RoomLobby } from '../../client/src/features/room/RoomLobby.js';
 import { clearInviteFromUrl } from '../../client/src/lib/invite.js';

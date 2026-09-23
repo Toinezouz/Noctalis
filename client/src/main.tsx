@@ -12,7 +12,13 @@ import { App } from './app/App.js';
 import { GameProvider } from './app/GameContext.js';
 import { ToastProvider } from './hooks/useToasts.js';
 import { I18nProvider, detectLanguage, type Language } from './i18n/index.js';
-import { clearSession, loadPreferences, loadSession, savePreferences } from './lib/storage.js';
+import {
+  clearSession,
+  loadPreferences,
+  loadSession,
+  migrateLegacyStorage,
+  savePreferences,
+} from './lib/storage.js';
 import { readInviteCode } from './lib/invite.js';
 
 const container = document.getElementById('root');
@@ -20,6 +26,7 @@ if (!container) {
   throw new Error("#root element missing from index.html");
 }
 
+migrateLegacyStorage();
 const preferences = loadPreferences();
 
 /*

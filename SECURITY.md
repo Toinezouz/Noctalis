@@ -35,7 +35,7 @@ project offers no financial reward.
 
 ## Scope
 
-The heart of NOCTALIS is a **confidentiality property**: nobody must ever be
+The heart of UMBRASTRA is a **confidentiality property**: nobody must ever be
 able to learn the numbers of their own stars, by any means.
 
 We therefore treat as vulnerabilities, first and foremost:

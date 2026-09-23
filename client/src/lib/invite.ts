@@ -1,4 +1,4 @@
-import { validateRoomCode } from '@noctalis/shared';
+import { validateRoomCode } from '@umbrastra/shared';
 
 /**
  * Invite links: `https://<host>/?join=AB7K9`.

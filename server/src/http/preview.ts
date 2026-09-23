@@ -1,9 +1,9 @@
-import { validateRoomCode } from '@noctalis/shared';
+import { validateRoomCode } from '@umbrastra/shared';
 
 /**
  * Link previews.
  *
- * When someone pastes a NOCTALIS link in a chat app, the app fetches the page
+ * When someone pastes an UMBRASTRA link in a chat app, the app fetches the page
  * and reads its Open Graph tags to draw a card: title, description, image.
  * Those apps do not run JavaScript, so the tags must already be in the HTML
  * the server sends.
@@ -39,33 +39,33 @@ interface PreviewText {
 const TEXT: Record<PreviewLang, PreviewText> = {
   en: {
     locale: 'en_US',
-    title: 'NOCTALIS - Find your constellation before anyone else',
+    title: 'UMBRASTRA - Find your constellation before anyone else',
     description:
       "You can see everyone's stars except your own. A free online deduction game for 2 to 4 people: no sign-up, no ads.",
-    inviteTitle: 'A game of NOCTALIS is waiting for you',
+    inviteTitle: 'A game of UMBRASTRA is waiting for you',
     inviteDescription: (code) =>
       `Game code ${code}. Open the link, pick a name and take your seat: free, in your browser, no sign-up.`,
-    imageAlt: 'Glowing star medallions on a night-sky game table, next to the NOCTALIS name.',
+    imageAlt: 'Glowing star medallions on a night-sky game table, next to the UMBRASTRA name.',
   },
   fr: {
     locale: 'fr_FR',
-    title: 'NOCTALIS - Devine ta constellation avant les autres',
+    title: 'UMBRASTRA - Devine ta constellation avant les autres',
     description:
       'Tu vois les étoiles de tout le monde, sauf les tiennes. Un jeu de déduction en ligne pour 2 à 4 personnes, gratuit, sans inscription ni publicité.',
-    inviteTitle: 'Une partie de NOCTALIS t’attend',
+    inviteTitle: 'Une partie d’UMBRASTRA t’attend',
     inviteDescription: (code) =>
       `Code de la partie : ${code}. Ouvre le lien, choisis un pseudo et prends place : gratuit, dans le navigateur, sans inscription.`,
-    imageAlt: 'Des médaillons d’étoiles lumineux sur une table de jeu couleur ciel de nuit, à côté du nom NOCTALIS.',
+    imageAlt: 'Des médaillons d’étoiles lumineux sur une table de jeu couleur ciel de nuit, à côté du nom UMBRASTRA.',
   },
   es: {
     locale: 'es_ES',
-    title: 'NOCTALIS - Adivina tu constelación antes que nadie',
+    title: 'UMBRASTRA - Adivina tu constelación antes que nadie',
     description:
       'Ves las estrellas de todo el mundo, menos las tuyas. Un juego de deducción en línea para 2 a 4 personas, gratis, sin registro ni anuncios.',
-    inviteTitle: 'Te espera una partida de NOCTALIS',
+    inviteTitle: 'Te espera una partida de UMBRASTRA',
     inviteDescription: (code) =>
       `Código de la partida: ${code}. Abre el enlace, elige un nombre y toma asiento: gratis, en el navegador, sin registro.`,
-    imageAlt: 'Medallones de estrellas luminosos sobre una mesa de juego color cielo nocturno, junto al nombre NOCTALIS.',
+    imageAlt: 'Medallones de estrellas luminosos sobre una mesa de juego color cielo nocturno, junto al nombre UMBRASTRA.',
   },
 };
 
@@ -139,7 +139,7 @@ export function buildPreviewTags({ origin, lang, inviteCode }: PreviewOptions): 
   const description = inviteCode ? text.inviteDescription(inviteCode) : text.description;
   const tags: [string, string, string][] = [
     ['property', 'og:type', 'website'],
-    ['property', 'og:site_name', 'NOCTALIS'],
+    ['property', 'og:site_name', 'UMBRASTRA'],
     ['property', 'og:locale', text.locale],
     ['property', 'og:title', title],
     ['property', 'og:description', description],

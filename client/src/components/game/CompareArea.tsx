@@ -1,4 +1,4 @@
-import { getTileByNumber, type CompareResult } from '@noctalis/shared';
+import { getTileByNumber, type CompareResult } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Tile } from './Tile.js';
 

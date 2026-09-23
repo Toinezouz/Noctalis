@@ -1,4 +1,4 @@
-import type { TileColor } from '@noctalis/shared';
+import type { TileColor } from '@umbrastra/shared';
 
 export interface ConstellationSigilProps {
   color: TileColor;

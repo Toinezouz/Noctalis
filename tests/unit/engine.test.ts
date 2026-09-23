@@ -28,7 +28,7 @@ import {
   validateClassify,
   validateGuess,
   validateGuessShape,
-} from '@noctalis/shared';
+} from '@umbrastra/shared';
 import { PLAYER_SEEDS, gameStartedByAlice } from './gameFixture.js';
 
 const SEEDS = PLAYER_SEEDS;

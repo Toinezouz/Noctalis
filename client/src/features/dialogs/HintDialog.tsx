@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getTileByNumber, type SecretTileView } from '@noctalis/shared';
+import { getTileByNumber, type SecretTileView } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';

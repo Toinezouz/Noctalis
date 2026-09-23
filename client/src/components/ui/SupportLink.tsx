@@ -11,7 +11,7 @@ export interface SupportLinkProps {
  * The support link, to GitHub Sponsors and nowhere else.
  *
  * It never interrupts a game, never pops up and never unlocks anything:
- * NOCTALIS is entirely free, and stays that way.
+ * UMBRASTRA is entirely free, and stays that way.
  */
 export function SupportLink({ variant = 'inline' }: SupportLinkProps): JSX.Element {
   const { t } = useI18n();

@@ -1,4 +1,4 @@
-import { COLOR_ORDER, type RevealedTile, type TileColor } from '@noctalis/shared';
+import { COLOR_ORDER, type RevealedTile, type TileColor } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Tile } from './Tile.js';
 

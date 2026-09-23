@@ -59,7 +59,7 @@ for (const name of SHARED_EXPORTS) {
     `export (?:function|const|class) ${name}\\b|export \\{[^}]*\\b${name}\\b`,
   ).test(sharedSources);
   if (!declared) {
-    fail(`missing export in @noctalis/shared: ${name}`);
+    fail(`missing export in @umbrastra/shared: ${name}`);
   }
 }
 
@@ -75,7 +75,7 @@ const SHARED_TYPES = [
 
 for (const name of SHARED_TYPES) {
   if (!new RegExp(`export (?:type|interface) ${name}\\b`).test(sharedSources)) {
-    fail(`missing type in @noctalis/shared: ${name}`);
+    fail(`missing type in @umbrastra/shared: ${name}`);
   }
 }
 

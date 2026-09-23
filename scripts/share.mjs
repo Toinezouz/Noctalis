@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * ---------------------------------------------------------------------------
- * NOCTALIS — play with friends far away, in one command
+ * UMBRASTRA — play with friends far away, in one command
  * ---------------------------------------------------------------------------
  * Builds the game if needed, opens a temporary public tunnel (Cloudflare),
  * then starts the server, only allowing that tunnel's address.
@@ -35,7 +35,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const IS_WINDOWS = process.platform === 'win32';
-const BIN_DIR = path.join(ROOT, 'node_modules', '.cache', 'noctalis');
+const BIN_DIR = path.join(ROOT, 'node_modules', '.cache', 'umbrastra');
 const BIN_PATH = path.join(BIN_DIR, IS_WINDOWS ? 'cloudflared.exe' : 'cloudflared');
 const RELEASE_BASE = 'https://github.com/cloudflare/cloudflared/releases/latest/download';
 const TUNNEL_URL_PATTERN = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/i;
@@ -67,7 +67,7 @@ const readOption = (flag, fallback) => {
 
 if (hasFlag('--help') || hasFlag('-h')) {
   console.log(`
-NOCTALIS — play with friends far away
+UMBRASTRA — play with friends far away
 
   npm run share                     Builds the game, opens a Cloudflare tunnel
                                     and starts the server. Share the link.
@@ -81,7 +81,7 @@ NOCTALIS — play with friends far away
 Ctrl+C stops the server and closes the tunnel.
 
 The cloudflared binary is looked up in the PATH, otherwise downloaded once
-into node_modules/.cache/noctalis/. To force a given binary:
+into node_modules/.cache/umbrastra/. To force a given binary:
   CLOUDFLARED_BIN=/path/to/cloudflared npm run share
 
 If your network filters the trycloudflare.com name, the script resolves it
@@ -181,7 +181,7 @@ function releaseAsset() {
   return null;
 }
 
-/** Downloads the official binary into node_modules/.cache/noctalis/. */
+/** Downloads the official binary into node_modules/.cache/umbrastra/. */
 async function downloadCloudflared() {
   const asset = releaseAsset();
   if (!asset) {
@@ -563,7 +563,7 @@ async function verifyPublicLink(url) {
       return {
         ok: false,
         kind: 'wrong-service',
-        detail: 'something answers at this address, but it is not the NOCTALIS server',
+        detail: 'something answers at this address, but it is not the UMBRASTRA server',
         via: reachable.via,
       };
     }

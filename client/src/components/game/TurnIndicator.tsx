@@ -1,4 +1,4 @@
-import type { GamePhase } from '@noctalis/shared';
+import type { GamePhase } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface TurnIndicatorProps {

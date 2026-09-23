@@ -1,5 +1,8 @@
 # Audit of the original project
 
+> The project was called **NOCTALIS** up to version 1.3 and was renamed
+> **UMBRASTRA** in 1.4. This record keeps the name used at the time.
+
 > Inspection report made **before any copy**, read-only. It describes the
 > project NOCTALIS 1.0 was derived from. The original project was neither
 > modified, renamed nor moved. It stays at `/home/user/Got-Five`, on its own

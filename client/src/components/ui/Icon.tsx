@@ -1,5 +1,5 @@
 /**
- * Small line icons drawn for NOCTALIS, in `currentColor`. They replace emoji,
+ * Small line icons drawn for UMBRASTRA, in `currentColor`. They replace emoji,
  * whose look depends on the device and clashes with the star-chart style.
  */
 export type IconName =

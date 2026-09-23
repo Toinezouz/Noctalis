@@ -1,4 +1,4 @@
-import type { Tile as TileData } from '@noctalis/shared';
+import type { Tile as TileData } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { ConstellationSigil } from './ConstellationSigil.js';
 

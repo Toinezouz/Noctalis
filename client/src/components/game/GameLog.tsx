@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { LogEntry, LogKind } from '@noctalis/shared';
+import type { LogEntry, LogKind } from '@umbrastra/shared';
 import { useI18n, type MessageKey } from '../../i18n/index.js';
 import { Icon, type IconName } from '../ui/Icon.js';
 

@@ -1,6 +1,6 @@
 {
-  "name": "@noctalis/server",
-  "version": "1.3.0",
+  "name": "@umbrastra/server",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@noctalis/shared": "*",
+    "@umbrastra/shared": "*",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "socket.io": "^4.8.0"

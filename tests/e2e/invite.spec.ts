@@ -51,7 +51,7 @@ test.describe('Invite links', () => {
     // A first visit remembers the name on this device.
     await guest.goto('/');
     await guest.evaluate(() => {
-      window.localStorage.setItem('noctalis:prefs', JSON.stringify({ name: 'Robin' }));
+      window.localStorage.setItem('umbrastra:prefs', JSON.stringify({ name: 'Robin' }));
     });
     await guest.goto(link);
     await expect(guest.getByTestId('name-input')).toHaveValue('Robin');
@@ -80,7 +80,7 @@ test.describe('Invite links', () => {
     expect(home).toContain('<meta name="twitter:card" content="summary_large_image" />');
 
     const invite = await (await request.get('/?join=AB7K9&lang=fr')).text();
-    expect(invite).toContain('Une partie de NOCTALIS t’attend');
+    expect(invite).toContain('Une partie d’UMBRASTRA t’attend');
     expect(invite).toContain('Code de la partie : AB7K9.');
 
     const image = await request.get('/og-image.jpg');

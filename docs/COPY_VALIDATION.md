@@ -1,5 +1,8 @@
 # Validating the copy
 
+> The project was called **NOCTALIS** up to version 1.3 and was renamed
+> **UMBRASTRA** in 1.4. This record keeps the name used at the time.
+
 A record of the checks run when NOCTALIS was created (version 1.0): first
 that the copy was **functionally identical to the original**, before any
 change of identity, then that the transformed project still passed
@@ -164,3 +167,20 @@ The automatic theme is removed; a first visit starts dark. Run on
 
 The Render sequence was not replayed for this version: nothing on the server
 or in the deployment changed.
+
+## Version 1.4 — the game becomes UMBRASTRA
+
+Every displayed name, the packages (`@umbrastra/*`) and the storage keys
+change; saved settings are carried over. Run on 2026-09-23, before the push.
+
+| Step | Result |
+| --- | --- |
+| `npm run typecheck` | ✅ 0 errors |
+| `npm run lint` | ✅ 0 errors |
+| `npm run check:contract` | ✅ 63 exports, 23 types, 19 events, 310 keys × 3 languages |
+| `npm test` | ✅ **212 tests** in 14 files (1 new: settings saved under the old name) |
+| `npm run build` | ✅ |
+| `npm run test:e2e` | ✅ **74 tests** (37 desktop + 37 mobile), 4.0 min |
+| Render sequence on a clean copy (the package names changed) | ✅ `npm ci --include=dev` links `@umbrastra/client`, `server` and `shared`; `/health` ok; title `UMBRASTRA - Find your constellation before anyone else`; French invite card `Une partie d’UMBRASTRA t’attend`; 20 E2E tests (invites, game flow, secrecy, themes) pass against it |
+| Secret search | ✅ only the deliberately fake `'invalid-token'` of a unit test; no `.env` |
+| Original GOT FIVE! repository | ✅ untouched, still at `f650a15` |

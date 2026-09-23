@@ -1,9 +1,12 @@
-# NOCTALIS
+# UMBRASTRA
 
 > Everyone at the table can see your stars. Everyone but you.
 
 A small online deduction game for **two to four people**, played in the
 browser. Free, open source, no account, no ads.
+
+*Umbra* is the shadow and *astra* the stars: the stars in the shadow are
+yours. (Until version 1.3, the game was called NOCTALIS.)
 
 [![CI](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml/badge.svg)](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml)
 [![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
@@ -21,7 +24,7 @@ the pictures facing out. You can read everybody's cards but your own. To find
 out what you are holding, you ask the others questions — carefully, because
 every answer they give you is also something they learned about the sky.
 
-That is NOCTALIS, with stars instead of cards. It works on a phone as well as
+That is UMBRASTRA, with stars instead of cards. It works on a phone as well as
 on a computer, and speaks English, French and Spanish.
 
 ## How a game goes
@@ -256,7 +259,7 @@ Please report security problems privately, never in a public issue: see
 
 **AGPL-3.0-or-later** — see [LICENSE](LICENSE).
 
-NOCTALIS is played over a network: the AGPL makes sure that any modified
+UMBRASTRA is played over a network: the AGPL makes sure that any modified
 version hosted for others stays free too. The full reasoning is in
 [docs/LICENSING.md](docs/LICENSING.md).
 
@@ -266,7 +269,7 @@ game.
 
 ## Supporting the project
 
-NOCTALIS is free and open source. **The whole game is free to play**, with no
+UMBRASTRA is free and open source. **The whole game is free to play**, with no
 account, no ads and no subscription, and nothing is reserved for anyone —
 including people who support the project.
 
