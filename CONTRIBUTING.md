@@ -8,7 +8,7 @@ correction, traduction, accessibilité, idée de règle, relecture.
 Pré-requis : **Node.js ≥ 20**.
 
 ```bash
-git clone https://github.com/Toinezouz/noctalis.git
+git clone https://github.com/Toinezouz/Noctalis.git
 cd noctalis
 npm install
 npm run dev

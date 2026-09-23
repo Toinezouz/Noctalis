@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: Faille de sécurité
-    url: https://github.com/Toinezouz/noctalis/security/advisories/new
+    url: https://github.com/Toinezouz/Noctalis/security/advisories/new
     about: Les failles se signalent en privé, jamais en issue publique.

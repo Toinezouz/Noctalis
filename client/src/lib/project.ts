@@ -9,7 +9,7 @@ export const PROJECT_NAME = 'NOCTALIS';
 export const PROJECT_VERSION = '1.0.0';
 
 export const GITHUB_OWNER = 'Toinezouz';
-export const GITHUB_REPO = 'noctalis';
+export const GITHUB_REPO = 'Noctalis';
 export const GITHUB_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}`;
 
 /**
