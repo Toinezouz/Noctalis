@@ -1,11 +1,11 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 
-// Chaque test repart d'un navigateur propre.
+// Every test starts from a clean browser.
 test.afterEach(async ({ browser }) => {
   await Promise.all(browser.contexts().map((context) => context.close()));
 });
 
-/** Ouvre l'accueil dans une langue de navigateur donnee. */
+/** Opens the home screen with a given browser language. */
 async function openHome(browser: Browser, locale: string): Promise<Page> {
   const context = await browser.newContext({ locale });
   const page = await context.newPage();
@@ -13,19 +13,20 @@ async function openHome(browser: Browser, locale: string): Promise<Page> {
   return page;
 }
 
-/** Textes attendus dans chaque langue, pour les assertions symetriques. */
+/** Expected texts in each language, for symmetric assertions. */
 const TEXT = {
   fr: {
     name: 'Alice',
-    yourTurn: 'À TON TOUR',
-    turnOf: (name: string) => `Tour de ${name}`,
+    yourTurn: 'À TOI DE JOUER',
+    turnOf: (name: string) => `Au tour de ${name}`,
     step1: 'Étape 1 / 2',
     choosingColor: (name: string) => `${name} choisit une constellation`,
     logTurn1: (name: string) => `Tour 1 : au tour de ${name}`,
-    logRevealed: 'a révélé l’étoile',
+    logDraw: (name: string) => `Le tirage au sort désigne ${name}`,
+    logRevealed: 'révèle l’étoile',
     logAnswers: 'répond',
     classifyAsk: 'te demande de SITUER l’étoile',
-    classifyChoose: 'Choisis une position',
+    classifyChoose: 'Choisis une place',
     classifyConfirm: 'Valider',
     compareAsk: 'te demande de JAUGER',
   },
@@ -34,14 +35,15 @@ const TEXT = {
     yourTurn: '¡TE TOCA!',
     turnOf: (name: string) => `Turno de ${name}`,
     step1: 'Paso 1 / 2',
-    choosingColor: (name: string) => `${name} está eligiendo una constelación`,
-    logTurn1: (name: string) => `Turno 1: le toca a ${name}`,
-    logRevealed: 'ha revelado la estrella',
+    choosingColor: (name: string) => `${name} elige una constelación`,
+    logTurn1: (name: string) => `Turno 1: juega ${name}`,
+    logDraw: (name: string) => `El sorteo elige a ${name}`,
+    logRevealed: 'revela la estrella',
     logAnswers: 'responde',
-    classifyAsk: 'te pide SITUAR la estrella',
-    classifyChoose: 'Elige una posición',
+    classifyAsk: 'te pide que SITÚES la estrella',
+    classifyChoose: 'Elige un sitio',
     classifyConfirm: 'Confirmar',
-    compareAsk: 'te pide MEDIR',
+    compareAsk: 'te pide que MIDAS',
   },
 } as const;
 
@@ -51,14 +53,14 @@ interface BilingualGame {
   french: Page;
   spanish: Page;
   code: string;
-  /** Joueur tire au sort par le serveur, et son adversaire. */
+  /** Player drawn by the server, and the other one. */
   active: Page;
   waiting: Page;
   activeLang: Lang;
   waitingLang: Lang;
 }
 
-/** Cree une partie a deux joueurs, chacun dans la langue de son navigateur. */
+/** Creates a two-player game, each player in their browser's language. */
 async function startBilingualGame(browser: Browser): Promise<BilingualGame> {
   const french = await openHome(browser, 'fr-FR');
   const spanish = await openHome(browser, 'es-ES');
@@ -79,7 +81,7 @@ async function startBilingualGame(browser: Browser): Promise<BilingualGame> {
   await expect(french.getByTestId('announce-button')).toBeVisible();
   await expect(spanish.getByTestId('announce-button')).toBeVisible();
 
-  // L'annonce du tirage au sort, puis le tutoriel.
+  // The opening draw, then the tutorial.
   for (const page of [french, spanish]) {
     const skipDraw = page.getByTestId('roulette-continue');
     try {
@@ -87,18 +89,18 @@ async function startBilingualGame(browser: Browser): Promise<BilingualGame> {
       await skipDraw.click();
       await page.getByTestId('roulette').waitFor({ state: 'detached', timeout: 4000 });
     } catch {
-      // Annonce deja refermee.
+      // Draw already closed.
     }
     const skip = page.getByTestId('skip-onboarding');
     try {
       await skip.waitFor({ state: 'visible', timeout: 4000 });
       await skip.click();
     } catch {
-      // Tutoriel deja vu.
+      // Tutorial already seen.
     }
   }
 
-  // Le premier joueur est tire au sort : seul lui a les boutons de couleur.
+  // The first player is drawn at random: only they have the constellation buttons.
   const frenchStarts = (await french.locator('[data-testid^="reveal-"]').count()) > 0;
   return {
     french,
@@ -111,8 +113,8 @@ async function startBilingualGame(browser: Browser): Promise<BilingualGame> {
   };
 }
 
-test.describe('Traduction espagnole', () => {
-  test("l'accueil suit la langue du navigateur", async ({ browser }) => {
+test.describe('Translations', () => {
+  test('the home screen follows the browser language', async ({ browser }) => {
     const spanish = await openHome(browser, 'es-ES');
     await expect(spanish.locator('html')).toHaveAttribute('lang', 'es');
     await expect(spanish.getByTestId('menu-create')).toHaveText('Crear una partida');
@@ -122,16 +124,21 @@ test.describe('Traduction espagnole', () => {
 
     const french = await openHome(browser, 'fr-FR');
     await expect(french.locator('html')).toHaveAttribute('lang', 'fr');
-    await expect(french.getByTestId('menu-create')).toHaveText('Créer une partie');
+    await expect(french.getByTestId('menu-create')).toHaveText('Lancer une partie');
 
-    // Une langue inconnue retombe sur le francais.
+    const english = await openHome(browser, 'en-GB');
+    await expect(english.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(english.getByTestId('menu-create')).toHaveText('Start a game');
+    await expect(english).toHaveTitle(/constellation before anyone else/);
+
+    // A language we do not offer falls back to English.
     const other = await openHome(browser, 'de-DE');
-    await expect(other.getByTestId('menu-create')).toHaveText('Créer une partie');
+    await expect(other.getByTestId('menu-create')).toHaveText('Start a game');
   });
 
-  test('le choix de langue est immediat et survit au rechargement', async ({ browser }) => {
+  test('choosing a language is instant and survives a reload', async ({ browser }) => {
     const page = await openHome(browser, 'fr-FR');
-    await expect(page.getByTestId('menu-create')).toHaveText('Créer une partie');
+    await expect(page.getByTestId('menu-create')).toHaveText('Lancer une partie');
 
     await page.getByTestId('lang-es').click();
     await expect(page.getByTestId('menu-create')).toHaveText('Crear una partida');
@@ -140,16 +147,19 @@ test.describe('Traduction espagnole', () => {
     await page.reload();
     await expect(page.getByTestId('menu-create')).toHaveText('Crear una partida');
 
+    await page.getByTestId('lang-en').click();
+    await expect(page.getByTestId('menu-create')).toHaveText('Start a game');
+
     await page.getByTestId('lang-fr').click();
-    await expect(page.getByTestId('menu-create')).toHaveText('Créer une partie');
+    await expect(page.getByTestId('menu-create')).toHaveText('Lancer une partie');
   });
 
-  test('chaque joueur voit la partie dans sa propre langue', async ({ browser }) => {
+  test('each player sees the game in their own language', async ({ browser }) => {
     const { french, spanish, active, waiting, activeLang, waitingLang } =
       await startBilingualGame(browser);
     const activeName = TEXT[activeLang].name;
 
-    // Bandeau de tour et panneau d'action, chacun dans sa langue.
+    // Turn banner and action panel, each in their own language.
     await expect(active.locator('.turn-indicator')).toContainText(TEXT[activeLang].yourTurn);
     await expect(waiting.locator('.turn-indicator')).toContainText(
       TEXT[waitingLang].turnOf(activeName),
@@ -159,35 +169,41 @@ test.describe('Traduction espagnole', () => {
       TEXT[waitingLang].choosingColor(activeName),
     );
 
-    // Zone publique et panneaux lateraux.
-    await expect(spanish.locator('.pool__head')).toContainText('Registro común');
-    await expect(spanish.locator('.table__side')).toContainText('Jugadores');
-    await expect(spanish.locator('.table__side')).toContainText('Historial');
+    // Open sky and side panels.
+    await expect(spanish.locator('.pool__head')).toContainText('El cielo común');
+    await expect(spanish.locator('.table__side')).toContainText('En la mesa');
+    await expect(spanish.locator('.table__side')).toContainText('Lo que ha pasado');
+    await expect(french.locator('.pool__head')).toContainText('Le ciel commun');
 
-    // Les boutons de couleur sont traduits pour le joueur actif.
+    // The constellation buttons work for the active player.
     await active.getByTestId('reveal-green').click();
     await expect(active.getByTestId('hint-instruction')).toBeVisible();
 
-    // L'historique est rendu dans la langue de chaque joueur, a partir du
-    // meme evenement serveur.
+    // The history is written in each player's language, from the same
+    // server event.
     await expect(french.locator('.game-log')).toContainText(TEXT.fr.logRevealed);
     await expect(spanish.locator('.game-log')).toContainText(TEXT.es.logRevealed);
     await expect(spanish.locator('.game-log')).toContainText(TEXT.es.logTurn1(activeName));
     await expect(french.locator('.game-log')).toContainText(TEXT.fr.logTurn1(activeName));
-    // Y compris le tirage au sort du premier joueur.
-    await expect(french.locator('.game-log')).toContainText(`Tirage au sort : ${activeName}`);
-    await expect(spanish.locator('.game-log')).toContainText(`Sorteo: empieza ${activeName}`);
+    // Including the draw of the first player.
+    await expect(french.locator('.game-log')).toContainText(TEXT.fr.logDraw(activeName));
+    await expect(spanish.locator('.game-log')).toContainText(TEXT.es.logDraw(activeName));
+
+    // Switching language mid-game, from the header.
+    await french.getByTestId('lang-select').selectOption('en');
+    await expect(french.locator('.pool__head')).toContainText('The open sky');
+    await expect(french.locator('html')).toHaveAttribute('lang', 'en');
   });
 
-  test('les dialogues SITUER et JAUGER sont traduits des deux cotes', async ({ browser }) => {
+  test('the PLACE and GAUGE dialogs are translated on both sides', async ({ browser }) => {
     const { active, waiting, activeLang, waitingLang } = await startBilingualGame(browser);
 
-    // Tour du joueur tire au sort : SITUER.
+    // The drawn player's turn: PLACE.
     await active.getByTestId('reveal-blue').click();
     await expect(active.getByTestId('hint-instruction')).toBeVisible();
     await active.locator('.pool__tiles button.tile').first().click();
 
-    // Cote demandeur : les deux actions, dans SA langue.
+    // Asker's side: both actions, in their language.
     await expect(active.getByTestId('choose-classify')).toContainText(
       activeLang === 'fr' ? 'SITUER' : 'SITUAR',
     );
@@ -196,7 +212,7 @@ test.describe('Traduction espagnole', () => {
     );
     await active.getByTestId('choose-classify').click();
 
-    // Cote repondeur : titre, consigne et bouton dans SA langue.
+    // Responder's side: title, instruction and button in their language.
     await expect(waiting.locator('.modal__title')).toContainText(TEXT[waitingLang].classifyAsk);
     await expect(waiting.getByTestId('confirm-classify')).toHaveText(
       TEXT[waitingLang].classifyChoose,
@@ -207,7 +223,7 @@ test.describe('Traduction espagnole', () => {
     );
     await waiting.getByTestId('confirm-classify').click();
 
-    // Le tour passe a l'autre joueur : JAUGER, dans l'autre langue.
+    // The turn goes to the other player: GAUGE, in the other language.
     await expect(waiting.locator('.turn-indicator')).toContainText(TEXT[waitingLang].yourTurn);
     await waiting.getByTestId('reveal-red').click();
     await expect(waiting.getByTestId('hint-instruction')).toBeVisible();
@@ -222,22 +238,22 @@ test.describe('Traduction espagnole', () => {
     await expect(waiting.locator('.game-log')).toContainText(TEXT[waitingLang].logAnswers);
   });
 
-  test('la fiche de deduction et la fin de partie sont traduites', async ({ browser }) => {
+  test('the star chart and the end screen are translated', async ({ browser }) => {
     const { french, spanish } = await startBilingualGame(browser);
 
-    // Fiche cote espagnol.
+    // The Spanish player's chart.
     await spanish.getByTestId('open-sheet').click();
     await expect(spanish.getByTestId('deduction-sheet')).toContainText('Mi carta celeste');
     await expect(spanish.getByTestId('crossed-count')).toContainText('tachados');
     await spanish.getByTestId('sheet-cell-17').click();
-    // Le libelle porte un suffixe si la tuile est deja revelee au centre :
-    // on verifie donc le debut du libelle.
+    // The label gets a suffix if the star is already revealed or held by
+    // someone else: only its beginning is checked.
     await expect(spanish.getByTestId('sheet-cell-17')).toHaveAccessibleName(
-      /^Número 17, Aurora, 1 brillo, eliminado/,
+      /^Número 17, Aurora, 1 destello, tachado/,
     );
     await spanish.getByTestId('close-sheet').click();
 
-    // Fin de partie : Alice gagne, chacun lit le resultat dans sa langue.
+    // End of game: Alice wins, each player reads the result in their language.
     const aliceSecrets = await spanish
       .locator('.player-zone--opponent .rack__column > .tile')
       .evaluateAll((nodes) => nodes.map((n) => Number(n.getAttribute('data-tile'))));
@@ -249,24 +265,24 @@ test.describe('Traduction espagnole', () => {
     await french.getByTestId('submit-guess').click();
     await french.getByTestId('confirm-guess').click();
 
-    await expect(french.getByTestId('game-over-result')).toContainText('Victoire de Alice');
-    await expect(spanish.getByTestId('game-over-result')).toContainText('¡Alice ha ganado!');
+    await expect(french.getByTestId('game-over-result')).toContainText('Bravo Alice, tu as trouvé ta constellation');
+    await expect(spanish.getByTestId('game-over-result')).toContainText('¡Victoria para Alice');
     await expect(spanish.getByTestId('rematch')).toHaveText('Jugar otra vez');
     await expect(spanish.getByTestId('back-home')).toHaveText('Volver al inicio');
   });
 
-  test('les erreurs de salon sont traduites', async ({ browser }) => {
+  test('room errors are translated', async ({ browser }) => {
     const spanish = await openHome(browser, 'es-ES');
     await spanish.getByTestId('menu-join').click();
     await spanish.getByTestId('name-input').fill('Bruno');
     await spanish.getByTestId('code-input').fill('ZZZZZ');
     await spanish.getByTestId('submit-room').click();
     await expect(spanish.getByTestId('home-error')).toHaveText(
-      'Esta partida no existe (o ha caducado).',
+      'Ninguna partida coincide con este código. Quizá haya caducado.',
     );
 
     await spanish.getByTestId('name-input').fill('B');
     await spanish.getByTestId('submit-room').click();
-    await expect(spanish.getByTestId('home-error')).toContainText('Apodo no válido');
+    await expect(spanish.getByTestId('home-error')).toContainText('Este nombre no es válido');
   });
 });

@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 
-// Setup commun aux tests unitaires.
-// Les tests DOM (`*.dom.test.tsx`) s'executent sous jsdom : on y fournit les
-// APIs absentes de jsdom mais utilisees par l'interface.
+// Shared setup of the unit tests.
+// DOM tests (`*.dom.test.tsx`) run under jsdom: this provides the APIs jsdom
+// lacks but the interface uses.
 if (typeof window !== 'undefined') {
   if (!window.matchMedia) {
     Object.defineProperty(window, 'matchMedia', {

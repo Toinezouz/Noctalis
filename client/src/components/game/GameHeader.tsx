@@ -1,4 +1,5 @@
 import { useI18n } from '../../i18n/index.js';
+import { Icon } from '../ui/Icon.js';
 import { IconButton } from '../ui/IconButton.js';
 import { Button } from '../ui/Button.js';
 import { LanguageSwitch } from '../ui/LanguageSwitch.js';
@@ -15,14 +16,14 @@ export interface GameHeaderProps {
   onOpenHelp: () => void;
   onOpenSheet: () => void;
   onLeave: () => void;
-  /** Bouton d'annonce : toujours accessible pendant l'observation. */
+  /** The call button: always at hand during the game. */
   onAnnounce?: () => void;
   announceDisabled?: boolean;
   showSheetButton: boolean;
   online: boolean;
 }
 
-/** Bandeau de jeu : marque, code d'observation, outils, annonce. */
+/** Game header: brand, room code, tools and the call button. */
 export function GameHeader({
   roomCode,
   soundEnabled,
@@ -60,12 +61,12 @@ export function GameHeader({
             disabled={announceDisabled}
             data-testid="announce-button"
           >
-            🖐 {t('header.announce')}
+            <Icon name="star" size={18} /> {t('header.announce')}
           </Button>
         ) : null}
         {showSheetButton ? (
           <Button variant="secondary" onClick={onOpenSheet} data-testid="open-sheet">
-            📋 {t('header.sheet')}
+            <Icon name="chart" size={18} /> {t('header.sheet')}
           </Button>
         ) : null}
         <LanguageSwitch compact />
@@ -75,13 +76,13 @@ export function GameHeader({
           aria-pressed={soundEnabled}
           onClick={onToggleSound}
         >
-          {soundEnabled ? '🔊' : '🔇'}
+          <Icon name={soundEnabled ? 'sound' : 'mute'} />
         </IconButton>
         <IconButton label={t('header.help')} onClick={onOpenHelp}>
-          ?
+          <Icon name="help" />
         </IconButton>
-        <IconButton label={t('header.quit')} onClick={onLeave}>
-          ⏻
+        <IconButton label={t('header.quit')} onClick={onLeave} data-testid="leave-game">
+          <Icon name="leave" />
         </IconButton>
       </div>
     </header>

@@ -1,45 +1,45 @@
 import type { RevealedTile, SecretTileView, Tile, TileColor } from './tiles.js';
 
 /**
- * Machine a etats de la partie. Chaque transition est explicite et validee
- * cote serveur (cf. `shared/src/game/engine.ts`).
+ * Game state machine. Every transition is explicit and validated on the
+ * server (see `shared/src/game/engine.ts`).
  */
 export type GamePhase =
-  /** La room existe, il manque le second joueur. */
+  /** The room exists but nobody has joined yet. */
   | 'WAITING_FOR_PLAYER'
-  /** Les deux joueurs sont la, la partie peut etre lancee. */
+  /** Enough people are here, the game can start. */
   | 'LOBBY_READY'
-  /** Distribution des etoiles (etat transitoire, cote serveur uniquement). */
+  /** Dealing the stars (transient, server only). */
   | 'SETUP'
-  /** Le joueur actif doit reveler une etoile en choisissant une constellation. */
+  /** The active player must reveal a star by picking a constellation. */
   | 'TURN_REVEAL'
-  /** Le joueur actif doit demander un indice (SITUER ou JAUGER). */
+  /** The active player must ask for a hint (PLACE or GAUGE). */
   | 'TURN_HINT'
-  /** L'adversaire doit situer l'etoile choisie. */
+  /** The responder must place the chosen star. */
   | 'WAITING_FOR_CLASSIFY'
-  /** L'adversaire doit confirmer la reponse de la mesure. */
+  /** The responder must confirm the gauge answer. */
   | 'WAITING_FOR_COMPARE'
-  /** Partie terminee. */
+  /** The game is over. */
   | 'GAME_OVER';
 
 export type HintType = 'classify' | 'compare';
 
-/** Demande SITUER en attente de reponse. */
+/** A pending PLACE request. */
 export interface ClassifyHint {
   type: 'classify';
-  /** Etoile publique choisie par le demandeur. */
+  /** Public star chosen by the asker. */
   tileNumber: number;
-  /** Joueur dont on situe les etoiles secretes (le joueur actif). */
+  /** Player whose secret stars are being placed against (the active player). */
   askerId: string;
-  /** Joueur qui doit repondre (il voit les vrais numeros du demandeur). */
+  /** Player who must answer (they can see the asker's real numbers). */
   responderId: string;
 }
 
-/** Demande JAUGER en attente de reponse. */
+/** A pending GAUGE request. */
 export interface CompareHint {
   type: 'compare';
   tileNumber: number;
-  /** Position secrete visee, 0 a 4. */
+  /** Secret position being gauged, 0 to 4. */
   position: number;
   askerId: string;
   responderId: string;
@@ -47,30 +47,30 @@ export interface CompareHint {
 
 export type PendingHint = ClassifyHint | CompareHint;
 
-/** Resultat d'un SITUER : l'etoile se range dans l'une des 6 encoches. */
+/** Result of a PLACE: the star lands in one of the 6 gaps. */
 export interface ClassifyResult {
   id: string;
-  /** Joueur dont le support recoit l'etoile situee. */
+  /** Player whose rack receives the placed star. */
   ownerId: string;
   tileNumber: number;
-  /** Encoche 0 (avant la 1re) a 5 (apres la 5e). */
+  /** Gap 0 (before the 1st star) to 5 (after the 5th). */
   slot: number;
   turn: number;
 }
 
-/** Resultat d'un JAUGER : OUI (meme nombre d'eclats) ou NON. */
+/** Result of a GAUGE: YES (same brightness) or NO. */
 export interface CompareResult {
   id: string;
   ownerId: string;
   tileNumber: number;
-  /** Position secrete jaugee, 0 a 4. */
+  /** Secret position that was gauged, 0 to 4. */
   position: number;
-  /** `true` = OUI (memes eclats), `false` = NON. */
+  /** `true` = YES (same brightness), `false` = NO. */
   match: boolean;
   turn: number;
 }
 
-/** Une annonce CONSTELLATION (une seule par joueur). */
+/** A CONSTELLATION! call (one per player). */
 export interface GuessRecord {
   playerId: string;
   numbers: number[];
@@ -89,8 +89,8 @@ export type LogKind =
   | 'connection';
 
 /**
- * Evenement de l'historique. Le serveur ne redige aucune phrase : il envoie un
- * code et ses parametres, et chaque client l'affiche dans SA langue.
+ * A history entry. The server never writes sentences: it sends a code and its
+ * parameters, and each client renders it in its own language.
  */
 export type LogCode =
   | 'game-started'
@@ -101,6 +101,7 @@ export type LogCode =
   | 'compare-requested'
   | 'classify-answered'
   | 'compare-answered'
+  | 'responder-changed'
   | 'guess-correct'
   | 'guess-wrong'
   | 'player-eliminated'
@@ -111,45 +112,48 @@ export type LogCode =
   | 'game-over-draw'
   | 'game-over-reserve-empty';
 
-/** Valeurs interpolees dans le message (noms, numeros, positions...). */
+/** Values interpolated into the message (names, numbers, positions...). */
 export type LogParams = Record<string, string | number | boolean>;
 
-/** Entree de l'historique public : jamais d'information secrete interdite. */
+/** Public history entry: never carries forbidden secret information. */
 export interface LogEntry {
   id: string;
   at: number;
   kind: LogKind;
-  /** Message a afficher, traduit par le client. */
+  /** Message to display, translated by the client. */
   code: LogCode;
   params: LogParams;
   playerId?: string;
-  /** Numero de etoile eventuellement concerne (toujours une etoile publique). */
+  /** Star involved, if any (always a public star). */
   tileNumber?: number;
 }
 
-/** Etat serveur complet d'un joueur. Ne quitte JAMAIS le serveur tel quel. */
+/** Full server-side state of a player. NEVER leaves the server as is. */
 export interface PlayerState {
   id: string;
   name: string;
   connected: boolean;
   lastSeenAt: number;
   isHost: boolean;
-  /** Les 5 numeros secrets, tries par ordre croissant. SECRET ABSOLU. */
+  /** The five secret numbers, in ascending order. TOP SECRET. */
   secret: number[];
   guessUsed: boolean;
+  /** Made a wrong call, or left: can no longer win. */
   eliminated: boolean;
+  /** Left the game for good: no longer plays nor answers hints. */
+  left: boolean;
 }
 
-/** Etat serveur complet de la partie. Ne quitte JAMAIS le serveur tel quel. */
+/** Full server-side state of a game. NEVER leaves the server as is. */
 export interface GameState {
   phase: GamePhase;
   players: PlayerState[];
-  /** Ordre des tours (ids des joueurs), a partir du joueur tire au sort. */
+  /** Turn order (player ids), starting from the player drawn at random. */
   order: string[];
   activePlayerId: string | null;
-  /** Joueur tire au sort pour ouvrir la partie (fixe des la distribution). */
+  /** Player drawn at random to open the game (fixed at deal time). */
   startingPlayerId: string;
-  /** Numeros de etoiles encore dans le ciel. */
+  /** Numbers of the stars still hidden in the sky. */
   reserve: number[];
   publicTiles: RevealedTile[];
   pendingHint: PendingHint | null;
@@ -158,15 +162,15 @@ export interface GameState {
   guesses: GuessRecord[];
   log: LogEntry[];
   winnerId: string | null;
-  /** Numero du tour courant (1 = premier tour). */
+  /** Current turn number (1 = first turn). */
   turn: number;
-  /** Une etoile a-t-elle deja ete revelee pendant ce tour ? */
+  /** Has a star already been revealed during this turn? */
   revealedThisTurn: boolean;
   startedAt: number | null;
   endedAt: number | null;
 }
 
-/** Joueur tel que vu par tout le monde : aucune information secrete. */
+/** A player as everybody sees them: no secret information. */
 export interface PublicPlayer {
   id: string;
   name: string;
@@ -174,24 +178,26 @@ export interface PublicPlayer {
   isHost: boolean;
   guessUsed: boolean;
   eliminated: boolean;
-  /** Constellations des 5 etoiles secretes, dans l'ordre des positions. */
+  left: boolean;
+  /** Constellations of the five secret stars, in position order. */
   tileColors: TileColor[];
 }
 
 /**
- * Vue publique de la partie : strictement tout ce que les deux joueurs
- * peuvent voir. Aucun numero secret n'y figure (sauf a la fin de partie,
- * dans `finalReveal`, une fois la partie terminee).
+ * Public view of the game: strictly what every player may see. No secret
+ * number appears in it (except in `finalReveal`, once the game is over).
  */
 export interface PublicGameState {
   phase: GamePhase;
   players: PublicPlayer[];
+  /** Turn order, starting from the player drawn at random. */
+  order: string[];
   activePlayerId: string | null;
-  /** Joueur tire au sort au debut de la partie (information publique). */
+  /** Player drawn at random at the start (public information). */
   startingPlayerId: string;
   publicTiles: RevealedTile[];
   reserveCount: number;
-  /** Nombre de etoiles encore disponibles par constellation (info publique). */
+  /** Stars still hidden in the sky, per constellation (public information). */
   reserveByColor: Record<TileColor, number>;
   pendingHint: PendingHint | null;
   classifications: ClassifyResult[];
@@ -203,35 +209,44 @@ export interface PublicGameState {
   revealedThisTurn: boolean;
   startedAt: number | null;
   endedAt: number | null;
-  /** Rempli uniquement quand `phase === 'GAME_OVER'`. */
+  /** Only filled in when `phase === 'GAME_OVER'`. */
   finalReveal: Record<string, Tile[]> | null;
 }
 
-/** Demande de reponse adressee a l'adversaire (vue privee du repondeur). */
+/** A hint the recipient has to answer (the responder's private view). */
 export interface PendingResponse {
   hint: PendingHint;
   /**
-   * Pour JAUGER uniquement : la reponse veritable, calculee par le serveur.
-   * Le repondeur voit de toute facon les vrais numeros du demandeur : cette
-   * valeur ne lui apprend rien, elle empeche simplement de repondre faux.
+   * For GAUGE only: the true answer, computed by the server. The responder
+   * can see the asker's real numbers anyway, so this teaches them nothing;
+   * it simply makes a wrong answer impossible.
    */
   truth: boolean | null;
 }
 
+/** Another player's rack, face up: I can read their numbers. */
+export interface RivalView {
+  playerId: string;
+  /** Their five stars, in ascending order. */
+  tiles: Tile[];
+}
+
 /**
- * Vue privee d'un joueur. C'est le seul canal par lequel un client recoit
- * des informations cachees, et il ne contient JAMAIS les numeros secrets du
- * destinataire.
+ * A player's private view. It is the only channel through which a client
+ * receives hidden information, and it NEVER contains its recipient's own
+ * secret numbers.
  */
 export interface PrivatePlayerState {
   playerId: string;
-  /** Mes etoiles : constellation + position, jamais le numero ni les eclats. */
+  /** My stars: constellation and position only, never number nor brightness. */
   myTiles: SecretTileView[];
-  /** Les etoiles de l'adversaire, face visible, triees par numero croissant. */
-  opponentTiles: Tile[];
-  opponentId: string | null;
+  /**
+   * Everybody else's stars, face up, in seating order: the player right
+   * after me in the turn order comes first.
+   */
+  rivals: RivalView[];
   guessUsed: boolean;
   eliminated: boolean;
-  /** Non nul quand c'est a moi de repondre a un indice. */
+  /** Set when a hint is waiting for my answer. */
   pendingResponse: PendingResponse | null;
 }

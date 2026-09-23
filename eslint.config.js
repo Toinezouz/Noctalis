@@ -47,8 +47,8 @@ export default tseslint.config(
     },
   },
   {
-    // Les tests peuvent etre plus permissifs sur les assertions non nulles
-    // et les acces indexes.
+    // Tests may be more lenient about non-null assertions and indexed
+    // access.
     files: ['tests/**/*.ts', 'tests/**/*.tsx'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -57,7 +57,7 @@ export default tseslint.config(
     },
   },
   {
-    // Scripts d'outillage en JavaScript simple : pas de projet TypeScript.
+    // Plain JavaScript tooling scripts: no TypeScript project.
     files: ['*.config.{js,ts}', 'eslint.config.js', 'scripts/**/*.mjs'],
     ...tseslint.configs.disableTypeChecked,
   },

@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { seatsAfter } from '@noctalis/shared';
 import type {
   Ack,
   GameError,
@@ -43,10 +44,10 @@ export interface GameActions {
   rematch: () => Promise<boolean>;
 }
 
-/** Tirage au sort du premier joueur, a annoncer une fois par partie. */
+/** The draw of the first player, announced once per game. */
 export interface StartingDraw {
   startingPlayerId: string;
-  /** Instant de reception : identifie l'annonce (nouvelle partie, revanche). */
+  /** Reception time: identifies the announcement (new game, rematch). */
   at: number;
 }
 
@@ -56,18 +57,18 @@ export interface GameContextValue {
   room: RoomState | null;
   publicState: PublicGameState | null;
   privateState: PrivatePlayerState | null;
-  /** Dernier evenement recu (animations ponctuelles). */
+  /** Last event received (one-off animations). */
   lastEvent: GameEvent | null;
   /**
-   * Tirage au sort a annoncer, ou `null` si l'annonce est faite. Il vient d'un
-   * evenement temps reel : un joueur qui se reconnecte en cours de partie ne
-   * revoit pas l'animation.
+   * Draw to announce, or `null` once announced. It comes from a real-time
+   * event: a player reconnecting mid-game does not see the animation again.
    */
   startingDraw: StartingDraw | null;
-  /** Ferme l'annonce du tirage au sort. */
+  /** Closes the draw announcement. */
   dismissStartingDraw: () => void;
   me: PublicPlayer | null;
-  opponent: PublicPlayer | null;
+  /** Everybody else, in seating order: the player after me comes first. */
+  rivals: PublicPlayer[];
   isMyTurn: boolean;
   mustAnswer: boolean;
   actions: GameActions;
@@ -76,8 +77,8 @@ export interface GameContextValue {
 const GameContext = createContext<GameContextValue | null>(null);
 
 /**
- * Message affiche pour chaque code d'erreur du serveur. La table est exhaustive
- * (TypeScript le verifie) : un nouveau code imposera sa traduction.
+ * Message shown for each server error code. The table is exhaustive
+ * (TypeScript checks it): a new code forces its translation.
  */
 const ERROR_KEYS: Record<GameErrorCode, MessageKey> = {
   PLAYER_NOT_FOUND: 'error.PLAYER_NOT_FOUND',
@@ -96,6 +97,7 @@ const ERROR_KEYS: Record<GameErrorCode, MessageKey> = {
   NOT_ENOUGH_PLAYERS: 'error.NOT_ENOUGH_PLAYERS',
   ROOM_NOT_FOUND: 'error.ROOM_NOT_FOUND',
   ROOM_FULL: 'error.ROOM_FULL',
+  ROOM_STARTED: 'error.ROOM_STARTED',
   ROOM_FINISHED: 'error.ROOM_FINISHED',
   NAME_TAKEN: 'error.NAME_TAKEN',
   BAD_TOKEN: 'error.BAD_TOKEN',
@@ -105,7 +107,7 @@ const ERROR_KEYS: Record<GameErrorCode, MessageKey> = {
   NETWORK_TIMEOUT: 'error.network',
 };
 
-/** Cle de traduction d'une erreur serveur. */
+/** Translation key of a server error. */
 export function errorMessageKey(code: GameErrorCode): MessageKey {
   return ERROR_KEYS[code] ?? 'error.WRONG_PHASE';
 }
@@ -121,7 +123,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
   const [lastEvent, setLastEvent] = useState<GameEvent | null>(null);
   const [startingDraw, setStartingDraw] = useState<StartingDraw | null>(null);
   const credentialsRef = useRef<PlayerCredentials | null>(null);
-  /** Evite de reannoncer plusieurs fois le meme changement de tour. */
+  /** Avoids announcing the same turn change twice. */
   const lastTurnAnnounced = useRef<number>(0);
 
   const applyCredentials = useCallback((next: PlayerCredentials | null) => {
@@ -149,7 +151,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
       const myId = credentialsRef.current?.playerId;
       const nameOf = (id: string | null): string => {
         const player = room?.players.find((p) => p.id === id);
-        return player?.name ?? 'Le joueur';
+        return player?.name ?? '?';
       };
 
       switch (event.type) {
@@ -167,7 +169,10 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
         case 'hint-requested':
           playSound('click');
           if (event.hint.responderId === myId) {
-            toasts.push(t('toast.yourAnswer'), 'warning');
+            toasts.push(
+              t('toast.yourAnswer', { name: nameOf(event.hint.askerId) }),
+              'warning',
+            );
           }
           break;
         case 'classify-result':
@@ -226,7 +231,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
     [room, t, toasts],
   );
 
-  // --- Cycle de vie du socket ---------------------------------------------
+  // --- Socket lifecycle -----------------------------------------------------
   useEffect(() => {
     const socket = getSocket();
 
@@ -284,7 +289,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
     };
   }, [applyCredentials, applyState, t, toasts]);
 
-  // Les evenements de jeu dependent des noms de joueurs : abonnement separe.
+  // Game events depend on player names: separate subscription.
   useEffect(() => {
     const socket = getSocket();
     socket.on('game:event', describeEvent);
@@ -303,9 +308,9 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
       toasts.push(t('toast.reconnected', { name }), 'success');
     };
     const onLeft = ({ playerId, name }: { playerId: string; name: string }): void => {
-      // Ne concerne que l'adversaire : mon propre depart est deja explicite.
+      // Only about the others: my own departure needs no toast.
       if (playerId !== credentialsRef.current?.playerId) {
-        toasts.push(t('toast.opponentLeft', { name }), 'warning', 5000);
+        toasts.push(t('toast.playerOffline', { name }), 'warning', 5000);
       }
     };
     socket.on('player:joined', onJoined);
@@ -318,7 +323,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
     };
   }, [t, toasts]);
 
-  // --- Actions ------------------------------------------------------------
+  // --- Actions --------------------------------------------------------------
 
   const handle = useCallback(
     async (
@@ -385,10 +390,14 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
     () => publicState?.players.find((p) => p.id === credentials?.playerId) ?? null,
     [publicState, credentials],
   );
-  const opponent = useMemo(
-    () => publicState?.players.find((p) => p.id !== credentials?.playerId) ?? null,
-    [publicState, credentials],
-  );
+  const rivals = useMemo(() => {
+    if (!publicState || !credentials) {
+      return [];
+    }
+    return seatsAfter(publicState.order, credentials.playerId)
+      .map((id) => publicState.players.find((p) => p.id === id))
+      .filter((p): p is PublicPlayer => p !== undefined);
+  }, [publicState, credentials]);
 
   const value = useMemo<GameContextValue>(
     () => ({
@@ -401,7 +410,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
       startingDraw,
       dismissStartingDraw,
       me,
-      opponent,
+      rivals,
       isMyTurn:
         publicState !== null &&
         credentials !== null &&
@@ -419,7 +428,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
       startingDraw,
       dismissStartingDraw,
       me,
-      opponent,
+      rivals,
       actions,
     ],
   );
@@ -430,7 +439,7 @@ export function GameProvider({ children }: { children: ReactNode }): JSX.Element
 export function useGame(): GameContextValue {
   const context = useContext(GameContext);
   if (!context) {
-    throw new Error('useGame doit etre utilise dans un GameProvider');
+    throw new Error('useGame must be used inside a GameProvider');
   }
   return context;
 }

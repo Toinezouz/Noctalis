@@ -14,24 +14,24 @@ import { TileBack } from './TileBack.js';
 
 export interface RackProps {
   ownerName: string;
-  /** Constellations des 5 etoiles, dans l'ordre des positions (donnee publique). */
+  /** Constellations of the five stars, in position order (public data). */
   colors: TileColor[];
   /**
-   * Faces visibles des 5 etoiles. Fournies pour l'adversaire (que je vois) ou
-   * a la revelation finale. `null` pour mes propres etoiles pendant la partie.
+   * Visible faces of the five stars: given for other players (whom I can
+   * see) or at the final reveal. `null` for my own stars during the game.
    */
   faces: TileData[] | null;
   classifications: ClassifyResult[];
   comparisons: CompareResult[];
-  /** Position selectionnee (choix d'une position pour JAUGER). */
+  /** Selected position (choosing a position to GAUGE). */
   selectedPosition?: number | null;
   onSelectPosition?: (position: number) => void;
   compact?: boolean;
 }
 
 /**
- * Support de jeu : 5 etoiles encadrees par les 6 encoches de SITUER, avec la
- * fleche de l'ordre croissant et, sous chaque etoile, les etoiles COMPAREES.
+ * A rack: five stars framed by the six PLACE gaps, with the ascending-order
+ * arrow and, under each star, the stars gauged against it.
  */
 export function Rack({
   ownerName,
@@ -102,7 +102,7 @@ export function Rack({
   );
 }
 
-/** Convertit une liste de numeros en etoiles completes. */
+/** Turns a list of numbers into complete stars. */
 export function facesFromNumbers(numbers: number[] | undefined | null): TileData[] | null {
   return numbers ? numbers.map((n) => getTileByNumber(n)) : null;
 }

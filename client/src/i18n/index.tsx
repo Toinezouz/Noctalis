@@ -9,56 +9,66 @@ import {
 } from 'react';
 import { COLOR_LABELS } from '@noctalis/shared';
 import type { TileColor } from '@noctalis/shared';
-import { fr, type MessageKey, type Messages } from './fr.js';
+import { en, type MessageKey, type Messages } from './en.js';
+import { fr } from './fr.js';
 import { es } from './es.js';
 
-export type Language = 'fr' | 'es';
+export type Language = 'fr' | 'en' | 'es';
 
-export const LANGUAGES: readonly { code: Language; label: string; flag: string }[] = [
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
+/**
+ * Languages on offer, each named in its own language. No flags: a flag
+ * stands for a country, not for the many people who speak a language.
+ */
+export const LANGUAGES: readonly { code: Language; label: string; short: string }[] = [
+  { code: 'fr', label: 'Français', short: 'FR' },
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'es', label: 'Español', short: 'ES' },
 ];
 
-const CATALOGUES: Record<Language, Messages> = { fr, es };
+const CATALOGUES: Record<Language, Messages> = { fr, en, es };
+
+function isLanguage(value: unknown): value is Language {
+  return value === 'fr' || value === 'en' || value === 'es';
+}
 
 export type TranslateParams = Record<string, string | number>;
 
 export interface I18nApi {
   lang: Language;
   setLang: (lang: Language) => void;
-  /** Traduit une cle, en remplacant les variables {…}. */
+  /** Translates a key, filling in the {…} variables. */
   t: (key: MessageKey, params?: TranslateParams) => string;
-  /** Nom localise d'une constellation de etoile. */
+  /** Localised name of a constellation. */
   color: (color: TileColor) => string;
-  /** Libelle localise d'une des 6 encoches de SITUER. */
+  /** Localised label of one of the six PLACE gaps. */
   slot: (slot: number) => string;
-  /** "1 point" / "2 eclats" dans la langue courante. */
+  /** "1 spark" / "2 sparks" in the current language. */
   points: (count: number) => string;
 }
 
 const I18nContext = createContext<I18nApi | null>(null);
 
-/** Langue par defaut : celle du navigateur si elle est connue, sinon francais. */
+/**
+ * Default language: the first of the browser's languages we know, otherwise
+ * English, which the largest number of people can read.
+ */
 export function detectLanguage(stored?: string | null): Language {
-  if (stored === 'fr' || stored === 'es') {
+  if (isLanguage(stored)) {
     return stored;
   }
   if (typeof navigator !== 'undefined') {
     const candidates = [navigator.language, ...(navigator.languages ?? [])];
     for (const candidate of candidates) {
       const code = candidate?.slice(0, 2).toLowerCase();
-      if (code === 'es') {
-        return 'es';
-      }
-      if (code === 'fr') {
-        return 'fr';
+      if (isLanguage(code)) {
+        return code;
       }
     }
   }
-  return 'fr';
+  return 'en';
 }
 
-/** Remplace les variables {nom} d'un message. */
+/** Fills in the {name} variables of a message. */
 export function interpolate(template: string, params?: TranslateParams): string {
   if (!params) {
     return template;
@@ -98,7 +108,7 @@ export function I18nProvider({
   const api = useMemo<I18nApi>(() => {
     const catalogue = CATALOGUES[lang];
     const t = (key: MessageKey, params?: TranslateParams): string =>
-      interpolate(catalogue[key] ?? fr[key] ?? key, params);
+      interpolate(catalogue[key] ?? en[key] ?? key, params);
     return {
       lang,
       setLang,
@@ -106,7 +116,7 @@ export function I18nProvider({
       color: (color: TileColor) => t(`color.${color}` as MessageKey),
       slot: (slot: number) => t(`slot.${String(slot)}` as MessageKey),
       points: (count: number) =>
-        `${String(count)} ${count > 1 ? t('common.points') : t('common.point')}`,
+        count > 1 ? t('common.points', { count }) : t('common.point', { count }),
     };
   }, [lang, setLang]);
 
@@ -116,17 +126,17 @@ export function I18nProvider({
 export function useI18n(): I18nApi {
   const context = useContext(I18nContext);
   if (!context) {
-    throw new Error('useI18n doit etre utilise dans un I18nProvider');
+    throw new Error('useI18n must be used inside an I18nProvider');
   }
   return context;
 }
 
 /**
- * Traduction hors composant (rare) : utilise le catalogue demande.
- * `COLOR_LABELS` du paquet partage reste la reference cote serveur.
+ * Translation outside a component (rare): uses the requested catalogue.
+ * The shared `COLOR_LABELS` stay the reference on the server side.
  */
 export function translate(lang: Language, key: MessageKey, params?: TranslateParams): string {
-  return interpolate(CATALOGUES[lang][key] ?? fr[key] ?? key, params);
+  return interpolate(CATALOGUES[lang][key] ?? en[key] ?? key, params);
 }
 
 export { COLOR_LABELS };

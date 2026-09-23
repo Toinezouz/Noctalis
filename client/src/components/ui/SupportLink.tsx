@@ -1,17 +1,17 @@
 import { useI18n } from '../../i18n/index.js';
 import { SPONSORS_URL } from '../../lib/project.js';
+import { Icon } from './Icon.js';
 
 export interface SupportLinkProps {
-  /** `inline` dans le pied de page, `button` dans la fenetre A propos. */
+  /** `inline` in the footer, `button` in the About dialog. */
   variant?: 'inline' | 'button';
 }
 
 /**
- * Lien de soutien, vers GitHub Sponsors et nulle part ailleurs.
+ * The support link, to GitHub Sponsors and nowhere else.
  *
- * Il n'interrompt jamais une partie, n'ouvre aucune fenetre surgissante et ne
- * conditionne aucune fonctionnalite : NOCTALIS est entierement gratuit, et le
- * reste.
+ * It never interrupts a game, never pops up and never unlocks anything:
+ * NOCTALIS is entirely free, and stays that way.
  */
 export function SupportLink({ variant = 'inline' }: SupportLinkProps): JSX.Element {
   const { t } = useI18n();
@@ -23,7 +23,7 @@ export function SupportLink({ variant = 'inline' }: SupportLinkProps): JSX.Eleme
       rel="noopener noreferrer"
       data-testid="support-link"
     >
-      <span aria-hidden="true">♥</span> {t('support.link')}
+      <Icon name="heart" size={16} /> {t('support.link')}
     </a>
   );
 }

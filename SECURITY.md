@@ -1,57 +1,55 @@
-# Politique de sécurité
+# Security policy
 
-## Signaler une vulnérabilité
+## Reporting a vulnerability
 
-**N'ouvrez pas d'issue publique pour une faille de sécurité.** Une issue est
-visible de tous, y compris de qui voudrait exploiter le problème avant qu'il
-ne soit corrigé.
+**Please do not open a public issue for a security problem.** Issues are
+visible to everyone, including anyone who might want to exploit the problem
+before it is fixed.
 
-Deux canaux privés :
+Use **GitHub Security Advisories** instead: the *Security* tab of the
+repository, then *Report a vulnerability*
+([direct link](https://github.com/Toinezouz/Noctalis/security/advisories/new)).
+It opens a private discussion with the maintainer and lets us publish an
+advisory once the fix is live.
 
-1. **GitHub Security Advisories** — onglet *Security* du dépôt, puis
-   *Report a vulnerability*. C'est le canal préféré : il crée un espace de
-   discussion privé et permet de publier un avis une fois le correctif
-   déployé.
-2. **Courriel** — **a.clav63@gmail.com**, avec « NOCTALIS sécurité » en objet.
+## What helps
 
-## Ce qui aide
+- a description of the problem and its impact;
+- the steps to reproduce it;
+- the version or commit concerned;
+- a suggested fix, if you have one.
 
-- une description du problème et de son impact ;
-- les étapes pour le reproduire ;
-- la version ou le commit concerné ;
-- si possible, une proposition de correctif.
-
-## Engagement
+## What you can expect
 
 | | |
 | --- | --- |
-| Accusé de réception | sous 72 heures |
-| Première évaluation | sous 7 jours |
-| Correctif | dès que possible, selon la gravité |
+| Acknowledgement | within 72 hours |
+| First assessment | within 7 days |
+| Fix | as soon as possible, depending on severity |
 
-Le projet est maintenu bénévolement : ces délais sont un engagement de bonne
-foi, pas un contrat de service.
+The project is maintained on a volunteer basis: these delays are a promise
+made in good faith, not a service contract.
 
-Vous serez crédité dans l'avis de sécurité, sauf si vous préférez rester
-anonyme. Le projet n'offre aucune récompense financière.
+You will be credited in the advisory unless you prefer to stay anonymous. The
+project offers no financial reward.
 
-## Périmètre
+## Scope
 
-Le cœur de NOCTALIS est une **propriété de confidentialité** : un joueur ne
-doit jamais pouvoir obtenir ses propres numéros d'étoiles, par aucun moyen.
+The heart of NOCTALIS is a **confidentiality property**: nobody must ever be
+able to learn the numbers of their own stars, by any means.
 
-Nous traitons donc comme des vulnérabilités, en priorité :
+We therefore treat as vulnerabilities, first and foremost:
 
-- toute fuite des étoiles secrètes d'un joueur vers ce joueur — dans le DOM,
-  le stockage local, une trame WebSocket, une réponse HTTP ou les journaux ;
-- toute possibilité de jouer à la place d'un autre, ou hors de son tour ;
-- toute réponse à un indice qui ne serait pas recalculée par le serveur ;
-- toute prise de contrôle d'une observation par un tiers ;
-- tout déni de service atteignable par un client ordinaire.
+- any leak of a player's secret stars to that player — in the DOM, local
+  storage, a WebSocket frame, an HTTP answer or the logs;
+- any way to play in someone else's place, or out of turn;
+- any hint answer that is not recomputed by the server;
+- any way for an outsider to take over a game;
+- any denial of service an ordinary client can trigger.
 
-Hors périmètre : les problèmes qui exigent un accès physique à la machine
-d'un joueur, et les partages volontaires d'informations entre joueurs.
+Out of scope: problems that require physical access to a player's machine,
+and information people choose to share with each other.
 
-## Versions suivies
+## Supported versions
 
-Seule la branche `main` et le déploiement en cours sont suivis.
+Only the `main` branch and the current deployment are supported.

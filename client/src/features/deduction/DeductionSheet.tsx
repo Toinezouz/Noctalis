@@ -4,29 +4,32 @@ import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { IconButton } from '../../components/ui/IconButton.js';
 import { Modal } from '../../components/ui/Modal.js';
+import { ConstellationSigil } from '../../components/game/ConstellationSigil.js';
 import { DeductionCell } from './DeductionCell.js';
 import { DeductionGuessRow } from './DeductionGuessRow.js';
 import type { DeductionApi } from './deductionStore.js';
 
 export interface DeductionSheetProps {
   sheet: DeductionApi;
-  /** Numeros deja revelés au centre (simple repere, aucun barrage automatique). */
+  /** Numbers already revealed in the middle (a landmark, never crossed automatically). */
   revealedNumbers: number[];
-  /** Fermeture (panneau lateral sur desktop, plein ecran sur mobile). */
+  /** Numbers I can see on other people's racks (a landmark too). */
+  heldNumbers?: number[];
+  /** Closes the chart (side panel on desktop, full screen on mobile). */
   onClose?: () => void;
-  /** Propose de reporter les 5 hypotheses dans l'annonce. */
+  /** Offers to copy the five guesses into the call. */
   onUseForAnnounce?: () => void;
   fullscreen?: boolean;
 }
 
 /**
- * Fiche de deduction : reproduction du principe de la fiche officielle.
- * 5 cases d'hypotheses, fleche croissante, puis la grille 1-60 en 5 lignes de
- * constellation et 12 colonnes. Tout est prive et persistant localement.
+ * The star chart: five guess boxes, the ascending arrow, then the 1-60 grid
+ * in five constellation rows of twelve. Private, and saved on this device.
  */
 export function DeductionSheet({
   sheet,
   revealedNumbers,
+  heldNumbers = [],
   onClose,
   onUseForAnnounce,
   fullscreen = false,
@@ -34,6 +37,7 @@ export function DeductionSheet({
   const { t, color: colorName } = useI18n();
   const [confirmReset, setConfirmReset] = useState(false);
   const revealed = new Set(revealedNumbers);
+  const held = new Set(heldNumbers);
 
   return (
     <aside
@@ -68,7 +72,9 @@ export function DeductionSheet({
                 <span className="visually-hidden">
                   {t('sheet.rowLabel', { color: colorName(COLOR_ORDER[rowIndex]!) })}
                 </span>
-                <span aria-hidden="true" className="sheet__row-chip" />
+                <span aria-hidden="true" className="sheet__row-chip">
+                  <ConstellationSigil color={COLOR_ORDER[rowIndex]!} size={16} />
+                </span>
               </span>
               {row.map((tile) => (
                 <span role="gridcell" key={tile.id}>
@@ -77,6 +83,7 @@ export function DeductionSheet({
                     crossed={sheet.isCrossed(tile.number)}
                     onToggle={sheet.toggle}
                     revealed={revealed.has(tile.number)}
+                    held={held.has(tile.number)}
                   />
                 </span>
               ))}
@@ -86,10 +93,18 @@ export function DeductionSheet({
       </div>
 
       <footer className="sheet__footer">
-        <p className="sheet__legend muted">
-          {t('sheet.legend')} <span className="sheet__legend-dot" aria-hidden="true" />{' '}
-          {t('sheet.legendEnd')}
-        </p>
+        <p className="sheet__legend muted">{t('sheet.legend')}</p>
+        <ul className="sheet__keys muted">
+          <li>
+            <span className="sheet__legend-dot" aria-hidden="true" /> {t('sheet.legendRevealed')}
+          </li>
+          {heldNumbers.length > 0 ? (
+            <li>
+              <span className="sheet__legend-ring" aria-hidden="true" /> {t('sheet.legendHeld')}
+            </li>
+          ) : null}
+        </ul>
+        <p className="sheet__legend muted">{t('sheet.legendEnd')}</p>
         <div className="sheet__actions">
           <span className="badge badge--muted" data-testid="crossed-count">
             {t('sheet.crossedCount', { count: sheet.crossedCount, total: TILE_COUNT })}

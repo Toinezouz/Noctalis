@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Libelle obligatoire : un bouton icone doit toujours etre annonce. */
+  /** Required label: an icon button must always be announced. */
   label: string;
   children: ReactNode;
 }

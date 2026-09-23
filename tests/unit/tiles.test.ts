@@ -13,7 +13,7 @@ import {
   tilesOfColor,
 } from '@noctalis/shared';
 
-/** Mapping officiel de la fiche : couleur attendue pour chaque numero. */
+/** Reference mapping of the chart: expected constellation for each number. */
 const EXPECTED_COLORS: Record<string, number[]> = {
   green: [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56],
   pink: [2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57],
@@ -22,7 +22,7 @@ const EXPECTED_COLORS: Record<string, number[]> = {
   orange: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
 };
 
-/** Points attendus, par paquets de 5 numeros : 1,2,3,1,2,3... */
+/** Expected brightness, in blocks of 5 numbers: 1,2,3,1,2,3... */
 const EXPECTED_POINTS: Record<number, number> = (() => {
   const map: Record<number, number> = {};
   const pattern = [1, 2, 3];
@@ -32,25 +32,25 @@ const EXPECTED_POINTS: Record<number, number> = (() => {
   return map;
 })();
 
-describe('donnees des 60 tuiles', () => {
-  it('contient exactement 60 tuiles', () => {
+describe('data of the 60 stars', () => {
+  it('holds exactly 60 stars', () => {
     expect(TILE_COUNT).toBe(60);
     expect(TILES).toHaveLength(60);
   });
 
-  it('couvre les numeros 1 a 60 sans doublon ni trou', () => {
+  it('covers numbers 1 to 60 without duplicates or gaps', () => {
     const numbers = TILES.map((t) => t.number).sort((a, b) => a - b);
     expect(new Set(numbers).size).toBe(60);
     expect(numbers).toEqual(Array.from({ length: 60 }, (_, i) => i + 1));
   });
 
-  it('a des identifiants uniques et stables', () => {
+  it('has unique, stable identifiers', () => {
     const ids = TILES.map((t) => t.id);
     expect(new Set(ids).size).toBe(60);
     expect(getTileByNumber(37).id).toBe('tile-37');
   });
 
-  it.each(Object.entries(EXPECTED_COLORS))('la ligne %s a les bons numeros', (color, numbers) => {
+  it.each(Object.entries(EXPECTED_COLORS))('row %s has the right numbers', (color, numbers) => {
     for (const n of numbers) {
       expect(colorForNumber(n)).toBe(color);
       expect(getTileByNumber(n).color).toBe(color);
@@ -58,14 +58,14 @@ describe('donnees des 60 tuiles', () => {
     expect(tilesOfColor(color as never).map((t) => t.number)).toEqual(numbers);
   });
 
-  it('attribue les points selon le motif des colonnes (1/2/3)', () => {
+  it('gives brightness following the column pattern (1/2/3)', () => {
     for (let n = 1; n <= 60; n += 1) {
       expect(pointsForNumber(n), `points de ${String(n)}`).toBe(EXPECTED_POINTS[n]);
       expect(getTileByNumber(n).points).toBe(EXPECTED_POINTS[n]);
     }
   });
 
-  it('verifie les 15 premiers exemples de la fiche', () => {
+  it('matches the first 15 examples of the chart', () => {
     const expected: [number, string, number][] = [
       [1, 'green', 1],
       [2, 'pink', 1],
@@ -89,7 +89,7 @@ describe('donnees des 60 tuiles', () => {
     }
   });
 
-  it('reprend le motif a partir de 16 et se termine sur 60 orange 3 points', () => {
+  it('repeats the pattern from 16 and ends on 60, Phoenix, 3 sparks', () => {
     expect(getTileByNumber(16)).toMatchObject({ color: 'green', points: 1 });
     expect(getTileByNumber(17)).toMatchObject({ color: 'pink', points: 1 });
     expect(getTileByNumber(37)).toMatchObject({ color: 'pink', points: 2 });
@@ -100,7 +100,7 @@ describe('donnees des 60 tuiles', () => {
     expect(getTileByNumber(60)).toMatchObject({ color: 'orange', points: 3 });
   });
 
-  it('calcule les colonnes 1 a 12', () => {
+  it('computes columns 1 to 12', () => {
     expect(columnForNumber(1)).toBe(1);
     expect(columnForNumber(5)).toBe(1);
     expect(columnForNumber(6)).toBe(2);
@@ -108,7 +108,7 @@ describe('donnees des 60 tuiles', () => {
     expect(SHEET_COLUMNS).toBe(12);
   });
 
-  it('expose une grille 5 lignes x 12 colonnes coherente', () => {
+  it('exposes a consistent 5 x 12 grid', () => {
     expect(SHEET_GRID).toHaveLength(5);
     SHEET_GRID.forEach((row, i) => {
       expect(row).toHaveLength(12);
@@ -119,7 +119,7 @@ describe('donnees des 60 tuiles', () => {
     });
   });
 
-  it('refuse les numeros invalides', () => {
+  it('refuses invalid numbers', () => {
     expect(isValidTileNumber(0)).toBe(false);
     expect(isValidTileNumber(61)).toBe(false);
     expect(isValidTileNumber(1.5)).toBe(false);
@@ -128,7 +128,7 @@ describe('donnees des 60 tuiles', () => {
     expect(() => colorForNumber(0)).toThrow();
   });
 
-  it('interdit toute divergence entre la fiche et les tuiles', () => {
+  it('forbids any drift between the chart and the stars', () => {
     for (const row of SHEET_GRID) {
       for (const cell of row) {
         const tile = getTileByNumber(cell.number);

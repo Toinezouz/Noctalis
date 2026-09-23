@@ -10,14 +10,14 @@ const VIEWPORTS = [
   { name: '375x812', width: 375, height: 812 },
 ];
 
-// Chaque test repart d'un navigateur propre : aucune session ne fuit d'un
-// test a l'autre (sessions, fiches de deduction, sockets).
+// Every test starts from a clean browser: no session leaks from one test to
+// the next (sessions, star charts, sockets).
 test.afterEach(async ({ browser }) => {
   await Promise.all(browser.contexts().map((context) => context.close()));
 });
 
 test.describe('Responsive', () => {
-  test('aucun debordement horizontal sur les tailles ciblees', async ({ browser }) => {
+  test('no horizontal overflow at the target sizes', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Alice', 'Bob']);
 
     for (const viewport of VIEWPORTS) {
@@ -30,10 +30,10 @@ test.describe('Responsive', () => {
       }));
       expect(
         metrics.scrollWidth,
-        `debordement horizontal en ${viewport.name}`,
+        `horizontal overflow at ${viewport.name}`,
       ).toBeLessThanOrEqual(metrics.clientWidth + 1);
 
-      // Les actions principales restent accessibles et cliquables.
+      // The main actions stay reachable and clickable.
       await expect(alice.getByTestId('announce-button')).toBeVisible();
       const sheetButton = alice.getByTestId('open-sheet');
       await expect(sheetButton).toBeVisible();
@@ -43,7 +43,7 @@ test.describe('Responsive', () => {
     }
   });
 
-  test('la fiche est utilisable en plein ecran sur mobile', async ({ browser }) => {
+  test('the star chart is usable full screen on a phone', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Alice', 'Bob']);
     await alice.setViewportSize({ width: 390, height: 844 });
     await alice.getByTestId('open-sheet').click();
@@ -51,7 +51,7 @@ test.describe('Responsive', () => {
     await expect(sheet).toHaveClass(/sheet--fullscreen/);
     await expect(alice.locator('.sheet-cell')).toHaveCount(60);
 
-    // Les cases restent assez grandes pour le doigt.
+    // Cells stay big enough for a finger.
     const box = await alice.getByTestId('sheet-cell-37').boundingBox();
     expect(box).not.toBeNull();
     expect(box!.width).toBeGreaterThanOrEqual(34);

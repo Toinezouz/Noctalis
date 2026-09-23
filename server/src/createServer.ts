@@ -9,13 +9,13 @@ import { RoomManager } from './rooms/RoomManager.js';
 import { registerHandlers, type GameServer, type GameSocket } from './socket/handlers.js';
 
 export interface CreateServerOptions {
-  /** Origines autorisees (CORS + Socket.IO). `true` = toutes (hors production). */
+  /** Allowed origins (CORS + Socket.IO). `true` = any (outside production). */
   origins?: string[] | true;
-  /** Duree de survie d'une room sans joueur connecte. */
+  /** How long a room survives with nobody connected. */
   roomTtlMs?: number;
-  /** Verification anti-fuite avant chaque emission (actif hors production). */
+  /** Leak check before every emission (on outside production). */
   strictLeakCheck?: boolean;
-  /** Sert le client construit depuis le meme service si le dossier existe. */
+  /** Serves the built client from the same service when the folder exists. */
   serveClient?: boolean;
   env?: string;
 }
@@ -24,7 +24,7 @@ export interface NoctalisServer {
   httpServer: HttpServer;
   io: GameServer;
   rooms: RoomManager;
-  /** Arrete proprement le serveur et libere les timers. */
+  /** Stops the server cleanly and clears its timers. */
   close: () => Promise<void>;
 }
 
@@ -64,7 +64,7 @@ export function createNoctalisServer(options: CreateServerOptions = {}): Noctali
   const httpServer = createServer(app);
   const io: GameServer = new Server(httpServer, {
     cors: { origin: origins, methods: ['GET', 'POST'] },
-    // Charge utile volontairement petite : aucun message legitime n'est gros.
+    // Deliberately small payload limit: no legitimate message is big.
     maxHttpBufferSize: 16 * 1024,
     pingTimeout: 20000,
     pingInterval: 10000,
@@ -77,7 +77,7 @@ export function createNoctalisServer(options: CreateServerOptions = {}): Noctali
   const sweeper = setInterval(() => {
     const removed = rooms.sweep();
     if (removed > 0) {
-      console.log(`[rooms] ${String(removed)} partie(s) inactive(s) supprimee(s)`);
+      console.log(`[rooms] ${String(removed)} idle room(s) removed`);
     }
   }, 60_000);
   sweeper.unref();

@@ -1,22 +1,22 @@
 import { COLOR_ORDER, SECRET_TILE_COUNT, TILE_COUNT, getTileByNumber } from '../data/tiles.js';
 import type { Tile } from '../types/tiles.js';
 
-/** Nombre d'encoches de la zone SITUER : avant la 1re ... apres la 5e. */
+/** Number of PLACE gaps: before the 1st star ... after the 5th. */
 export const CLASSIFY_SLOT_COUNT = SECRET_TILE_COUNT + 1;
 
-/** Libelles francais des 6 encoches de SITUER. */
+/** English labels of the 6 PLACE gaps (server messages, tests). */
 export const CLASSIFY_SLOT_LABELS: readonly string[] = Object.freeze([
-  'Avant la 1re',
-  'Entre la 1re et la 2e',
-  'Entre la 2e et la 3e',
-  'Entre la 3e et la 4e',
-  'Entre la 4e et la 5e',
-  'Apres la 5e',
+  'Before the 1st',
+  'Between the 1st and the 2nd',
+  'Between the 2nd and the 3rd',
+  'Between the 3rd and the 4th',
+  'Between the 4th and the 5th',
+  'After the 5th',
 ]);
 
 /**
- * Position exacte d'une etoile publique parmi 5 numeros secrets tries.
- * Renvoie un entier de 0 (avant la 1re) a 5 (apres la 5e).
+ * Exact gap of a public star among five sorted secret numbers.
+ * Returns an integer from 0 (before the 1st) to 5 (after the 5th).
  */
 export function getClassifyPosition(secret: readonly number[], tileNumber: number): number {
   let slot = 0;
@@ -29,9 +29,9 @@ export function getClassifyPosition(secret: readonly number[], tileNumber: numbe
 }
 
 /**
- * Verifie la reponse d'un joueur a une demande SITUER.
- * Le serveur reste seul juge : cette fonction sert a savoir si le repondeur
- * s'est trompe (simple retour d'information), pas a fixer le resultat.
+ * Checks a player's answer to a PLACE request.
+ * The server stays the only judge: this only tells whether the responder
+ * made a mistake (feedback), it never decides the result.
  */
 export function validateClassify(
   secret: readonly number[],
@@ -42,17 +42,17 @@ export function validateClassify(
   return { correctSlot, wasCorrect: correctSlot === proposedSlot };
 }
 
-/** JAUGER : seul le nombre d'eclats compte, jamais la constellation. */
+/** GAUGE: only brightness matters, never the constellation. */
 export function comparePoints(a: Tile, b: Tile): boolean {
   return a.points === b.points;
 }
 
-/** JAUGER a partir des numeros. */
+/** GAUGE, from star numbers. */
 export function comparePointsByNumber(aNumber: number, bNumber: number): boolean {
   return comparePoints(getTileByNumber(aNumber), getTileByNumber(bNumber));
 }
 
-/** Raison structuree d'un refus, pour que le client la traduise. */
+/** Structured reason for a refusal, so that the client can translate it. */
 export type GuessIssue = 'count' | 'range' | 'order' | 'colors';
 
 export type GuessValidation =
@@ -60,15 +60,15 @@ export type GuessValidation =
   | { ok: false; issue: GuessIssue; reason: string };
 
 /**
- * Valide la *forme* d'une annonce : 5 entiers distincts entre 1
- * et 60, en ordre strictement croissant (l'ordre du support).
+ * Validates the *shape* of a call: 5 distinct integers between 1 and 60, in
+ * strictly ascending order (the order of the rack), one per constellation.
  */
 export function validateGuessShape(numbers: readonly unknown[]): GuessValidation {
   if (!Array.isArray(numbers) || numbers.length !== SECRET_TILE_COUNT) {
     return {
       ok: false,
       issue: 'count',
-      reason: `Il faut exactement ${String(SECRET_TILE_COUNT)} numeros.`,
+      reason: `Exactly ${String(SECRET_TILE_COUNT)} numbers are needed.`,
     };
   }
   const parsed: number[] = [];
@@ -77,7 +77,7 @@ export function validateGuessShape(numbers: readonly unknown[]): GuessValidation
       return {
         ok: false,
         issue: 'range',
-        reason: `Chaque numero doit etre un entier entre 1 et ${String(TILE_COUNT)}.`,
+        reason: `Each number must be an integer between 1 and ${String(TILE_COUNT)}.`,
       };
     }
     parsed.push(raw as number);
@@ -87,7 +87,7 @@ export function validateGuessShape(numbers: readonly unknown[]): GuessValidation
       return {
         ok: false,
         issue: 'order',
-        reason: 'Les numeros doivent etre en ordre croissant, sans doublon.',
+        reason: 'Numbers must be in ascending order, without duplicates.',
       };
     }
   }
@@ -96,13 +96,13 @@ export function validateGuessShape(numbers: readonly unknown[]): GuessValidation
     return {
       ok: false,
       issue: 'colors',
-      reason: 'Ta proposition doit contenir une tuile de chaque couleur.',
+      reason: 'A call needs one star of each constellation.',
     };
   }
   return { ok: true, numbers: parsed };
 }
 
-/** La tentative correspond-elle exactement aux 5 numeros secrets ? */
+/** Does the call match the five secret numbers exactly? */
 export function validateGuess(secret: readonly number[], numbers: readonly number[]): boolean {
   if (secret.length !== numbers.length) {
     return false;

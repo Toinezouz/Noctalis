@@ -1,4 +1,4 @@
-import { getTileByNumber, type PublicGameState } from '@noctalis/shared';
+import { MIN_PLAYERS, getTileByNumber, type PublicGameState } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Tile } from '../../components/game/Tile.js';
@@ -10,37 +10,42 @@ export interface GameOverScreenProps {
   onRematch: () => void;
   onHome: () => void;
   rematchReady: string[];
-  opponentPresent: boolean;
+  /** Ids of the players still in the room. */
+  seated: string[];
 }
 
-/** Ecran de fin : vainqueur, revelation des 10 etoiles secretes, rejouer. */
+/** Soft colours of the celebration sparks, one per constellation. */
+const SPARK_COLORS = ['green', 'pink', 'blue', 'red', 'orange'] as const;
+
+/** End screen: the result, everybody's five stars, and another round. */
 export function GameOverScreen({
   state,
   myId,
   onRematch,
   onHome,
   rematchReady,
-  opponentPresent,
+  seated,
 }: GameOverScreenProps): JSX.Element {
   const { t } = useI18n();
   const winner = state.players.find((p) => p.id === state.winnerId) ?? null;
   const iWon = state.winnerId === myId;
   const iAskedRematch = rematchReady.includes(myId);
-  const opponentAskedRematch = rematchReady.some((id) => id !== myId);
+  const readyCount = rematchReady.filter((id) => seated.includes(id)).length;
+  const enoughPlayers = seated.length >= MIN_PLAYERS;
+  const othersWaiting = readyCount > 0 && !iAskedRematch;
 
   return (
     <div className="game-over" data-testid="game-over">
       {iWon ? (
-        <div className="game-over__confetti" aria-hidden="true">
-          {Array.from({ length: 24 }, (_, i) => (
+        <div className="game-over__sparks" aria-hidden="true">
+          {Array.from({ length: 28 }, (_, i) => (
             <span
               key={i}
+              data-color={SPARK_COLORS[i % SPARK_COLORS.length]}
               style={{
-                left: `${String((i * 4.1) % 100)}%`,
-                animationDelay: `${String((i % 8) * 0.18)}s`,
-                background: ['#2FB061', '#F05A9C', '#2AA7E0', '#E8453C', '#F79020', '#FFC93C'][
-                  i % 6
-                ],
+                left: `${String((i * 37) % 100)}%`,
+                top: `${String((i * 53) % 90)}%`,
+                animationDelay: `${String((i % 7) * 0.22)}s`,
               }}
             />
           ))}
@@ -58,25 +63,35 @@ export function GameOverScreen({
         </p>
 
         <div className="game-over__reveal">
-          {state.players.map((player) => {
-            const tiles = state.finalReveal?.[player.id] ?? [];
-            return (
-              <div className="game-over__player" key={player.id}>
-                <h3>
-                  {player.name}
-                  {player.id === myId ? ` ${t('common.you')}` : ''}
-                  {player.eliminated ? (
-                    <span className="badge badge--danger">{t('status.eliminated')}</span>
-                  ) : null}
-                </h3>
-                <div className="game-over__tiles">
-                  {tiles.map((tile) => (
-                    <Tile key={tile.id} tile={getTileByNumber(tile.number)} size="sm" animate />
-                  ))}
+          {state.order
+            .map((id) => state.players.find((p) => p.id === id))
+            .map((player) => {
+              if (!player) {
+                return null;
+              }
+              const tiles = state.finalReveal?.[player.id] ?? [];
+              return (
+                <div
+                  className={`game-over__player ${player.id === state.winnerId ? 'is-winner' : ''}`.trim()}
+                  key={player.id}
+                >
+                  <h3>
+                    {player.name}
+                    {player.id === myId ? <span className="muted"> {t('common.you')}</span> : null}
+                    {player.left ? (
+                      <span className="badge badge--muted">{t('status.left')}</span>
+                    ) : player.eliminated ? (
+                      <span className="badge badge--danger">{t('status.eliminated')}</span>
+                    ) : null}
+                  </h3>
+                  <div className="game-over__tiles">
+                    {tiles.map((tile) => (
+                      <Tile key={tile.id} tile={getTileByNumber(tile.number)} size="sm" animate />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
 
         {state.guesses.length > 0 ? (
@@ -85,11 +100,10 @@ export function GameOverScreen({
               const player = state.players.find((p) => p.id === guess.playerId);
               return (
                 <li key={`${guess.playerId}-${String(index)}`}>
-                  {t('over.guessLine', {
+                  {t(guess.correct ? 'over.guessLineOk' : 'over.guessLineKo', {
                     name: player?.name ?? '',
-                    numbers: guess.numbers.join(' - '),
-                  })}{' '}
-                  {guess.correct ? `✅ ${t('over.guessOk')}` : `❌ ${t('over.guessKo')}`}
+                    numbers: guess.numbers.join(' · '),
+                  })}
                 </li>
               );
             })}
@@ -101,7 +115,7 @@ export function GameOverScreen({
             variant="primary"
             size="lg"
             onClick={onRematch}
-            disabled={iAskedRematch || !opponentPresent}
+            disabled={iAskedRematch || !enoughPlayers}
             data-testid="rematch"
           >
             {iAskedRematch ? t('over.waitingReplay') : t('over.replay')}
@@ -110,14 +124,12 @@ export function GameOverScreen({
             {t('over.home')}
           </Button>
         </div>
-        {opponentAskedRematch && !iAskedRematch ? (
-          <p className="center" style={{ fontWeight: 800 }}>
-            {t('over.opponentWantsReplay')}
+        {enoughPlayers && (othersWaiting || iAskedRematch) ? (
+          <p className="center game-over__rematch" data-testid="rematch-count">
+            {t('over.replayCount', { ready: readyCount, total: seated.length })}
           </p>
         ) : null}
-        {!opponentPresent ? (
-          <p className="center muted">{t('over.opponentLeft')}</p>
-        ) : null}
+        {!enoughPlayers ? <p className="center muted">{t('over.everyoneLeft')}</p> : null}
       </div>
     </div>
   );

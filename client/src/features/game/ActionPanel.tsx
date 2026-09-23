@@ -1,5 +1,6 @@
 import { COLOR_ORDER, type GamePhase, type TileColor } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
+import { ConstellationSigil } from '../../components/game/ConstellationSigil.js';
 
 export interface ActionPanelProps {
   phase: GamePhase;
@@ -9,13 +10,14 @@ export interface ActionPanelProps {
   onReveal: (color: TileColor) => void;
   selectedTile: number | null;
   activeName: string;
-  opponentName: string;
+  /** Who has to answer the pending hint, if any. */
+  responderName: string;
   busy: boolean;
 }
 
 /**
- * Panneau d'action : guide le joueur actif a travers les deux etapes
- * obligatoires du tour, et explique l'attente aux autres moments.
+ * Action panel: walks the active player through the two steps of a turn,
+ * and explains what everybody is waiting for the rest of the time.
  */
 export function ActionPanel({
   phase,
@@ -25,7 +27,7 @@ export function ActionPanel({
   onReveal,
   selectedTile,
   activeName,
-  opponentName,
+  responderName,
   busy,
 }: ActionPanelProps): JSX.Element {
   const { t, color: colorName } = useI18n();
@@ -63,7 +65,7 @@ export function ActionPanel({
         ? t('action.waitingReveal', { name: activeName })
         : phase === 'TURN_HINT'
           ? t('action.waitingHint', { name: activeName })
-          : t('action.waitingAnswer', { name: opponentName }),
+          : t('action.waitingAnswer', { name: responderName }),
     );
   }
 
@@ -90,8 +92,9 @@ export function ActionPanel({
                 }}
                 aria-label={t('action.revealColor', { color: colorName(color), count: left })}
               >
+                <ConstellationSigil color={color} className="color-button__sigil" size={26} />
                 <span className="color-button__label">{colorName(color)}</span>
-                <span className="color-button__count">{left}</span>
+                <span className="color-button__count">{t('action.leftCount', { count: left })}</span>
               </button>
             );
           })}
@@ -116,10 +119,8 @@ export function ActionPanel({
   }
 
   return waiting(
-    `${opponentName} ${
-      phase === 'WAITING_FOR_CLASSIFY'
-        ? t('action.waitingClassifyShort')
-        : t('action.waitingAnswerShort')
-    }…`,
+    phase === 'WAITING_FOR_CLASSIFY'
+      ? t('action.waitingClassify', { name: responderName })
+      : t('action.waitingAnswer', { name: responderName }),
   );
 }

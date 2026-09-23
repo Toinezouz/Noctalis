@@ -9,21 +9,22 @@ import { TileBack } from '../../components/game/TileBack.js';
 export interface HintDialogProps {
   open: boolean;
   tileNumber: number | null;
-  /** Mes 5 etoiles (constellation + position uniquement). */
+  /** My five stars (constellation and position only). */
   myTiles: SecretTileView[];
-  opponentName: string;
+  /** Who will answer: the next person in the turn order. */
+  responderName: string;
   onClose: () => void;
   onClassify: (tileNumber: number) => void;
   onCompare: (tileNumber: number, position: number) => void;
   busy?: boolean;
 }
 
-/** Etape 2 du tour : choisir le type d'indice pour l'etoile selectionnee. */
+/** Step 2 of a turn: choose the kind of hint for the selected star. */
 export function HintDialog({
   open,
   tileNumber,
   myTiles,
-  opponentName,
+  responderName,
   onClose,
   onClassify,
   onCompare,
@@ -97,7 +98,7 @@ export function HintDialog({
             >
               <span className="hint-choice__title">{t('hint.classify')}</span>
               <span className="hint-choice__text">
-                {t('hint.classifyText', { name: opponentName })}
+                {t('hint.classifyText', { name: responderName })}
               </span>
             </button>
             <button
@@ -111,7 +112,7 @@ export function HintDialog({
             >
               <span className="hint-choice__title">{t('hint.compare')}</span>
               <span className="hint-choice__text">
-                {t('hint.compareText', { name: opponentName })}
+                {t('hint.compareText', { name: responderName })}
               </span>
             </button>
           </div>

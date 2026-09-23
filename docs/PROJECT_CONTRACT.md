@@ -1,44 +1,59 @@
-# Contrat technique de NOCTALIS
+# NOCTALIS technical contract
 
-> **Source de vérité des signatures.** Tout nom, toute signature et tout
-> événement listés ici sont immuables. Un fichier qui s'en écarte est en
-> faute, pas le contrat.
+> **Source of truth for signatures.** Every name, signature and event listed
+> here is fixed. A file that departs from it is at fault, not the contract.
 >
-> Pour changer une signature : modifier ce document, modifier **tous** les
-> consommateurs, exécuter `npm run typecheck`, `npm run test`, puis
-> `npm run check:contract` qui vérifie que le code expose bien ce contrat.
+> To change a signature: update this document, update **every** consumer,
+> run `npm run typecheck` and `npm test`, then `npm run check:contract`,
+> which checks that the code really exposes this contract.
 
-## 0. Renommages décidés lors de la migration
+## 0. Change log
 
-| Avant | Après | Raison |
+### 1.0 — renames made during the migration
+
+| Before | After | Why |
 | --- | --- | --- |
-| `@gotfive/shared` · `@gotfive/server` · `@gotfive/client` | `@noctalis/shared` · `@noctalis/server` · `@noctalis/client` | identité |
-| `GameOverReason = 'got-five'` | `GameOverReason = 'constellation'` | identité, valeur transmise sur le réseau |
-| clés `gotfive:*` (stockage local) | `noctalis:*` | identité |
-| `data-testid="got-five-button"` | `data-testid="announce-button"` | identité |
-| `data-testid="got-five-input-N"` | `data-testid="announce-input-N"` | identité |
-| prop `gotFiveDisabled` | `announceDisabled` | identité |
-| `PublicPlayer.guessUsed` | *inchangé* | terme générique |
+| `@gotfive/shared` · `@gotfive/server` · `@gotfive/client` | `@noctalis/shared` · `@noctalis/server` · `@noctalis/client` | identity |
+| `GameOverReason = 'got-five'` | `GameOverReason = 'constellation'` | identity, value sent over the network |
+| `gotfive:*` storage keys | `noctalis:*` | identity |
+| `data-testid="got-five-button"` | `data-testid="announce-button"` | identity |
+| `data-testid="got-five-input-N"` | `data-testid="announce-input-N"` | identity |
+| prop `gotFiveDisabled` | `announceDisabled` | identity |
 
-Tout le reste du moteur conserve ses noms : ils décrivent des mécanismes, pas
-une marque.
+### 1.1 — tables of 2 to 4 players
 
-## 1. Types de données (`@noctalis/shared`)
+| Before | After | Why |
+| --- | --- | --- |
+| `createGame` accepts exactly 2 seeds | accepts `MIN_PLAYERS` (2) to `MAX_PLAYERS` (4) | bigger tables |
+| `getOpponent(state, id)` | `getRivals(state, id)` — everybody else, in seating order | several opponents |
+| `PrivatePlayerState.opponentTiles` / `opponentId` | `PrivatePlayerState.rivals: RivalView[]` | several opponents |
+| — | `PublicGameState.order` | who answers is public |
+| — | `PlayerState.left`, `PublicPlayer.left` | leaving no longer ends a game of 3 or 4 |
+| — | `seatsAfter`, `pickResponder`, `reassignResponder` | who answers a question |
+| — | `LogCode 'responder-changed'`, `GameErrorCode 'ROOM_STARTED'` | new situations |
+| log params `{ opponent }` | `{ responder }` (hint requests), `{ remaining }` (out of the race) | several opponents |
+| `COLOR_LABELS`, `CLASSIFY_SLOT_LABELS` in French | in English | server messages are for developers |
+
+The rest of the engine keeps its names: they describe mechanisms, not a brand.
+
+## 1. Data types (`@noctalis/shared`)
 
 ```ts
 type TileColor = 'green' | 'pink' | 'blue' | 'red' | 'orange';
 type TilePoints = 1 | 2 | 3;
 
-interface Tile { number: number; color: TileColor; points: TilePoints }
+interface Tile { id: string; number: number; color: TileColor; points: TilePoints }
 interface SecretTileView { color: TileColor; position: number }
 interface RevealedTile { tile: Tile; order: number; revealedBy: string | null; used: boolean }
+interface RivalView { playerId: string; tiles: Tile[] }
 ```
 
-Les identifiants de `TileColor` restent en anglais : ce sont des teintes. Leur
-nom d'affichage (Lyre, Aurore, Cygne, Braise, Phénix) vit dans les catalogues
-de traduction, jamais dans le moteur.
+`TileColor` identifiers are technical names and are never shown. Players see
+Lyra, Aurora, Cygnus, Ember and Phoenix (Lyre, Aurore, Cygne, Braise, Phénix;
+Lira, Aurora, Cisne, Brasa, Fénix) from the client's translation catalogues.
+`points` is called *sparks* in the interface.
 
-## 2. Constantes
+## 2. Constants
 
 ```ts
 const TILE_COUNT = 60;
@@ -48,13 +63,16 @@ const CLASSIFY_SLOT_COUNT = 6;
 const SHEET_COLUMNS = 12;
 const TILES: readonly Tile[];
 const SHEET_GRID: readonly (readonly Tile[])[];
+const COLOR_LABELS: Readonly<Record<TileColor, string>>; // English, server messages
 const ROOM_CODE_LENGTH = 5;
 const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 16;
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 4;
 ```
 
-## 3. Machine à états
+## 3. State machine
 
 ```ts
 type GamePhase =
@@ -72,30 +90,32 @@ type HintType = 'classify' | 'compare';
 type RoomStatus = 'waiting' | 'playing' | 'finished';
 ```
 
-Un seul nom par état. Aucun synonyme n'est toléré.
+One name per state. No synonym is tolerated. In the interface, `classify` is
+called **PLACE** (SITUER, SITUAR) and `compare` **GAUGE** (JAUGER, MEDIR).
 
-## 4. États et projections
+## 4. States and projections
 
 ```ts
-interface GameState          // serveur uniquement, ne sort jamais
-interface PublicGameState    // visible par les deux joueurs
-interface PrivatePlayerState // visible par un seul joueur
+interface GameState          // server only, never leaves it
+interface PublicGameState    // visible to everybody at the table
+interface PrivatePlayerState // visible to one player only
 interface PublicPlayer
-interface PlayerState        // serveur uniquement (contient `secret`)
+interface PlayerState        // server only (holds `secret`)
 
 function toPublicGameState(state: GameState): PublicGameState;
 function toPlayerPrivateState(state: GameState, playerId: string): PrivatePlayerState | null;
 function findSecretLeak(state: GameState, playerId: string, payload: unknown): SecretLeak | null;
 ```
 
-**Règle non négociable** : aucun chemin de code ne sérialise `GameState`. Un
-client ne reçoit que la combinaison des deux projections, et sa vue privée ne
-contient jamais ses propres numéros.
+**Non-negotiable rule**: no code path serialises `GameState`. A client only
+ever receives the two projections combined, and its private view never holds
+its own numbers. `PrivatePlayerState.rivals` lists everybody else's stars, in
+seating order (the player right after me comes first).
 
-## 5. Moteur
+## 5. Engine
 
 ```ts
-function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState;
+function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState; // 2 to 4 seeds
 function revealTile(state: GameState, playerId: string, color: TileColor, rng: Rng): EngineResult;
 function requestClassify(state: GameState, playerId: string, tileNumber: number): EngineResult;
 function submitClassify(state: GameState, playerId: string, slot: number): EngineResult;
@@ -103,9 +123,12 @@ function requestCompare(state: GameState, playerId: string, tileNumber: number, 
 function submitCompare(state: GameState, playerId: string): EngineResult;
 function submitGuess(state: GameState, playerId: string, numbers: readonly number[]): EngineResult;
 function forfeit(state: GameState, playerId: string): EngineResult;
+function reassignResponder(state: GameState): GameEvent[];
 
 function getPlayer(state: GameState, playerId: string): PlayerState | undefined;
-function getOpponent(state: GameState, playerId: string): PlayerState | undefined;
+function getRivals(state: GameState, playerId: string): PlayerState[];
+function seatsAfter(order: readonly string[], playerId: string): string[];
+function pickResponder<T extends ResponderCandidate>(order: readonly string[], players: readonly T[], askerId: string): T | null;
 function getWinner(state: GameState): PlayerState | null;
 function isPublicTile(state: GameState, tileNumber: number): boolean;
 function availablePublicTiles(state: GameState): RevealedTile[];
@@ -115,10 +138,20 @@ function setPlayerConnected(state: GameState, playerId: string, connected: boole
 type EngineResult = { ok: true; events: GameEvent[] } | { ok: false; error: GameError };
 ```
 
-`submitCompare` ne prend **pas** la réponse du client : le serveur la
-recalcule. C'est une propriété de sécurité, pas un détail de signature.
+- `submitCompare` does **not** take the client's answer: the server works it
+  out. That is a security property, not a detail of the signature.
+- **Who answers**: the next person in the turn order who is still at the
+  table, preferably someone online (`pickResponder`). The client uses the same
+  pure function to say who will answer before the question is asked.
+- **Going offline**: `reassignResponder` hands a pending question to someone
+  online; with nobody better available, the game waits, as it always did.
+- **Wrong call**: the player is out of the race, skipped in the turn order,
+  but still answers questions. When nobody can win any more, the game ends
+  without a winner.
+- **Leaving** (`forfeit`): the player leaves the rotation. When a single
+  person remains at the table, they win.
 
-## 6. Données et règles
+## 6. Data and rules
 
 ```ts
 function colorForNumber(n: number): TileColor;
@@ -137,12 +170,12 @@ function countReserveByColor(reserve: readonly number[]): Record<TileColor, numb
 function comparePoints(a: Tile, b: Tile): boolean;
 function comparePointsByNumber(aNumber: number, bNumber: number): boolean;
 function getClassifyPosition(secret: readonly number[], tileNumber: number): number;
-function validateClassify(secret: readonly number[], tileNumber: number, slot: number): boolean;
+function validateClassify(secret: readonly number[], tileNumber: number, slot: number): { correctSlot: number; wasCorrect: boolean };
 function validateGuess(secret: readonly number[], numbers: readonly number[]): boolean;
 function validateGuessShape(numbers: readonly unknown[]): GuessValidation;
 ```
 
-## 7. Hasard
+## 7. Randomness
 
 ```ts
 type Rng = () => number;
@@ -152,7 +185,7 @@ function randomInt(rng: Rng, max: number): number;
 function pickRandom<T>(rng: Rng, items: readonly T[]): T;
 ```
 
-## 8. Validation des entrées
+## 8. Input validation
 
 ```ts
 type Validated<T> = { ok: true; value: T } | { ok: false; reason: string };
@@ -166,33 +199,40 @@ function validateNumberList(raw: unknown, length: number): Validated<number[]>;
 function sanitizeName(raw: unknown): string;
 ```
 
-## 9. Protocole Socket.IO
+`reason` and `GameError.message` are English, for developers. Players only
+ever see a translation of the error **code**.
 
-Noms d'événements **immuables**. Chaque action cliente répond par un
-acquittement `Ack<T> = { ok: true; data: T } | { ok: false; error: GameError }`.
+## 9. Socket.IO protocol
 
-### Client → serveur
+Event names are **fixed**. Every client action is acknowledged with
+`Ack<T> = { ok: true; data: T } | { ok: false; error: GameError }`.
 
-| Événement | Charge utile | Acquittement |
+### Client → server
+
+| Event | Payload | Acknowledgement |
 | --- | --- | --- |
 | `room:create` | `{ name: string }` | `Ack<PlayerCredentials>` |
 | `room:join` | `{ name: string; code: string }` | `Ack<PlayerCredentials>` |
 | `player:reconnect` | `{ code: string; playerId: string; token: string }` | `Ack<PlayerCredentials>` |
 | `room:leave` | `{}` | `Ack<null>` |
-| `game:start` | `{}` | `Ack<null>` |
+| `game:start` | `{}` — host only, 2 to 4 people seated | `Ack<null>` |
 | `game:reveal` | `{ color: TileColor }` | `Ack<null>` |
 | `game:request-classify` | `{ tileNumber: number }` | `Ack<null>` |
 | `game:submit-classify` | `{ slot: number }` | `Ack<null>` |
 | `game:request-compare` | `{ tileNumber: number; position: number }` | `Ack<null>` |
-| `game:submit-compare` | `{ answer: boolean }` — **valeur ignorée** | `Ack<null>` |
+| `game:submit-compare` | `{ answer: boolean }` — **value ignored** | `Ack<null>` |
 | `game:guess` | `{ numbers: number[] }` | `Ack<null>` |
-| `game:rematch` | `{}` | `Ack<null>` |
+| `game:rematch` | `{}` — starts once everybody seated asked | `Ack<null>` |
 
-### Serveur → client
+Joining is only possible in the lobby: a room refuses newcomers once its game
+has started (`ROOM_STARTED`), and beyond four people (`ROOM_FULL`). When the
+host leaves the lobby, the longest-seated person becomes host.
 
-| Événement | Contenu |
+### Server → client
+
+| Event | Content |
 | --- | --- |
-| `room:state` / `game:state` | `StatePayload` — individualisé par joueur |
+| `room:state` / `game:state` | `StatePayload` — built separately for each player |
 | `game:event` | `GameEvent` |
 | `player:joined` / `player:left` / `player:reconnected` | `{ playerId: string; name: string }` |
 | `server:error` | `GameError` |
@@ -201,7 +241,7 @@ acquittement `Ack<T> = { ok: true; data: T } | { ok: false; error: GameError }`.
 type GameEvent =
   | { type: 'game-started'; startingPlayerId: string }
   | { type: 'tile-revealed'; tile: Tile; byPlayerId: string }
-  | { type: 'hint-requested'; hint: PendingHint }
+  | { type: 'hint-requested'; hint: PendingHint } // also sent when the responder changes
   | { type: 'classify-result'; result: ClassifyResult; wasCorrect: boolean }
   | { type: 'compare-result'; result: CompareResult }
   | { type: 'turn-changed'; activePlayerId: string | null; turn: number }
@@ -211,17 +251,17 @@ type GameEvent =
 interface StatePayload { room: RoomState; publicState: PublicGameState | null; privateState: PrivatePlayerState | null }
 ```
 
-## 10. Routes HTTP
+## 10. HTTP routes
 
-| Méthode | Chemin | Réponse |
+| Method | Path | Answer |
 | --- | --- | --- |
 | `GET` | `/health` | `{ status: 'ok', rooms: number, uptime: number, env: string }` |
-| `GET` | `/*` | `client/dist/index.html` (repli SPA) |
+| `GET` | `/*` | `client/dist/index.html` (SPA fallback) |
 
-`status` vaut toujours la chaîne `"ok"` quand le service répond : c'est la
-sonde utilisée par Render.
+`status` is always the string `"ok"` when the service answers: it is the probe
+Render uses.
 
-## 11. Serveur
+## 11. Server
 
 ```ts
 function createNoctalisServer(options: ServerOptions): NoctalisServer;
@@ -249,17 +289,16 @@ class RoomManager {
 }
 ```
 
-`RoomManager` est le dépôt en mémoire de la v1 : **les observations en cours
-sont perdues si le service redémarre.** C'est documenté, assumé, et suffisant
-pour des parties de quelques dizaines de minutes. Aucune base de données n'est
-ajoutée tant qu'un besoin réel ne l'impose pas.
+`RoomManager` is an in-memory store: **games in progress are lost if the
+service restarts.** That is documented, deliberate, and enough for games
+played in one sitting. No database is added until a real need calls for it.
 
-## 12. Client — composants et props
+## 12. Client — components and props
 
 ```tsx
 function App(): JSX.Element;
 function GameProvider({ children }: { children: ReactNode }): JSX.Element;
-function useGame(): GameContextValue;
+function useGame(): GameContextValue; // exposes `me` and `rivals` (seating order)
 
 function GameTable(props: GameTableProps): JSX.Element | null;
 function GameHeader(props: GameHeaderProps): JSX.Element;
@@ -270,6 +309,8 @@ function LanguageSwitch(props: LanguageSwitchProps): JSX.Element;
 function SupportLink(props: SupportLinkProps): JSX.Element;
 function AboutDialog(props: AboutDialogProps): JSX.Element | null;
 function SiteFooter(props: SiteFooterProps): JSX.Element;
+function ConstellationSigil(props: ConstellationSigilProps): JSX.Element;
+function Icon(props: IconProps): JSX.Element;
 
 interface GameActions {
   createRoom(name: string): Promise<{ ok: boolean; errorCode?: GameErrorCode }>;
@@ -286,7 +327,7 @@ interface GameActions {
 }
 ```
 
-## 13. Magasins et hooks
+## 13. Stores and hooks
 
 ```ts
 function useDeductionSheet(roomCode: string | null, playerId: string | null): DeductionSheetStore;
@@ -305,7 +346,19 @@ function useToasts(): ToastApi;
 function useI18n(): I18nApi;
 ```
 
-## 14. Thème
+## 14. Languages
+
+```ts
+type Language = 'fr' | 'en' | 'es';
+function detectLanguage(stored?: string | null): Language; // saved choice, browser, then English
+```
+
+`client/src/i18n/en.ts` is the reference catalogue; `fr.ts` and `es.ts` carry
+exactly the same keys and the same `{variables}`. Player-facing texts never
+use technical words and, in French and Spanish, avoid gendered forms (see
+`tests/unit/i18n.test.ts`).
+
+## 15. Theme
 
 ```ts
 type ThemePreference = 'auto' | 'light' | 'dark';
@@ -315,52 +368,54 @@ function nextThemePreference(preference: ThemePreference): ThemePreference;
 function applyTheme(theme: ResolvedTheme): void;
 ```
 
-## 15. Stockage local
+## 16. Local storage
 
-| Clé | Contenu |
+| Key | Content |
 | --- | --- |
-| `noctalis:session` | identifiants de reconnexion (jamais de secret de jeu) |
-| `noctalis:prefs` | pseudo, son, tutoriel vu, langue, thème |
-| `noctalis:sheet:<code>:<playerId>` | carte du ciel personnelle |
+| `noctalis:session` | reconnection credentials (never a game secret) |
+| `noctalis:prefs` | name, sound, tutorial seen, language, theme |
+| `noctalis:sheet:<code>:<playerId>` | personal star chart |
 
-## 16. Variables d'environnement
+## 17. Environment variables
 
-| Variable | Défaut | Rôle |
+| Variable | Default | Role |
 | --- | --- | --- |
-| `PORT` | `3001` | port d'écoute (fourni par Render) |
-| `NODE_ENV` | `development` | mode d'exécution |
-| `CLIENT_URL` | `http://localhost:5173` | origines autorisées, séparées par des virgules |
-| `ROOM_TTL_MS` | `900000` | survie d'une observation sans joueur connecté |
-| `VITE_SERVER_URL` | vide | origine du serveur, lue au build du client |
+| `PORT` | `3001` | listening port (provided by Render) |
+| `NODE_ENV` | `development` | runtime mode |
+| `CLIENT_URL` | `http://localhost:5173` | allowed origins, comma-separated |
+| `ROOM_TTL_MS` | `900000` | how long a room survives with nobody connected |
+| `VITE_SERVER_URL` | empty | server origin, read when the client is built |
 
-Aucune de ces variables n'est un secret. Le projet n'en utilise aucun.
+None of these variables is a secret. The project uses none.
 
-## 17. Scripts npm
+## 18. npm scripts
 
-| Script | Rôle |
+| Script | Role |
 | --- | --- |
-| `npm run dev` | serveur + client en développement |
-| `npm run build` | shared, puis serveur, puis client |
-| `npm start` | démarre le serveur compilé (commande de Render) |
-| `npm test` | tests Vitest |
-| `npm run test:e2e` | tests Playwright, joues contre le serveur de production |
-| `npm run typecheck` | 4 projets TypeScript |
+| `npm run dev` | server + client in development |
+| `npm run build` | shared, then server, then client |
+| `npm start` | starts the built server (Render's start command) |
+| `npm test` | Vitest tests |
+| `npm run test:e2e` | Playwright tests, played against the production server |
+| `npm run typecheck` | 4 TypeScript projects |
 | `npm run lint` | ESLint |
-| `npm run check:contract` | vérifie que le code expose ce contrat |
-| `npm run share` | partie à distance via tunnel éphémère |
+| `npm run check:contract` | checks that the code exposes this contract |
+| `npm run share` | plays with friends far away through a temporary tunnel (`play.cmd` on Windows) |
 
-## 18. Identifiants de test (`data-testid`)
+## 19. Test identifiers (`data-testid`)
 
-Stables : les tests E2E en dépendent.
+Stable: the end-to-end tests depend on them.
 
 `menu-create`, `menu-join`, `menu-help`, `name-input`, `code-input`,
-`submit-room`, `home-error`, `room-code`, `waiting-host`, `start-game`,
-`announce-button`, `announce-input-0..4`, `submit-guess`, `confirm-guess`,
-`open-sheet`, `close-sheet`, `reset-sheet`, `confirm-reset`,
-`deduction-sheet`, `sheet-cell-<n>`, `guess-input-<i>`, `crossed-count`,
-`reveal-<color>`, `hint-instruction`, `choose-classify`, `choose-compare`,
-`confirm-classify`, `confirm-compare`, `confirm-compare-answer`, `game-over`,
-`game-over-result`, `rematch`, `back-home`, `opponent-offline`,
-`skip-onboarding`, `lang-fr`, `lang-es`, `theme-auto`, `theme-light`,
-`theme-dark`, `theme-cycle`, `roulette`, `roulette-continue`,
-`roulette-note`, `support-link`, `about-open`, `about-dialog`.
+`submit-room`, `home-error`, `room-code`, `copy-code`, `lobby-player-<i>`,
+`waiting-host`, `start-game`, `leave-room`, `announce-button`,
+`announce-input-0..4`, `submit-guess`, `confirm-guess`, `open-sheet`,
+`close-sheet`, `reset-sheet`, `confirm-reset`, `deduction-sheet`,
+`sheet-cell-<n>`, `guess-input-<i>`, `crossed-count`, `reveal-<color>`,
+`hint-instruction`, `choose-classify`, `choose-compare`, `confirm-classify`,
+`confirm-compare`, `confirm-compare-answer`, `game-over`, `game-over-result`,
+`rematch`, `rematch-count`, `back-home`, `opponent-offline`, `leave-game`,
+`skip-onboarding`, `next-onboarding`, `lang-fr`, `lang-en`, `lang-es`,
+`lang-select`, `theme-auto`, `theme-light`, `theme-dark`, `theme-cycle`,
+`roulette`, `roulette-continue`, `roulette-note`, `support-link`,
+`about-open`, `about-dialog`.

@@ -23,7 +23,7 @@ export function Field({ label, error, hint, className = '', ...rest }: FieldProp
         {...rest}
       />
       {hint ? (
-        <span id={hintId} className="muted" style={{ fontSize: 'var(--fs-sm)' }}>
+        <span id={hintId} className="field__hint">
           {hint}
         </span>
       ) : null}

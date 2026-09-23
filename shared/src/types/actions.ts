@@ -1,7 +1,7 @@
 import type { ClassifyResult, CompareResult, PendingHint } from './game.js';
 import type { Tile, TileColor } from './tiles.js';
 
-/** Action de jeu demandee par un client. Toujours revalidee par le serveur. */
+/** A game action requested by a client. Always re-validated by the server. */
 export type GameAction =
   | { type: 'reveal'; color: TileColor }
   | { type: 'request-classify'; tileNumber: number }
@@ -12,11 +12,12 @@ export type GameAction =
 
 export type GameOverReason = 'constellation' | 'all-eliminated' | 'reserve-empty' | 'forfeit';
 
-/** Evenement produit par le moteur, diffuse aux clients (animations, log). */
+/** An event produced by the engine and broadcast to clients (animations, log). */
 export type GameEvent =
-  /** Ouverture de la partie : annonce le joueur tire au sort (animation). */
+  /** The game opens: announces the player drawn at random (roulette). */
   | { type: 'game-started'; startingPlayerId: string }
   | { type: 'tile-revealed'; tile: Tile; byPlayerId: string }
+  /** Also sent again when the responder changes (the previous one went offline). */
   | { type: 'hint-requested'; hint: PendingHint }
   | { type: 'classify-result'; result: ClassifyResult; wasCorrect: boolean }
   | { type: 'compare-result'; result: CompareResult }
@@ -39,20 +40,22 @@ export type GameErrorCode =
   | 'PLAYER_ELIMINATED'
   | 'GAME_OVER'
   | 'NOT_ENOUGH_PLAYERS'
-  // Salon : chaque situation a son code, pour un message clair et traduisible.
+  // Rooms: every situation has its own code, for a clear, translatable message.
   | 'ROOM_NOT_FOUND'
   | 'ROOM_FULL'
+  | 'ROOM_STARTED'
   | 'ROOM_FINISHED'
   | 'NAME_TAKEN'
   | 'BAD_TOKEN'
   | 'SERVER_BUSY'
   | 'INVALID_NAME'
   | 'INVALID_CODE'
-  /** Produit par le client lorsqu'une action reste sans reponse. */
+  /** Produced by the client when an action gets no answer. */
   | 'NETWORK_TIMEOUT';
 
 export interface GameError {
   code: GameErrorCode;
+  /** Developer-facing explanation. Players see a translation of `code`. */
   message: string;
 }
 

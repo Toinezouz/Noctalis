@@ -11,18 +11,20 @@ import { I18nProvider, type Language } from '../../client/src/i18n/index.js';
 const ROOM = 'AB7K9';
 const PLAYER = 'p_test';
 
-/** Petit hote qui branche la fiche sur son magasin persistant. */
+/** A small host wiring the chart to its persistent store. */
 function SheetHost({
   revealed = [],
+  held = [],
   lang = 'fr',
 }: {
   revealed?: number[];
+  held?: number[];
   lang?: Language;
 }): JSX.Element {
   const sheet = useDeductionSheet(ROOM, PLAYER);
   return (
     <I18nProvider initialLanguage={lang}>
-      <DeductionSheet sheet={sheet} revealedNumbers={revealed} />
+      <DeductionSheet sheet={sheet} revealedNumbers={revealed} heldNumbers={held} />
     </I18nProvider>
   );
 }
@@ -32,8 +34,8 @@ beforeEach(() => {
   cleanup();
 });
 
-describe('Fiche de deduction (composant)', () => {
-  it('affiche exactement 60 cases, une par numero, sans doublon', () => {
+describe('Star chart (component)', () => {
+  it('shows exactly 60 cells, one per number, no duplicate', () => {
     render(<SheetHost />);
     const cells = screen.getAllByRole('button', { name: /^Numéro \d+/ });
     expect(cells).toHaveLength(60);
@@ -44,14 +46,14 @@ describe('Fiche de deduction (composant)', () => {
     );
   });
 
-  it('affiche la bonne constellation et le bon nombre d éclats pour les 60 numeros', () => {
+  it('shows the right constellation and brightness for all 60 numbers', () => {
     render(<SheetHost />);
     for (const tile of TILES) {
       const cell = screen.getByTestId(`sheet-cell-${String(tile.number)}`);
       expect(cell.getAttribute('data-color')).toBe(tile.color);
       expect(cell.querySelectorAll('.sheet-cell__dot')).toHaveLength(tile.points);
-      // La fiche affiche le nom traduit de la constellation, pas le libelle
-      // serveur : c'est bien le catalogue du client qui fait foi ici.
+      // The chart shows the translated constellation name, not the server
+      // label: the client's catalogue is the reference here.
       expect(cell.getAttribute('aria-label')).toContain(fr[`color.${tile.color}`]);
       expect(cell.getAttribute('aria-label')).toContain(
         `${String(tile.points)} éclat${tile.points > 1 ? 's' : ''}`,
@@ -59,7 +61,7 @@ describe('Fiche de deduction (composant)', () => {
     }
   });
 
-  it('verifie les exemples officiels de la fiche', () => {
+  it('matches the reference examples of the chart', () => {
     render(<SheetHost />);
     const expected: [number, string, number][] = [
       [1, 'Lyre', 1],
@@ -82,12 +84,12 @@ describe('Fiche de deduction (composant)', () => {
       expect(cell.getAttribute('aria-label')).toBe(
         `Numéro ${String(n)}, ${color}, ${String(points)} éclat${
           points > 1 ? 's' : ''
-        }, non éliminé`,
+        }, encore possible`,
       );
     }
   });
 
-  it('barre au premier clic et restaure au second', async () => {
+  it('crosses out on the first tap and restores on the second', async () => {
     const user = userEvent.setup();
     render(<SheetHost />);
     const cell = screen.getByTestId('sheet-cell-17');
@@ -96,7 +98,7 @@ describe('Fiche de deduction (composant)', () => {
     await user.click(cell);
     expect(cell).toHaveAttribute('aria-pressed', 'true');
     expect(cell.querySelector('.sheet-cell__cross')).not.toBeNull();
-    expect(cell.getAttribute('aria-label')).toContain('éliminé');
+    expect(cell.getAttribute('aria-label')).toContain('barré');
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('1 / 60');
 
     await user.click(cell);
@@ -105,7 +107,7 @@ describe('Fiche de deduction (composant)', () => {
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60');
   });
 
-  it('conserve les deductions apres demontage / remontage', async () => {
+  it('keeps the deductions across unmount / remount', async () => {
     const user = userEvent.setup();
     const first = render(<SheetHost />);
     await user.click(screen.getByTestId('sheet-cell-23'));
@@ -117,7 +119,7 @@ describe('Fiche de deduction (composant)', () => {
     expect(screen.getByTestId('guess-input-2')).toHaveValue('31');
   });
 
-  it('accepte, nettoie et persiste les 5 hypotheses', async () => {
+  it('accepts, cleans and saves the 5 guesses', async () => {
     const user = userEvent.setup();
     render(<SheetHost />);
     const values = ['18', '24', '31', '42', '56'];
@@ -127,7 +129,7 @@ describe('Fiche de deduction (composant)', () => {
     for (const [index, value] of values.entries()) {
       expect(screen.getByTestId(`guess-input-${String(index)}`)).toHaveValue(value);
     }
-    // Les caracteres non numeriques sont ignores.
+    // Non-digit characters are ignored.
     await user.clear(screen.getByTestId('guess-input-0'));
     await user.type(screen.getByTestId('guess-input-0'), 'a7b');
     expect(screen.getByTestId('guess-input-0')).toHaveValue('7');
@@ -138,18 +140,18 @@ describe('Fiche de deduction (composant)', () => {
     expect(stored.guesses).toEqual(['7', '24', '31', '42', '56']);
   });
 
-  it('efface tout apres confirmation, et seulement apres', async () => {
+  it('clears everything after confirmation, and only then', async () => {
     const user = userEvent.setup();
     render(<SheetHost />);
     await user.click(screen.getByTestId('sheet-cell-11'));
     await user.type(screen.getByTestId('guess-input-0'), '11');
 
-    // Ouvrir puis annuler : rien n'est efface.
+    // Open then cancel: nothing is cleared.
     await user.click(screen.getByTestId('reset-sheet'));
     await user.click(screen.getByRole('button', { name: 'Annuler' }));
     expect(screen.getByTestId('sheet-cell-11')).toHaveAttribute('aria-pressed', 'true');
 
-    // Confirmer : tout est reinitialise.
+    // Confirm: everything is reset.
     await user.click(screen.getByTestId('reset-sheet'));
     await user.click(screen.getByTestId('confirm-reset'));
     expect(screen.getByTestId('sheet-cell-11')).toHaveAttribute('aria-pressed', 'false');
@@ -157,18 +159,19 @@ describe('Fiche de deduction (composant)', () => {
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60');
   });
 
-  it('signale les tuiles revelees sans jamais les barrer automatiquement', () => {
+  it('marks revealed stars without ever crossing them out', () => {
     render(<SheetHost revealed={[3, 12, 25, 40, 58]} />);
     for (const n of [3, 12, 25, 40, 58]) {
       const cell = screen.getByTestId(`sheet-cell-${String(n)}`);
       expect(cell.className).toContain('is-revealed');
       expect(cell).toHaveAttribute('aria-pressed', 'false');
       expect(cell.getAttribute('aria-label')).toContain('déjà révélée');
+      expect(cell.querySelector('.sheet-cell__revealed')).not.toBeNull();
     }
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60');
   });
 
-  it('ne stocke que le raisonnement du joueur, jamais un secret de jeu', async () => {
+  it('only stores the player\'s reasoning, never a game secret', async () => {
     const user = userEvent.setup();
     render(<SheetHost />);
     await user.click(screen.getByTestId('sheet-cell-44'));
@@ -178,7 +181,7 @@ describe('Fiche de deduction (composant)', () => {
     expect(parsed['crossed']).toEqual([44]);
   });
 
-  it('chaque joueur et chaque partie ont leur propre fiche', async () => {
+  it('every player and every game has its own chart', async () => {
     const user = userEvent.setup();
     const first = render(<SheetHost />);
     await user.click(screen.getByTestId('sheet-cell-9'));
@@ -196,32 +199,32 @@ describe('Fiche de deduction (composant)', () => {
     expect(screen.getByTestId('sheet-cell-9')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('se traduit entierement en espagnol', async () => {
+  it('is fully translated into Spanish', async () => {
     const user = userEvent.setup();
     render(<SheetHost lang="es" revealed={[12]} />);
 
     expect(screen.getByText('Mi carta celeste')).toBeInTheDocument();
-    expect(screen.getByText('Privada: ni el servidor ni tu rival la ven.')).toBeInTheDocument();
-    expect(screen.getByTestId('reset-sheet')).toHaveTextContent('Borrar mis deducciones');
+    expect(screen.getByText('Solo para ti: nadie más la ve.')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-sheet')).toHaveTextContent('Borrar mi carta');
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60 tachados');
 
     const cell = screen.getByTestId('sheet-cell-37');
-    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 brillos, no eliminado');
+    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 destellos, aún posible');
     await user.click(cell);
-    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 brillos, eliminado');
+    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 destellos, tachado');
 
-    // La ficha revelada garde son repere, dans la langue choisie.
+    // The revealed star keeps its landmark, in the chosen language.
     expect(screen.getByTestId('sheet-cell-12').getAttribute('aria-label')).toContain(
-      'ya revelada en el centro',
+      'ya revelada en el cielo',
     );
 
-    // La confirmation de reinitialisation est traduite elle aussi.
+    // The reset confirmation is translated too.
     await user.click(screen.getByTestId('reset-sheet'));
-    expect(screen.getByText('¿Borrar toda la hoja?')).toBeInTheDocument();
+    expect(screen.getByText('¿Borrar toda la carta?')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
   });
 
-  it('les 5 lignes de couleur suivent l ordre officiel', () => {
+  it('the 5 constellation rows follow the reference order', () => {
     render(<SheetHost />);
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(5);
@@ -238,9 +241,30 @@ describe('Fiche de deduction (composant)', () => {
         Number(cell.querySelector('.sheet-cell')?.getAttribute('data-number')),
       );
       expect(numbers).toEqual(expectedRows[index]);
-      // Toutes les cases d'une ligne partagent la couleur de la ligne.
+      // Every cell of a row shares the row's constellation.
       const colors = new Set(numbers.map((n) => getTileByNumber(n).color));
       expect(colors.size).toBe(1);
     });
+  });
+
+  it('marks the stars held by others, still without crossing them out', () => {
+    render(<SheetHost held={[8, 19, 33]} lang="en" />);
+    for (const n of [8, 19, 33]) {
+      const cell = screen.getByTestId(`sheet-cell-${String(n)}`);
+      expect(cell.className).toContain('is-held');
+      expect(cell).toHaveAttribute('aria-pressed', 'false');
+      expect(cell.getAttribute('aria-label')).toContain('held by someone else');
+    }
+    expect(screen.getByTestId('sheet-cell-9').className).not.toContain('is-held');
+    expect(screen.getByText(/cannot be yours/)).toBeInTheDocument();
+    expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60');
+  });
+
+  it('reads naturally in English', () => {
+    render(<SheetHost lang="en" />);
+    expect(screen.getByText('My star chart')).toBeInTheDocument();
+    expect(screen.getByTestId('sheet-cell-60').getAttribute('aria-label')).toBe(
+      'Number 60, Phoenix, 3 sparks, still possible',
+    );
   });
 });

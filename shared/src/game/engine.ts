@@ -5,6 +5,7 @@ import {
   getTileByNumber,
   isValidTileNumber,
 } from '../data/tiles.js';
+import { MAX_PLAYERS, MIN_PLAYERS } from '../protocol/events.js';
 import type { RevealedTile } from '../types/tiles.js';
 import type {
   ClassifyResult,
@@ -29,7 +30,7 @@ import {
   validateGuessShape,
 } from './rules.js';
 
-/** Description minimale d'un joueur au moment de creer la partie. */
+/** Minimal description of a player when a game is created. */
 export interface PlayerSeed {
   id: string;
   name: string;
@@ -44,9 +45,8 @@ function nextId(prefix: string): string {
 }
 
 /**
- * Ajoute une entree a l'historique. Aucune phrase n'est redigee ici : seuls un
- * code et ses parametres circulent, pour que chaque client les affiche dans sa
- * propre langue.
+ * Appends a history entry. No sentence is written here: only a code and its
+ * parameters travel, so that each client can show them in its own language.
  */
 function log(
   state: GameState,
@@ -64,8 +64,8 @@ function log(
     ...extra,
   };
   state.log.push(entry);
-  // L'historique reste borne : une partie tres longue ne fait pas gonfler
-  // indefiniment la charge utile envoyee aux clients.
+  // The history stays bounded: a very long game does not keep inflating the
+  // payload sent to every client.
   if (state.log.length > 200) {
     state.log.splice(0, state.log.length - 200);
   }
@@ -75,25 +75,65 @@ export function getPlayer(state: GameState, playerId: string): PlayerState | und
   return state.players.find((p) => p.id === playerId);
 }
 
-export function getOpponent(state: GameState, playerId: string): PlayerState | undefined {
-  return state.players.find((p) => p.id !== playerId);
+/**
+ * The ids of `order` starting right after `playerId` and going round the
+ * table, `playerId` itself excluded. Unknown ids yield the plain order.
+ */
+export function seatsAfter(order: readonly string[], playerId: string): string[] {
+  const index = order.indexOf(playerId);
+  const rotated = index < 0 ? order.slice() : [...order.slice(index + 1), ...order.slice(0, index)];
+  return rotated.filter((id) => id !== playerId);
+}
+
+/** Everybody but `playerId`, in seating order: the next player comes first. */
+export function getRivals(state: GameState, playerId: string): PlayerState[] {
+  return seatsAfter(state.order, playerId)
+    .map((id) => getPlayer(state, id))
+    .filter((p): p is PlayerState => p !== undefined);
+}
+
+/** The bits of a player that the choice of a responder depends on. */
+export interface ResponderCandidate {
+  id: string;
+  connected: boolean;
+  left: boolean;
 }
 
 /**
- * L'etoile est-elle disponible dans la releve commun ?
- * Une etoile deja utilisee pour un indice a rejoint un support : elle n'est
- * plus choisissable.
+ * Who answers a hint asked by `askerId`?
+ *
+ * The next person in the turn order who is still at the table, preferably
+ * someone online, so that a closed tab never blocks the game. Everybody but
+ * the asker can see the asker's stars, so anybody can answer truthfully.
+ *
+ * Pure function over public data: the client uses it too, to tell the asker
+ * who is going to answer before they even ask.
+ */
+export function pickResponder<T extends ResponderCandidate>(
+  order: readonly string[],
+  players: readonly T[],
+  askerId: string,
+): T | null {
+  const candidates = seatsAfter(order, askerId)
+    .map((id) => players.find((p) => p.id === id))
+    .filter((p): p is T => p !== undefined && !p.left);
+  return candidates.find((p) => p.connected) ?? candidates[0] ?? null;
+}
+
+/**
+ * Is this star available in the shared sky?
+ * A star already used for a hint has joined a rack: it cannot be picked again.
  */
 export function isPublicTile(state: GameState, tileNumber: number): boolean {
   return state.publicTiles.some((t) => t.tile.number === tileNumber && !t.used);
 }
 
-/** Etoiles encore disponibles au centre. */
+/** Stars still available in the middle of the table. */
 export function availablePublicTiles(state: GameState): RevealedTile[] {
   return state.publicTiles.filter((t) => !t.used);
 }
 
-/** Marque une etoile comme consommee : elle quitte la releve commun. */
+/** Marks a star as used: it leaves the shared sky. */
 function consumePublicTile(state: GameState, tileNumber: number): void {
   const entry = state.publicTiles.find((t) => t.tile.number === tileNumber);
   if (entry) {
@@ -102,18 +142,20 @@ function consumePublicTile(state: GameState, tileNumber: number): void {
 }
 
 /**
- * Cree une partie complete : melange, distribution des 5 etoiles secretes
- * (une par constellation, triees par ordre croissant), mise en place des 5 etoiles
- * publiques initiales (une par constellation) et tirage au sort du joueur qui ouvre
- * la partie.
+ * Creates a complete game for 2 to 4 players: shuffles, deals five secret
+ * stars to everyone (one per constellation, sorted in ascending order), lays
+ * out five public stars (one per constellation) and draws the player who
+ * opens the game.
  */
 export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
-  if (seeds.length !== 2) {
-    throw new RangeError('NOCTALIS se joue exactement a 2 observateurs.');
+  if (seeds.length < MIN_PLAYERS || seeds.length > MAX_PLAYERS) {
+    throw new RangeError(
+      `NOCTALIS is played by ${String(MIN_PLAYERS)} to ${String(MAX_PLAYERS)} players.`,
+    );
   }
 
   const deck = shuffleDeck(createDeck(), rng);
-  /** Pioche par constellation : on retire les etoiles au fur et a mesure. */
+  /** One draw pile per constellation: stars are taken off as they are dealt. */
   const byColor = new Map<TileColor, number[]>();
   for (const color of COLOR_ORDER) {
     byColor.set(
@@ -126,7 +168,7 @@ export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
     const pool = byColor.get(color)!;
     const n = pool.shift();
     if (n === undefined) {
-      throw new RangeError(`Plus aucune tuile ${color} disponible`);
+      throw new RangeError(`No ${color} star left to deal`);
     }
     return n;
   };
@@ -140,18 +182,19 @@ export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
     secret: [],
     guessUsed: false,
     eliminated: false,
+    left: false,
   }));
 
-  // 1 etoile de chaque constellation par joueur, puis tri croissant.
+  // One star of each constellation per player, then sorted.
   for (const player of players) {
     player.secret = COLOR_ORDER.map((color) => takeColor(color)).sort((a, b) => a - b);
   }
 
-  // 5 etoiles publiques initiales : une de chaque constellation.
+  // Five public stars to start with: one of each constellation.
   const publicNumbers = COLOR_ORDER.map((color) => takeColor(color));
 
-  // Qui commence ? Tirage au sort, exactement comme on tire a la courte paille
-  // avant une partie sur table. L'ordre des tours part de ce joueur.
+  // Who starts? Drawn at random, like drawing straws before a board game.
+  // The turn order goes round the table from that player.
   const startingIndex = randomInt(rng, players.length);
   const starter = players[startingIndex]!;
   const order = [...players.slice(startingIndex), ...players.slice(0, startingIndex)].map(
@@ -192,7 +235,7 @@ export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
   return state;
 }
 
-/** Tire au hasard une etoile encore disponible d'une constellation donnee. */
+/** Draws a random star still hidden in the given constellation. */
 export function drawTileByColor(state: GameState, color: TileColor, rng: Rng): number | null {
   const pool = reserveOfColor(state.reserve, color);
   if (pool.length === 0) {
@@ -205,22 +248,22 @@ export function drawTileByColor(state: GameState, color: TileColor, rng: Rng): n
 
 function guardActive(state: GameState, playerId: string): EngineResult | null {
   if (state.phase === 'GAME_OVER') {
-    return engineError('GAME_OVER', 'La partie est terminee.');
+    return engineError('GAME_OVER', 'The game is over.');
   }
   const player = getPlayer(state, playerId);
   if (!player) {
-    return engineError('PLAYER_NOT_FOUND', "Tu n'es pas dans cette partie.");
+    return engineError('PLAYER_NOT_FOUND', 'Player not in this game.');
   }
   if (player.eliminated) {
-    return engineError('PLAYER_ELIMINATED', 'Tu as deja fait ton annonce.');
+    return engineError('PLAYER_ELIMINATED', 'Player already made their call.');
   }
   if (state.activePlayerId !== playerId) {
-    return engineError('NOT_YOUR_TURN', "Ce n'est pas ton tour.");
+    return engineError('NOT_YOUR_TURN', 'Not this player\'s turn.');
   }
   return null;
 }
 
-/** PHASE 1 du tour : reveler une etoile de la constellation choisie. */
+/** Step 1 of a turn: reveal a star of the chosen constellation. */
 export function revealTile(
   state: GameState,
   playerId: string,
@@ -232,16 +275,16 @@ export function revealTile(
     return guard;
   }
   if (state.phase !== 'TURN_REVEAL') {
-    return engineError('WRONG_PHASE', 'Tu as deja revele une tuile pendant ce tour.');
+    return engineError('WRONG_PHASE', 'A star was already revealed this turn.');
   }
   if (!COLOR_ORDER.includes(color)) {
-    return engineError('INVALID_COLOR', 'Couleur inconnue.');
+    return engineError('INVALID_COLOR', 'Unknown constellation.');
   }
   const number = drawTileByColor(state, color, rng);
   if (number === null) {
     return engineError(
       'COLOR_EXHAUSTED',
-      `La constellation ${COLOR_LABELS[color]} n'a plus aucune etoile au ciel.`,
+      `${COLOR_LABELS[color]} has no hidden star left.`,
     );
   }
 
@@ -267,35 +310,52 @@ export function revealTile(
   return { ok: true, events: [{ type: 'tile-revealed', tile, byPlayerId: playerId }] };
 }
 
-/** PHASE 2a : demander a l'adversaire de SITUER une etoile publique. */
+/** Checks shared by both hint requests; returns the responder on success. */
+function prepareHint(
+  state: GameState,
+  playerId: string,
+  tileNumber: number,
+): { ok: true; responder: PlayerState } | { ok: false; result: EngineResult } {
+  const guard = guardActive(state, playerId);
+  if (guard) {
+    return { ok: false, result: guard };
+  }
+  if (state.phase !== 'TURN_HINT') {
+    return { ok: false, result: engineError('WRONG_PHASE', 'Reveal a star first.') };
+  }
+  if (!isValidTileNumber(tileNumber) || !isPublicTile(state, tileNumber)) {
+    return {
+      ok: false,
+      result: engineError('TILE_NOT_PUBLIC', 'This star is not in the shared sky.'),
+    };
+  }
+  const responder = pickResponder(state.order, state.players, playerId);
+  if (!responder) {
+    return { ok: false, result: engineError('NOT_ENOUGH_PLAYERS', 'Nobody left to answer.') };
+  }
+  return { ok: true, responder };
+}
+
+/** Step 2a: ask the next player to PLACE a public star among my stars. */
 export function requestClassify(
   state: GameState,
   playerId: string,
   tileNumber: number,
 ): EngineResult {
-  const guard = guardActive(state, playerId);
-  if (guard) {
-    return guard;
+  const prepared = prepareHint(state, playerId, tileNumber);
+  if (!prepared.ok) {
+    return prepared.result;
   }
-  if (state.phase !== 'TURN_HINT') {
-    return engineError('WRONG_PHASE', "Revele d'abord une tuile.");
-  }
-  if (!isValidTileNumber(tileNumber) || !isPublicTile(state, tileNumber)) {
-    return engineError('TILE_NOT_PUBLIC', "Cette tuile n'est pas dans la zone publique.");
-  }
-  const opponent = getOpponent(state, playerId);
-  if (!opponent) {
-    return engineError('NOT_ENOUGH_PLAYERS', 'Adversaire introuvable.');
-  }
+  const { responder } = prepared;
 
   state.pendingHint = {
     type: 'classify',
     tileNumber,
     askerId: playerId,
-    responderId: opponent.id,
+    responderId: responder.id,
   };
-  // L'etoile quitte le centre des qu'elle est choisie : elle rejoint le
-  // support du demandeur et ne peut plus servir a un autre indice.
+  // The star leaves the middle as soon as it is chosen: it joins the asker's
+  // rack and cannot be used for another hint.
   consumePublicTile(state, tileNumber);
   state.phase = 'WAITING_FOR_CLASSIFY';
 
@@ -304,35 +364,35 @@ export function requestClassify(
     state,
     'hint-request',
     'classify-requested',
-    { name: player.name, opponent: opponent.name, tile: tileNumber },
+    { name: player.name, responder: responder.name, tile: tileNumber },
     { playerId, tileNumber },
   );
 
-  return { ok: true, events: [{ type: 'hint-requested', hint: state.pendingHint }] };
+  return { ok: true, events: [{ type: 'hint-requested', hint: { ...state.pendingHint } }] };
 }
 
-/** PHASE 2a (reponse) : l'adversaire situe l'etoile. Le serveur tranche. */
+/** Step 2a (answer): the responder places the star. The server decides. */
 export function submitClassify(state: GameState, playerId: string, slot: number): EngineResult {
   if (state.phase !== 'WAITING_FOR_CLASSIFY' || !state.pendingHint) {
-    return engineError('WRONG_PHASE', 'Aucune demande CLASSER en cours.');
+    return engineError('WRONG_PHASE', 'No PLACE request pending.');
   }
   const hint = state.pendingHint;
   if (hint.type !== 'classify') {
-    return engineError('WRONG_PHASE', "L'indice en cours n'est pas un CLASSER.");
+    return engineError('WRONG_PHASE', 'The pending hint is not a PLACE.');
   }
   if (hint.responderId !== playerId) {
-    return engineError('NOT_RESPONDER', "Ce n'est pas a toi de repondre.");
+    return engineError('NOT_RESPONDER', 'This player is not the one answering.');
   }
   if (!Number.isInteger(slot) || slot < 0 || slot >= CLASSIFY_SLOT_COUNT) {
-    return engineError('INVALID_SLOT', 'Emplacement invalide.');
+    return engineError('INVALID_SLOT', 'Invalid gap.');
   }
 
   const asker = getPlayer(state, hint.askerId);
   if (!asker) {
-    return engineError('PLAYER_NOT_FOUND', 'Demandeur introuvable.');
+    return engineError('PLAYER_NOT_FOUND', 'Asker not found.');
   }
 
-  // Le serveur recalcule la verite : la reponse du client ne peut pas mentir.
+  // The server computes the truth again: the client's answer cannot lie.
   const correctSlot = getClassifyPosition(asker.secret, hint.tileNumber);
   const wasCorrect = correctSlot === slot;
 
@@ -365,37 +425,28 @@ export function submitClassify(state: GameState, playerId: string, slot: number)
   return { ok: true, events };
 }
 
-/** PHASE 2b : demander une COMPARAISON de eclats avec l'une de mes positions. */
+/** Step 2b: ask the next player to GAUGE a public star against one of my positions. */
 export function requestCompare(
   state: GameState,
   playerId: string,
   tileNumber: number,
   position: number,
 ): EngineResult {
-  const guard = guardActive(state, playerId);
-  if (guard) {
-    return guard;
-  }
-  if (state.phase !== 'TURN_HINT') {
-    return engineError('WRONG_PHASE', "Revele d'abord une tuile.");
-  }
-  if (!isValidTileNumber(tileNumber) || !isPublicTile(state, tileNumber)) {
-    return engineError('TILE_NOT_PUBLIC', "Cette tuile n'est pas dans la zone publique.");
+  const prepared = prepareHint(state, playerId, tileNumber);
+  if (!prepared.ok) {
+    return prepared.result;
   }
   if (!Number.isInteger(position) || position < 0 || position >= SECRET_TILE_COUNT) {
-    return engineError('INVALID_POSITION', 'Position invalide.');
+    return engineError('INVALID_POSITION', 'Invalid position.');
   }
-  const opponent = getOpponent(state, playerId);
-  if (!opponent) {
-    return engineError('NOT_ENOUGH_PLAYERS', 'Adversaire introuvable.');
-  }
+  const { responder } = prepared;
 
   state.pendingHint = {
     type: 'compare',
     tileNumber,
     position,
     askerId: playerId,
-    responderId: opponent.id,
+    responderId: responder.id,
   };
   consumePublicTile(state, tileNumber);
   state.phase = 'WAITING_FOR_COMPARE';
@@ -407,19 +458,19 @@ export function requestCompare(
     'compare-requested',
     {
       name: player.name,
-      opponent: opponent.name,
+      responder: responder.name,
       tile: tileNumber,
       position: position + 1,
     },
     { playerId, tileNumber },
   );
 
-  return { ok: true, events: [{ type: 'hint-requested', hint: state.pendingHint }] };
+  return { ok: true, events: [{ type: 'hint-requested', hint: { ...state.pendingHint } }] };
 }
 
 /**
- * Reponse veritable a une demande JAUGER, calculee par le serveur.
- * Renvoie `null` si aucune demande JAUGER n'est en cours.
+ * True answer to a pending GAUGE request, computed by the server.
+ * Returns `null` when no GAUGE request is pending.
  */
 export function getCompareTruth(state: GameState): boolean | null {
   const hint = state.pendingHint;
@@ -438,23 +489,23 @@ export function getCompareTruth(state: GameState): boolean | null {
 }
 
 /**
- * PHASE 2b (reponse) : l'adversaire confirme. La valeur envoyee par le client
- * est ignoree : seule la verite calculee par le serveur fait foi.
+ * Step 2b (answer): the responder confirms. Whatever the client sends is
+ * ignored: only the truth computed by the server counts.
  */
 export function submitCompare(state: GameState, playerId: string): EngineResult {
   if (state.phase !== 'WAITING_FOR_COMPARE' || !state.pendingHint) {
-    return engineError('WRONG_PHASE', 'Aucune demande COMPARER en cours.');
+    return engineError('WRONG_PHASE', 'No GAUGE request pending.');
   }
   const hint = state.pendingHint;
   if (hint.type !== 'compare') {
-    return engineError('WRONG_PHASE', "L'indice en cours n'est pas un COMPARER.");
+    return engineError('WRONG_PHASE', 'The pending hint is not a GAUGE.');
   }
   if (hint.responderId !== playerId) {
-    return engineError('NOT_RESPONDER', "Ce n'est pas a toi de repondre.");
+    return engineError('NOT_RESPONDER', 'This player is not the one answering.');
   }
   const truth = getCompareTruth(state);
   if (truth === null) {
-    return engineError('WRONG_PHASE', 'Comparaison impossible.');
+    return engineError('WRONG_PHASE', 'Nothing to gauge.');
   }
 
   const result: CompareResult = {
@@ -487,16 +538,54 @@ export function submitCompare(state: GameState, playerId: string): EngineResult 
   return { ok: true, events };
 }
 
-/** Termine le tour courant et passe la main (ou termine la partie). */
+/**
+ * If the player expected to answer the pending hint went offline or left,
+ * hands the question over to the next person who can answer. Nothing changes
+ * when nobody better is available: the game then waits, as it always did.
+ */
+export function reassignResponder(state: GameState): GameEvent[] {
+  const hint = state.pendingHint;
+  if (!hint || state.phase === 'GAME_OVER') {
+    return [];
+  }
+  const current = getPlayer(state, hint.responderId);
+  if (current && current.connected && !current.left) {
+    return [];
+  }
+  const next = pickResponder(state.order, state.players, hint.askerId);
+  if (!next || next.id === hint.responderId) {
+    return [];
+  }
+  hint.responderId = next.id;
+  log(
+    state,
+    'hint-request',
+    'responder-changed',
+    { name: next.name, previous: current?.name ?? '' },
+    { playerId: next.id, tileNumber: hint.tileNumber },
+  );
+  return [{ type: 'hint-requested', hint: { ...hint } }];
+}
+
+/** Ends the current turn and passes the lead (or ends the game). */
 function endTurn(state: GameState): GameEvent[] {
-  const events: GameEvent[] = [];
+  return passTurn(state, state.activePlayerId ?? '');
+}
+
+/**
+ * Hands the lead to the next player still in the race after `fromId`.
+ * Any pending hint is dropped. Ends the game when the sky is empty or when
+ * nobody can win any more.
+ */
+function passTurn(state: GameState, fromId: string): GameEvent[] {
+  state.pendingHint = null;
   state.revealedThisTurn = false;
 
   if (state.reserve.length === 0) {
     return finishGame(state, null, 'reserve-empty');
   }
 
-  const next = nextActivePlayer(state);
+  const next = nextActivePlayer(state, fromId);
   if (!next) {
     return finishGame(state, null, 'all-eliminated');
   }
@@ -505,22 +594,24 @@ function endTurn(state: GameState): GameEvent[] {
   state.turn += 1;
   state.phase = 'TURN_REVEAL';
   log(state, 'turn', 'turn-start', { turn: state.turn, name: next.name }, { playerId: next.id });
-  events.push({ type: 'turn-changed', activePlayerId: next.id, turn: state.turn });
-  return events;
+  return [{ type: 'turn-changed', activePlayerId: next.id, turn: state.turn }];
 }
 
-function nextActivePlayer(state: GameState): PlayerState | null {
-  const alive = state.players.filter((p) => !p.eliminated);
-  if (alive.length === 0) {
-    return null;
+/**
+ * The next player in the turn order who can still win, going round the
+ * table from `fromId`. It may be `fromId` itself when they are the last one
+ * in the race.
+ */
+function nextActivePlayer(state: GameState, fromId: string): PlayerState | null {
+  const start = state.order.indexOf(fromId);
+  for (let step = 1; step <= state.order.length; step += 1) {
+    const id = state.order[(start + step + state.order.length) % state.order.length]!;
+    const player = getPlayer(state, id);
+    if (player && !player.eliminated) {
+      return player;
+    }
   }
-  if (alive.length === 1) {
-    return alive[0]!;
-  }
-  const currentIndex = state.order.indexOf(state.activePlayerId ?? '');
-  const nextIndex = (currentIndex + 1) % state.order.length;
-  const nextId2 = state.order[nextIndex]!;
-  return getPlayer(state, nextId2) ?? null;
+  return null;
 }
 
 function finishGame(
@@ -543,44 +634,66 @@ function finishGame(
       { name: winner?.name ?? '' },
       { playerId: winnerId },
     );
-  } else if (reason === 'all-eliminated') {
-    log(state, 'system', 'game-over-draw', {});
-  } else {
+  } else if (reason === 'reserve-empty') {
     log(state, 'system', 'game-over-reserve-empty', {});
+  } else {
+    log(state, 'system', 'game-over-draw', {});
   }
 
   return [{ type: 'game-over', winnerId, reason }];
 }
 
-/** Abandon volontaire : l'adversaire gagne. */
+/**
+ * A player leaves during the game. They can no longer win nor answer hints.
+ * When a single person is left at the table, that person wins; otherwise the
+ * game goes on without the one who left.
+ */
 export function forfeit(state: GameState, playerId: string): EngineResult {
   if (state.phase === 'GAME_OVER') {
-    return engineError('GAME_OVER', 'La partie est deja terminee.');
+    return engineError('GAME_OVER', 'The game is already over.');
   }
   const player = getPlayer(state, playerId);
-  if (!player) {
-    return engineError('PLAYER_NOT_FOUND', "Tu n'es pas dans cette partie.");
+  if (!player || player.left) {
+    return engineError('PLAYER_NOT_FOUND', 'Player not in this game.');
   }
-  const opponent = getOpponent(state, playerId);
+  player.left = true;
+  player.eliminated = true;
+  player.connected = false;
   log(state, 'system', 'player-left', { name: player.name }, { playerId });
-  return { ok: true, events: finishGame(state, opponent?.id ?? null, 'forfeit') };
+
+  const stillHere = state.players.filter((p) => !p.left);
+  if (stillHere.length <= 1) {
+    return { ok: true, events: finishGame(state, stillHere[0]?.id ?? null, 'forfeit') };
+  }
+  if (!stillHere.some((p) => !p.eliminated)) {
+    return { ok: true, events: finishGame(state, null, 'all-eliminated') };
+  }
+
+  const events: GameEvent[] = [];
+  if (state.activePlayerId === playerId) {
+    // Whatever they were doing is dropped: the next player takes over.
+    events.push(...passTurn(state, playerId));
+  } else if (state.pendingHint?.responderId === playerId) {
+    events.push(...reassignResponder(state));
+  }
+  return { ok: true, events };
 }
 
-/** Annonce CONSTELLATION : possible a tout moment, une seule fois par joueur. */
+/** CONSTELLATION! call: allowed at any time, once per player. */
 export function submitGuess(
   state: GameState,
   playerId: string,
   numbers: readonly number[],
 ): EngineResult {
   if (state.phase === 'GAME_OVER') {
-    return engineError('GAME_OVER', 'La partie est terminee.');
+    return engineError('GAME_OVER', 'The game is over.');
   }
   const player = getPlayer(state, playerId);
-  if (!player) {
-    return engineError('PLAYER_NOT_FOUND', "Tu n'es pas dans cette partie.");
+  if (!player || player.left) {
+    return engineError('PLAYER_NOT_FOUND', 'Player not in this game.');
   }
   if (player.guessUsed) {
-    return engineError('GUESS_ALREADY_USED', 'Tu as deja fait ton annonce.');
+    return engineError('GUESS_ALREADY_USED', 'Player already made their call.');
   }
   const shape = validateGuessShape(numbers);
   if (!shape.ok) {
@@ -607,8 +720,8 @@ export function submitGuess(
   }
 
   player.eliminated = true;
-  const opponent = getOpponent(state, playerId);
-  if (!opponent || opponent.eliminated) {
+  const stillInRace = state.players.filter((p) => !p.eliminated);
+  if (stillInRace.length === 0) {
     events.push(...finishGame(state, null, 'all-eliminated'));
     return { ok: true, events };
   }
@@ -617,40 +730,29 @@ export function submitGuess(
     state,
     'system',
     'player-eliminated',
-    { name: player.name, opponent: opponent.name },
+    { name: player.name, remaining: stillInRace.length },
     { playerId },
   );
 
-  // Si le joueur elimine avait la main (ou une demande en cours), la partie
-  // repart proprement sur l'adversaire.
-  if (state.activePlayerId === playerId || state.pendingHint?.askerId === playerId) {
-    state.pendingHint = null;
-    state.revealedThisTurn = false;
-    state.activePlayerId = opponent.id;
-    state.turn += 1;
-    state.phase = 'TURN_REVEAL';
-    log(
-      state,
-      'turn',
-      'turn-start',
-      { turn: state.turn, name: opponent.name },
-      { playerId: opponent.id },
-    );
-    events.push({ type: 'turn-changed', activePlayerId: opponent.id, turn: state.turn });
+  // A player out of the race no longer plays: if they had the lead, or a
+  // hint of theirs was waiting for an answer, the game moves on. They still
+  // answer other people's hints, since they can see their stars.
+  if (state.activePlayerId === playerId) {
+    events.push(...passTurn(state, playerId));
   }
 
   return { ok: true, events };
 }
 
-/** Vainqueur eventuel de la partie. */
+/** The winner, if any. */
 export function getWinner(state: GameState): PlayerState | null {
   return state.winnerId ? (getPlayer(state, state.winnerId) ?? null) : null;
 }
 
-/** Marque la connexion d'un joueur (pour l'affichage "deconnecte"). */
+/** Records a player's connection (for the "offline" badge). */
 export function setPlayerConnected(state: GameState, playerId: string, connected: boolean): void {
   const player = getPlayer(state, playerId);
-  if (!player) {
+  if (!player || player.left) {
     return;
   }
   player.connected = connected;

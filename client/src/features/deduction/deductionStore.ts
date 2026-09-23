@@ -9,27 +9,27 @@ import {
 } from '../../lib/storage.js';
 
 export interface DeductionApi {
-  /** Numeros barres au feutre. */
+  /** Numbers crossed out. */
   crossed: ReadonlySet<number>;
   isCrossed: (n: number) => boolean;
-  /** Premier clic : barre. Second clic : restaure. */
+  /** First tap crosses out, second tap restores. */
   toggle: (n: number) => void;
-  /** Les 5 hypotheses courantes (chaines libres, saisie partielle possible). */
+  /** The current 5 guesses (free strings, partial input allowed). */
   guesses: string[];
   setGuess: (index: number, value: string) => void;
-  /** Efface tout : numeros barres et hypotheses. */
+  /** Clears everything: crossed numbers and guesses. */
   reset: () => void;
   crossedCount: number;
-  /** Les hypotheses forment-elles une annonce valide ? */
+  /** Do the guesses make a valid call? */
   guessNumbers: number[] | null;
 }
 
 const EMPTY: StoredDeduction = { crossed: [], guesses: ['', '', '', '', ''] };
 
 /**
- * Fiche de deduction : 100 % locale et privee.
- * Rien n'est envoye au serveur, rien n'est partage avec l'adversaire, et
- * aucun secret de jeu n'est stocke - uniquement le raisonnement du joueur.
+ * The star chart: 100% local and private.
+ * Nothing is sent to the server, nothing is shared with the other players,
+ * and no game secret is stored — only the player's own reasoning.
  */
 export function useDeductionSheet(roomCode: string | null, playerId: string | null): DeductionApi {
   const key = roomCode && playerId ? deductionKey(roomCode, playerId) : null;

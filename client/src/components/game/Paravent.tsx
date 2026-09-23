@@ -2,47 +2,60 @@ import { useI18n } from '../../i18n/index.js';
 
 export interface ParaventProps {
   name: string;
-  /** Cote de table : change l'inclinaison du paravent. */
+  /** Which side of the table: mine sits below my rack, the others above theirs. */
   side: 'mine' | 'opponent';
   connected?: boolean;
+  /** Has the lead right now. */
+  active?: boolean;
+  /** Has to answer a hint right now. */
+  answering?: boolean;
+  /** Made a wrong call or left: out of the race. */
+  out?: boolean;
 }
 
 /**
- * Paravent virtuel : carton imprime violet/magenta, legerement courbe, avec un
- * motif numerique original (chiffres et pastilles dessines en SVG).
+ * The name plate of a rack: a strip of night sky carrying the player's name
+ * and what they are up to.
  */
-export function Paravent({ name, side, connected = true }: ParaventProps): JSX.Element {
+export function Paravent({
+  name,
+  side,
+  connected = true,
+  active = false,
+  answering = false,
+  out = false,
+}: ParaventProps): JSX.Element {
   const { t } = useI18n();
+  const status = !connected
+    ? t('common.offline')
+    : answering
+      ? t('rack.answering')
+      : active
+        ? t('rack.playing')
+        : out
+          ? t('status.eliminated')
+          : null;
+  const classes = [
+    'paravent',
+    `paravent--${side}`,
+    active ? 'is-active' : '',
+    answering ? 'is-answering' : '',
+    !connected ? 'is-offline' : '',
+    out ? 'is-out' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className={`paravent paravent--${side}`} aria-hidden="true">
-      <svg className="paravent__art" viewBox="0 0 400 80" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id={`paravent-${side}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7d31c9" />
-            <stop offset="55%" stopColor="#6a2bae" />
-            <stop offset="100%" stopColor="#4a1a80" />
-          </linearGradient>
-          <pattern
-            id={`paravent-pattern-${side}`}
-            width="56"
-            height="40"
-            patternUnits="userSpaceOnUse"
-          >
-            <text x="6" y="26" fontSize="18" fontFamily="Fredoka Variable, sans-serif" fill="rgba(255,255,255,0.14)">
-              5
-            </text>
-            <circle cx="40" cy="12" r="5" fill="rgba(255,201,60,0.18)" />
-            <circle cx="30" cy="32" r="3" fill="rgba(240,90,156,0.24)" />
-          </pattern>
-        </defs>
-        <rect width="400" height="80" fill={`url(#paravent-${side})`} />
-        <rect width="400" height="80" fill={`url(#paravent-pattern-${side})`} />
-        <rect y="70" width="400" height="10" fill="rgba(21,8,34,0.28)" />
-      </svg>
+    <div className={classes}>
+      <span className="paravent__avatar" aria-hidden="true">
+        {name.slice(0, 1).toUpperCase()}
+      </span>
       <span className="paravent__label">
         {name}
-        {connected ? '' : ` (${t('common.offline')})`}
+        {side === 'mine' ? <span className="paravent__me"> {t('common.you')}</span> : null}
       </span>
+      {status ? <span className="paravent__status">{status}</span> : null}
     </div>
   );
 }

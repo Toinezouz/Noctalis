@@ -14,7 +14,7 @@ export interface AboutDialogProps {
   onClose: () => void;
 }
 
-/** A propos : ce qu'est le projet, ou est son code, et comment le soutenir. */
+/** About: what the project is, where its code lives, and how to support it. */
 export function AboutDialog({ open, onClose }: AboutDialogProps): JSX.Element | null {
   const { t } = useI18n();
   if (!open) {

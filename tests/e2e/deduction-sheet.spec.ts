@@ -1,21 +1,21 @@
 import { expect, test } from '@playwright/test';
 import { startGame } from './helpers.js';
 
-// Chaque test repart d'un navigateur propre : aucune session ne fuit d'un
-// test a l'autre (sessions, fiches de deduction, sockets).
+// Every test starts from a clean browser: no session leaks from one test to
+// the next (sessions, star charts, sockets).
 test.afterEach(async ({ browser }) => {
   await Promise.all(browser.contexts().map((context) => context.close()));
 });
 
-test.describe('Fiche de deduction', () => {
-  test('grille complete, toggle, persistance et reinitialisation', async ({ browser }) => {
+test.describe('Star chart', () => {
+  test('full grid, toggling, persistence and reset', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Alicia', 'Bobby']);
 
-    // 1. Ouvrir la fiche
+    // 1. Open the chart
     await alice.getByTestId('open-sheet').click();
     await expect(alice.getByTestId('deduction-sheet')).toBeVisible();
 
-    // La grille contient exactement 60 cases, numerotees de 1 a 60.
+    // The grid holds exactly 60 cells, numbered from 1 to 60.
     const cells = alice.locator('.sheet-cell');
     await expect(cells).toHaveCount(60);
     const numbers = await cells.evaluateAll((nodes) =>
@@ -26,7 +26,7 @@ test.describe('Fiche de deduction', () => {
       Array.from({ length: 60 }, (_, i) => i + 1),
     );
 
-    // Constellations et eclats : la carte lit la meme source que les etoiles.
+    // Constellations and brightness: the chart reads the same source as the stars.
     const samples: [number, string, number][] = [
       [1, 'green', 1],
       [2, 'pink', 1],
@@ -45,31 +45,31 @@ test.describe('Fiche de deduction', () => {
       await expect(cell.locator('.sheet-cell__dot')).toHaveCount(points);
     }
 
-    // 3-4. Cliquer sur 17 : il est barre.
+    // 3-4. Tap 17: it gets crossed out.
     const cell17 = alice.getByTestId('sheet-cell-17');
     await expect(cell17).toHaveAttribute('aria-pressed', 'false');
     await cell17.click();
     await expect(cell17).toHaveAttribute('aria-pressed', 'true');
     await expect(cell17.locator('.sheet-cell__cross')).toBeVisible();
-    await expect(cell17).toHaveAccessibleName(/éliminé/);
+    await expect(cell17).toHaveAccessibleName(/crossed out/);
 
-    // 5-6. Recliquer : il est restaure.
+    // 5-6. Tap again: it comes back.
     await cell17.click();
     await expect(cell17).toHaveAttribute('aria-pressed', 'false');
     await expect(cell17.locator('.sheet-cell__cross')).toHaveCount(0);
 
-    // On le barre de nouveau, avec quelques autres.
+    // Cross it out again, with another one.
     await cell17.click();
     await alice.getByTestId('sheet-cell-42').click();
     await expect(alice.getByTestId('crossed-count')).toContainText('2 / 60');
 
-    // 7. Inscrire les 5 hypotheses.
+    // 7. Write down the 5 guesses.
     const guesses = ['18', '24', '31', '42', '56'];
     for (const [index, value] of guesses.entries()) {
       await alice.getByTestId(`guess-input-${String(index)}`).fill(value);
     }
 
-    // 8-10. Fermer puis rouvrir : tout est conserve.
+    // 8-10. Close and reopen: everything is kept.
     await alice.getByTestId('close-sheet').click();
     await expect(alice.getByTestId('deduction-sheet')).toHaveCount(0);
     await alice.getByTestId('open-sheet').click();
@@ -80,14 +80,14 @@ test.describe('Fiche de deduction', () => {
       await expect(alice.getByTestId(`guess-input-${String(index)}`)).toHaveValue(value);
     }
 
-    // La fiche survit aussi a un rechargement de page (reconnexion).
+    // The chart survives a page reload too (reconnection).
     await alice.reload();
     await expect(alice.getByTestId('announce-button')).toBeVisible();
     await alice.getByTestId('open-sheet').click();
     await expect(alice.getByTestId('sheet-cell-17')).toHaveAttribute('aria-pressed', 'true');
     await expect(alice.getByTestId('guess-input-1')).toHaveValue('24');
 
-    // 11-13. Effacer les deductions, avec confirmation.
+    // 11-13. Clear the chart, with a confirmation.
     await alice.getByTestId('reset-sheet').click();
     await alice.getByTestId('confirm-reset').click();
     await expect(alice.getByTestId('sheet-cell-17')).toHaveAttribute('aria-pressed', 'false');
@@ -98,31 +98,33 @@ test.describe('Fiche de deduction', () => {
     }
   });
 
-  test('la carte ne barre jamais automatiquement une etoile revelee', async ({ browser }) => {
+  test('the chart never crosses out a star by itself', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Anna', 'Boris']);
     await alice.getByTestId('open-sheet').click();
 
-    // Les 5 etoiles initiales du releve portent un repere, aucune n'est barree.
+    // The 5 initial stars of the sky carry a landmark, none is crossed out.
     const revealed = alice.locator('.sheet-cell.is-revealed');
     await expect(revealed).toHaveCount(5);
+    // So do the 5 stars seen on the other player's rack.
+    await expect(alice.locator('.sheet-cell.is-held')).toHaveCount(5);
     await expect(alice.locator('.sheet-cell.is-crossed')).toHaveCount(0);
     await expect(alice.getByTestId('crossed-count')).toContainText('0 / 60');
   });
 
-  test('accessibilite : clavier et libelles', async ({ browser }) => {
+  test('accessibility: keyboard and labels', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Ada', 'Bo']);
     await alice.getByTestId('open-sheet').click();
 
     const cell = alice.getByTestId('sheet-cell-37');
-    // Idem : l'etoile 37 peut faire partie des 5 etoiles initiales du releve,
-    // ce qui ajoute une precision a la fin du libelle.
-    await expect(cell).toHaveAccessibleName(/^Numéro 37, Aurore, 2 éclats, non éliminé/);
+    // Star 37 may be one of the initial public stars, or on the other rack,
+    // which adds a detail at the end of the label.
+    await expect(cell).toHaveAccessibleName(/^Number 37, Aurora, 2 sparks, still possible/);
     await cell.focus();
     await expect(cell).toBeFocused();
     await alice.keyboard.press('Enter');
-    await expect(cell).toHaveAccessibleName(/^Numéro 37, Aurore, 2 éclats, éliminé/);
+    await expect(cell).toHaveAccessibleName(/^Number 37, Aurora, 2 sparks, crossed out/);
     await expect(cell).toBeFocused();
     await alice.keyboard.press('Enter');
-    await expect(cell).toHaveAccessibleName(/non éliminé/);
+    await expect(cell).toHaveAccessibleName(/still possible/);
   });
 });

@@ -1,67 +1,65 @@
 import { expect, test } from '@playwright/test';
 import {
   dismissRoulette,
+  makeCall,
   readOpponentTiles,
   revealAnyColor,
   selectPublicTile,
   startGame,
+  wrongCall,
 } from './helpers.js';
 
-// Chaque test repart d'un navigateur propre : aucune session ne fuit d'un
-// test a l'autre (sessions, fiches de deduction, sockets).
+// Every test starts from a clean browser: no session leaks from one test to
+// the next (sessions, star charts, sockets).
 test.afterEach(async ({ browser }) => {
   await Promise.all(browser.contexts().map((context) => context.close()));
 });
 
-test.describe('Partie complete a deux joueurs', () => {
-  test('mise en place, tour complet, SITUER, JAUGER et changement de tour', async ({
-    browser,
-  }) => {
-    // Le premier joueur est tire au sort : on suit les roles, pas les pseudos.
-    const { first, second, firstName, secondName } = await startGame(browser, [
-      'Alice',
-      'Bob',
-    ]);
+test.describe('A full two-player game', () => {
+  test('setup, a full turn, PLACE, GAUGE and the next turn', async ({ browser }) => {
+    // The first player is drawn at random: follow the roles, not the names.
+    const { first, second, firstName, secondName } = await startGame(browser, ['Alice', 'Bob']);
 
-    // Mise en place : 5 tuiles publiques, une de chaque couleur.
+    // Setup: 5 public stars, one per constellation.
     await expect(first.locator('.pool__tiles .tile')).toHaveCount(5);
     await expect(second.locator('.pool__tiles .tile')).toHaveCount(5);
 
-    // Chacun voit les 5 tuiles de l'autre, face visible...
+    // Each player sees the other's 5 stars face up...
     const firstSecrets = await readOpponentTiles(second);
     const secondSecrets = await readOpponentTiles(first);
     expect(firstSecrets).toHaveLength(5);
     expect(secondSecrets).toHaveLength(5);
-    // ...triees par ordre croissant.
+    // ...sorted in ascending order...
     expect([...firstSecrets].sort((a, b) => a - b)).toEqual(firstSecrets);
-    // ...et les deux mains sont disjointes.
+    // ...and the two hands do not overlap.
     expect(new Set([...firstSecrets, ...secondSecrets]).size).toBe(10);
 
-    // ...mais personne ne voit ses propres tuiles : 5 dos sur son propre support.
+    // ...but nobody sees their own: 5 eclipsed stars on their own rack.
     await expect(first.locator('.player-zone--mine .tile-back')).toHaveCount(5);
     await expect(second.locator('.player-zone--mine .tile-back')).toHaveCount(5);
 
-    // Le joueur tire au sort commence.
-    await expect(first.locator('.turn-indicator')).toContainText('À TON TOUR');
-    await expect(second.locator('.turn-indicator')).toContainText(`Tour de ${firstName}`);
+    // The player drawn at random starts.
+    await expect(first.locator('.turn-indicator')).toContainText('YOUR TURN');
+    await expect(second.locator('.turn-indicator')).toContainText(`${firstName}’s turn`);
 
-    // Etape 1 : reveler une tuile.
+    // Step 1: reveal a star.
     await revealAnyColor(first);
     await expect(first.locator('.pool__tiles .tile')).toHaveCount(6);
     await expect(second.locator('.pool__tiles .tile')).toHaveCount(6);
     await expect(first.getByTestId('hint-instruction')).toBeVisible();
 
-    // Etape 2 : choisir n'importe quelle tuile publique (ici la premiere) et CLASSER.
+    // Step 2: pick any public star (here the first one) and PLACE.
     const chosenNumber = await selectPublicTile(first, 0);
+    await expect(first.getByRole('dialog')).toContainText(`${secondName} puts this star`);
     await first.getByTestId('choose-classify').click();
 
-    // Bob doit repondre : il voit les vrais numeros d'Alice.
+    // The other player answers: they can see the real numbers.
     await expect(second.getByTestId('confirm-classify')).toBeVisible();
     await expect(second.getByTestId('confirm-classify')).toBeDisabled();
     await second.locator('.slot-picker__slot').first().click();
     await second.getByTestId('confirm-classify').click();
 
-    // Le serveur place la tuile a la position exacte, visible par les deux.
+    // The server puts the star in its exact gap, for both to see.
     const expectedSlot = firstSecrets.filter((n) => n < chosenNumber).length;
     const placed = first.locator(
       `.player-zone--mine .classify-slot[data-slot="${String(expectedSlot)}"] .tile`,
@@ -69,67 +67,58 @@ test.describe('Partie complete a deux joueurs', () => {
     await expect(placed).toHaveCount(1);
     await expect(placed).toHaveAttribute('data-tile', String(chosenNumber));
 
-    // La tuile utilisee quitte la zone commune, pour les deux joueurs.
-    await expect(
-      first.locator(`.pool__tiles .tile[data-tile="${String(chosenNumber)}"]`),
-    ).toHaveCount(0);
-    await expect(
-      second.locator(`.pool__tiles .tile[data-tile="${String(chosenNumber)}"]`),
-    ).toHaveCount(0);
-    // Une revelation, un indice : le centre revient a 5 tuiles disponibles.
+    // The used star leaves the open sky, for both players.
+    await expect(first.locator(`.pool__tiles .tile[data-tile="${String(chosenNumber)}"]`)).toHaveCount(0);
+    await expect(second.locator(`.pool__tiles .tile[data-tile="${String(chosenNumber)}"]`)).toHaveCount(0);
+    // One reveal, one hint: back to 5 available stars.
     await expect(first.locator('.pool__tiles .tile')).toHaveCount(5);
 
-    // Le tour passe au second joueur.
-    await expect(second.locator('.turn-indicator')).toContainText('À TON TOUR');
-    await expect(first.locator('.turn-indicator')).toContainText(`Tour de ${secondName}`);
+    // The turn goes to the second player.
+    await expect(second.locator('.turn-indicator')).toContainText('YOUR TURN');
+    await expect(first.locator('.turn-indicator')).toContainText(`${secondName}’s turn`);
     await expect(first.getByTestId('reveal-green')).toHaveCount(0);
 
-    // Tour du second joueur : reveal puis COMPARER sur sa position 2.
+    // Second player's turn: reveal, then GAUGE against position 2.
     await revealAnyColor(second);
     const compareNumber = await selectPublicTile(second, 0);
     await second.getByTestId('choose-compare').click();
     await second.locator('.hint-dialog__rack .tile-back').nth(1).click();
     await second.getByTestId('confirm-compare').click();
 
-    // L'autre joueur confirme la reponse : le serveur impose la verite.
+    // The other player confirms the answer: the server enforces the truth.
     await expect(first.getByTestId('confirm-compare-answer')).toBeVisible();
     const answerLabel = (await first.getByTestId('confirm-compare-answer').innerText()).trim();
     await first.getByTestId('confirm-compare-answer').click();
 
-    // La tuile comparee est posee devant la position 2 du second joueur.
+    // The gauged star sits under position 2 of the second player.
     const compareArea = second.locator('.player-zone--mine .compare-area .tile');
     await expect(compareArea).toHaveCount(1);
     await expect(compareArea).toHaveAttribute('data-tile', String(compareNumber));
-    // Reponse NON : la tuile est inclinee.
-    if (answerLabel.includes('NON')) {
+    // A NO shows as a dimmed star.
+    if (answerLabel.includes('NO')) {
       await expect(compareArea).toHaveClass(/tile--tilted/);
     } else {
       await expect(compareArea).not.toHaveClass(/tile--tilted/);
     }
 
-    // L'historique public raconte la partie.
-    await expect(first.locator('.game-log')).toContainText('a révélé l’étoile');
-    await expect(first.locator('.game-log')).toContainText('SITUER');
+    // The public history tells the story.
+    await expect(first.locator('.game-log')).toContainText('revealed star');
+    await expect(first.locator('.game-log')).toContainText('PLACE');
   });
 
-  test('annonce exacte : victoire, revelation finale et revanche', async ({ browser }) => {
+  test('a right call: victory, final reveal and rematch', async ({ browser }) => {
     const { alice, bob } = await startGame(browser, ['Alice', 'Bob']);
     const aliceSecrets = await readOpponentTiles(bob);
 
-    await alice.getByTestId('announce-button').click();
-    for (const [index, number] of aliceSecrets.entries()) {
-      await alice.getByTestId(`announce-input-${String(index)}`).fill(String(number));
-    }
-    await alice.getByTestId('submit-guess').click();
-    await alice.getByTestId('confirm-guess').click();
+    await makeCall(alice, aliceSecrets);
 
-    // Les deux joueurs voient la fin de partie.
+    // Both players see the end of the game.
     await expect(alice.getByTestId('game-over')).toBeVisible();
     await expect(bob.getByTestId('game-over')).toBeVisible();
-    await expect(alice.getByTestId('game-over-result')).toContainText('Victoire de Alice');
-    await expect(bob.getByTestId('game-over-result')).toContainText('Alice a gagné');
+    await expect(alice.getByTestId('game-over-result')).toContainText('You found your constellation, Alice');
+    await expect(bob.getByTestId('game-over-result')).toContainText('Alice found their constellation');
 
-    // Revelation des 10 tuiles secretes.
+    // All 10 secret stars are revealed.
     await expect(alice.locator('.game-over__tiles .tile')).toHaveCount(10);
     const revealedNumbers = await alice
       .locator('.game-over__tiles .tile')
@@ -138,12 +127,13 @@ test.describe('Partie complete a deux joueurs', () => {
       expect(revealedNumbers).toContain(secret);
     }
 
-    // Revanche : il faut l'accord des deux joueurs.
+    // Rematch: everybody has to agree.
     await alice.getByTestId('rematch').click();
-    await expect(alice.getByTestId('rematch')).toContainText('En attente');
+    await expect(alice.getByTestId('rematch')).toContainText('Waiting for the others');
+    await expect(bob.getByTestId('rematch-count')).toContainText('1 of 2');
     await bob.getByTestId('rematch').click();
 
-    // La revanche retire au sort le premier joueur : l'annonce revient.
+    // A rematch draws the first player again: the wheel comes back.
     await expect(alice.getByTestId('roulette')).toBeVisible();
     await expect(bob.getByTestId('roulette')).toBeVisible();
     await dismissRoulette(alice);
@@ -151,53 +141,33 @@ test.describe('Partie complete a deux joueurs', () => {
 
     await expect(alice.getByTestId('game-over')).toHaveCount(0);
     await expect(alice.locator('.pool__tiles .tile')).toHaveCount(5);
-    await expect(alice.locator('.turn-indicator')).toContainText('Tour 1');
-    // Et la main revient bien a l'un des deux joueurs.
+    await expect(alice.locator('.turn-indicator')).toContainText('Turn 1');
+    // And exactly one of the two has the lead.
     const leads = await Promise.all(
       [alice, bob].map(async (page) => page.locator('[data-testid^="reveal-"]').count()),
     );
     expect(leads.filter((count) => count > 0)).toHaveLength(1);
   });
 
-  test('annonce ratee : elimination, une seule tentative, l observation continue', async ({
-    browser,
-  }) => {
+  test('a wrong call: out of the race, one call only, the game goes on', async ({ browser }) => {
     const { alice, bob } = await startGame(browser, ['Alice', 'Bob']);
     const aliceSecrets = await readOpponentTiles(bob);
 
-    // Proposition valide dans sa forme (une couleur par tuile, ordre croissant)
-    // mais volontairement fausse.
-    const wrong = [1, 2, 3, 4, 5]
-      .map((base) => {
-        for (let n = base; n <= 60; n += 5) {
-          if (!aliceSecrets.includes(n)) {
-            return n;
-          }
-        }
-        return base;
-      })
-      .sort((a, b) => a - b);
+    await makeCall(alice, wrongCall(aliceSecrets));
 
-    await alice.getByTestId('announce-button').click();
-    for (const [index, number] of wrong.entries()) {
-      await alice.getByTestId(`announce-input-${String(index)}`).fill(String(number));
-    }
-    await alice.getByTestId('submit-guess').click();
-    await alice.getByTestId('confirm-guess').click();
-
-    // Alice est eliminee : plus de bouton d'annonce, et Bob prend la main.
+    // Alice is out: no more call button, and Bob takes the lead.
     await expect(alice.getByTestId('announce-button')).toHaveCount(0);
     await expect(bob.locator('.player-status').filter({ hasText: 'Alice' })).toContainText(
-      'Éliminé',
+      'Out of the race',
     );
-    await expect(bob.locator('.turn-indicator')).toContainText('À TON TOUR');
+    await expect(bob.locator('.turn-indicator')).toContainText('YOUR TURN');
 
-    // La partie continue : Bob peut jouer son tour.
+    // The game goes on: Bob can play his turn.
     await revealAnyColor(bob);
     await expect(bob.locator('.pool__tiles .tile')).toHaveCount(6);
   });
 
-  test('une tuile utilisee reste marquee sur la fiche de deduction', async ({ browser }) => {
+  test('a used star stays marked on the star chart', async ({ browser }) => {
     const { first, second } = await startGame(browser, ['Alice', 'Bob']);
 
     await revealAnyColor(first);
@@ -207,30 +177,30 @@ test.describe('Partie complete a deux joueurs', () => {
     await second.locator('.slot-picker__slot').first().click();
     await second.getByTestId('confirm-classify').click();
 
-    // Elle a disparu du centre...
+    // Gone from the middle...
     await expect(first.locator(`.pool__tiles .tile[data-tile="${String(used)}"]`)).toHaveCount(0);
-    // ...mais elle est visible sur le support du demandeur, a sa place.
+    // ...but visible on the asker's rack, in its gap.
     await expect(
       first.locator(`.player-zone--mine .classify-slot .tile[data-tile="${String(used)}"]`),
     ).toHaveCount(1);
-    // ...et la fiche de deduction garde la trace : ce numero est sorti du sac.
+    // ...and the star chart remembers: this number left the reserve.
     await first.getByTestId('open-sheet').click();
     const cell = first.getByTestId(`sheet-cell-${String(used)}`);
     await expect(cell).toHaveClass(/is-revealed/);
-    await expect(cell).toHaveAccessibleName(/déjà révélée au centre/);
+    await expect(cell).toHaveAccessibleName(/already revealed in the sky/);
   });
 
-  test('impossible de jouer hors de son tour', async ({ browser }) => {
+  test('nobody can play out of turn', async ({ browser }) => {
     const { first, second, firstName } = await startGame(browser, ['Alice', 'Bob']);
-    // Celui qui n'a pas la main n'a aucun bouton de couleur.
+    // The player without the lead has no constellation button.
     await expect(second.getByTestId('reveal-green')).toHaveCount(0);
     await expect(second.locator('.action-panel')).toContainText(firstName);
-    // Les tuiles publiques ne sont pas selectionnables pour lui.
+    // Public stars cannot be selected either.
     await expect(second.locator('.pool__tiles button.tile')).toHaveCount(0);
     await expect(first.getByTestId('reveal-green')).toBeVisible();
   });
 
-  test('erreurs de salon : code inconnu, partie pleine, pseudo trop court', async ({ browser }) => {
+  test('room errors: unknown code, game already started, name too short', async ({ browser }) => {
     const { code } = await startGame(browser, ['Alice', 'Bob']);
     const page = await (await browser.newContext()).newPage();
 
@@ -239,42 +209,40 @@ test.describe('Partie complete a deux joueurs', () => {
     await page.getByTestId('name-input').fill('Chris');
     await page.getByTestId('code-input').fill('ZZZZZ');
     await page.getByTestId('submit-room').click();
-    await expect(page.getByTestId('home-error')).toContainText("n'existe pas");
+    await expect(page.getByTestId('home-error')).toContainText('No game matches this code');
 
     await page.getByTestId('code-input').fill(code);
     await page.getByTestId('submit-room').click();
-    await expect(page.getByTestId('home-error')).toContainText('complète');
+    await expect(page.getByTestId('home-error')).toContainText('already begun');
 
     await page.getByTestId('name-input').fill('A');
     await page.getByTestId('submit-room').click();
-    await expect(page.getByTestId('home-error')).toContainText('Pseudo invalide');
+    await expect(page.getByTestId('home-error')).toContainText('This name is not valid');
   });
 
-  test('reconnexion apres rechargement de page', async ({ browser }) => {
-    // On recharge la page du joueur qui a la main : la partie doit rester jouable.
+  test('reconnects after a page reload', async ({ browser }) => {
+    // Reload the page of the player in the lead: the game must stay playable.
     const { first, second } = await startGame(browser, ['Alice', 'Bob']);
     const opponentSecrets = await readOpponentTiles(first);
 
     await first.reload();
     await expect(first.getByTestId('announce-button')).toBeVisible();
-    // L'etat est restaure : mes 5 dos, les 5 tuiles adverses, la zone publique.
+    // The state is back: my 5 eclipsed stars, the other 5, the open sky.
     await expect(first.locator('.player-zone--mine .tile-back')).toHaveCount(5);
     expect(await readOpponentTiles(first)).toEqual(opponentSecrets);
     await expect(first.locator('.pool__tiles .tile')).toHaveCount(5);
-    // Une reconnexion ne rejoue pas l'annonce du tirage au sort.
+    // A reconnection does not replay the opening draw.
     await expect(first.getByTestId('roulette')).toHaveCount(0);
-    // Et la partie reste jouable.
+    // And the game is still playable.
     await revealAnyColor(first);
     await expect(second.locator('.pool__tiles .tile')).toHaveCount(6);
   });
 
-  test('deconnexion de l adversaire signalee', async ({ browser }) => {
+  test('tells when the other player goes offline', async ({ browser }) => {
     const { alice, bob } = await startGame(browser, ['Alice', 'Bob']);
     await bob.close();
-    await expect(alice.locator('.player-status').filter({ hasText: 'Bob' })).toContainText(
-      'déconnecté',
-    );
-    // Un bandeau explicite rassure le joueur reste seul.
-    await expect(alice.getByTestId('opponent-offline')).toContainText('déconnecté');
+    await expect(alice.locator('.player-status').filter({ hasText: 'Bob' })).toContainText('offline');
+    // A clear banner reassures the player left alone.
+    await expect(alice.getByTestId('opponent-offline')).toContainText('Bob is offline for now');
   });
 });

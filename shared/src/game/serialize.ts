@@ -9,17 +9,17 @@ import type {
 } from '../types/game.js';
 import type { Tile } from '../types/tiles.js';
 import { countReserveByColor } from './deck.js';
-import { getCompareTruth, getOpponent, getPlayer } from './engine.js';
+import { getCompareTruth, getPlayer, getRivals } from './engine.js';
 
 /**
  * ---------------------------------------------------------------------------
- * SERIALISATION : la frontiere de securite du jeu.
+ * SERIALISATION: the security boundary of the game.
  * ---------------------------------------------------------------------------
- * Le `GameState` serveur n'est JAMAIS envoye tel quel. Un client ne recoit que
- * la combinaison de :
- *   - `toPublicGameState(state)`            -> visible par tout le monde
- *   - `toPlayerPrivateState(state, id)`     -> visible par ce joueur seulement
- * et cette derniere ne contient jamais les numeros secrets de son destinataire.
+ * The server-side `GameState` is NEVER sent as is. A client only ever gets
+ * the combination of:
+ *   - `toPublicGameState(state)`            -> visible to everybody
+ *   - `toPlayerPrivateState(state, id)`     -> visible to that player only
+ * and the latter never contains its recipient's own secret numbers.
  */
 
 function toPublicPlayer(player: PlayerState): PublicPlayer {
@@ -30,13 +30,14 @@ function toPublicPlayer(player: PlayerState): PublicPlayer {
     isHost: player.isHost,
     guessUsed: player.guessUsed,
     eliminated: player.eliminated,
-    // Seules les constellations sont publiques : elles sont visibles sur le dos des
-    // etoiles posees sur le support, exactement comme sur la table physique.
+    left: player.left,
+    // Only the constellations are public: they show on the back of the stars
+    // standing on the rack, exactly as they would on a real table.
     tileColors: player.secret.map((n) => getTileByNumber(n).color),
   };
 }
 
-/** Vue publique complete de la partie. */
+/** Complete public view of the game. */
 export function toPublicGameState(state: GameState): PublicGameState {
   const finished = state.phase === 'GAME_OVER';
   const finalReveal = finished
@@ -48,6 +49,7 @@ export function toPublicGameState(state: GameState): PublicGameState {
   return {
     phase: state.phase,
     players: state.players.map(toPublicPlayer),
+    order: state.order.slice(),
     activePlayerId: state.activePlayerId,
     startingPlayerId: state.startingPlayerId,
     publicTiles: state.publicTiles.map((t) => ({ ...t })),
@@ -68,10 +70,10 @@ export function toPublicGameState(state: GameState): PublicGameState {
 }
 
 /**
- * Vue privee d'un joueur.
- * - Ses propres etoiles : constellation + position uniquement (ni numero, ni eclats,
- *   car les eclats reduiraient le champ des possibles a 12 numeros sur 60).
- * - Les etoiles de l'adversaire : face visible, avec numero et eclats.
+ * A player's private view.
+ * - Their own stars: constellation and position only (no number and no
+ *   brightness, since brightness alone narrows the number to 12 out of 60).
+ * - Everybody else's stars: face up, with number and brightness.
  */
 export function toPlayerPrivateState(
   state: GameState,
@@ -81,11 +83,10 @@ export function toPlayerPrivateState(
   if (!player) {
     return null;
   }
-  const opponent = getOpponent(state, playerId);
-
-  const opponentTiles: Tile[] = opponent
-    ? opponent.secret.map((n) => getTileByNumber(n))
-    : [];
+  const rivals = getRivals(state, playerId).map((rival) => ({
+    playerId: rival.id,
+    tiles: rival.secret.map((n): Tile => getTileByNumber(n)),
+  }));
 
   let pendingResponse: PendingResponse | null = null;
   if (state.pendingHint && state.pendingHint.responderId === playerId) {
@@ -101,8 +102,7 @@ export function toPlayerPrivateState(
       position,
       color: getTileByNumber(n).color,
     })),
-    opponentTiles,
-    opponentId: opponent?.id ?? null,
+    rivals,
     guessUsed: player.guessUsed,
     eliminated: player.eliminated,
     pendingResponse,
@@ -111,29 +111,29 @@ export function toPlayerPrivateState(
 
 /**
  * ---------------------------------------------------------------------------
- * GARDE-FOU ANTI-TRICHE
+ * ANTI-CHEAT GUARD
  * ---------------------------------------------------------------------------
- * Parcourt une charge utile destinee a `playerId` et cherche un de ses numeros
- * secrets. Le parcours est conscient des cles : les champs dont le domaine
- * numerique n'a rien a voir avec un numero de etoile (`position` 0-4, `eclats`
- * 1-3, `slot` 0-5, compteurs, horodatages...) sont ignores, sans quoi un
- * secret comme "3" declencherait une fausse alerte a chaque position.
+ * Walks a payload meant for `playerId` and looks for one of their secret
+ * numbers. The walk is key-aware: fields whose numeric domain has nothing to
+ * do with a star number (`position` 0-4, `points` 1-3, `slot` 0-5, counters,
+ * timestamps...) are skipped, otherwise a secret such as "3" would raise a
+ * false alarm on every position.
  *
- * Les chaines de caracteres (textes de l'historique) sont egalement inspectees :
- * seuls y sont tolerés les nombres deja publics (etoiles revelees, numero de
- * tour, ordinaux des 6 encoches, annonces faites a voix haute).
+ * Strings (history texts) are inspected too: the only numbers tolerated in
+ * them are those already public (revealed stars, turn number, ordinals of the
+ * 6 gaps, calls made out loud).
  *
- * Utilise par les tests et, en developpement, par le serveur avant chaque
+ * Used by the tests and, outside production, by the server before every
  * emission.
  */
 export interface SecretLeak {
-  /** Numero secret retrouve. */
+  /** The secret number that was found. */
   number: number;
-  /** Chemin dans la charge utile, ex. "privateState.myTiles[0].number". */
+  /** Path in the payload, e.g. "privateState.myTiles[0].number". */
   path: string;
 }
 
-/** Cles dont les valeurs numeriques ne sont jamais des numeros de etoile. */
+/** Keys whose numeric values are never star numbers. */
 const NON_TILE_NUMBER_KEYS = new Set([
   'position',
   'points',
@@ -149,6 +149,7 @@ const NON_TILE_NUMBER_KEYS = new Set([
   'count',
   'total',
   'index',
+  'remaining',
   'green',
   'pink',
   'blue',
@@ -156,18 +157,21 @@ const NON_TILE_NUMBER_KEYS = new Set([
   'orange',
 ]);
 
-/** Cles portant des identifiants opaques (ils contiennent des chiffres). */
-const IDENTIFIER_KEYS = new Set(['id', 'code', 'token', 'name']);
+/**
+ * Keys carrying opaque identifiers (they contain digits). `order` and
+ * `rematchReady` are lists of player ids.
+ */
+const IDENTIFIER_KEYS = new Set(['id', 'code', 'token', 'name', 'order', 'rematchReady']);
 
 /**
- * Une cle designe-t-elle un identifiant ou un pseudo ? Les chiffres qu'ils
- * contiennent ("p_sszHPTWCDh7i", "Bob37") ne sont jamais des numeros de etoile.
+ * Does this key hold an identifier or a name? The digits they contain
+ * ("p_sszHPTWCDh7i", "Bob37") are never star numbers.
  */
 function isIdentifierKey(key: string): boolean {
   return IDENTIFIER_KEYS.has(key) || key.endsWith('Id') || key.endsWith('By');
 }
 
-/** Echappe une chaine pour l'inserer dans une expression reguliere. */
+/** Escapes a string for use inside a regular expression. */
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -184,10 +188,10 @@ export function findSecretLeak(
   const secrets = new Set(player.secret);
 
   /**
-   * Nombres devenus legitimement publics :
-   * - les etoiles revelees au centre (jamais des etoiles secretes) ;
-   * - les annonces CONSTELLATION, faites a voix haute par leur auteur ;
-   * - l'integralite des secrets une fois la partie terminee (revelation finale).
+   * Numbers that legitimately became public:
+   * - stars revealed in the middle (never secret stars);
+   * - CONSTELLATION! calls, made out loud by their author;
+   * - every secret once the game is over (final reveal).
    */
   const publiclyKnown = new Set<number>();
   for (const t of state.publicTiles) {
@@ -206,7 +210,7 @@ export function findSecretLeak(
     }
   }
 
-  /** Petits nombres qui parsement les textes (ordinaux, numero de tour...). */
+  /** Small numbers scattered through texts (ordinals, turn number...). */
   const textNoise = new Set<number>([1, 2, 3, 4, 5, 6]);
   for (let i = 1; i <= state.turn; i += 1) {
     textNoise.add(i);
@@ -227,8 +231,8 @@ export function findSecretLeak(
       if (isIdentifierKey(key)) {
         return null;
       }
-      // Les pseudos sont retires du texte : un joueur nomme "Bob37" ne doit
-      // pas declencher une fausse alerte sur le numero 37.
+      // Names are stripped from the text: a player called "Bob37" must not
+      // raise a false alarm on star 37.
       const cleaned = namePattern ? value.replace(namePattern, ' ') : value;
       for (const token of cleaned.match(/\d+/g) ?? []) {
         const n = Number(token);

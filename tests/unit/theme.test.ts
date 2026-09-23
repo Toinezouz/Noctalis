@@ -7,10 +7,11 @@ import {
   nextThemePreference,
   resolveTheme,
 } from '../../client/src/lib/theme.js';
+import { en } from '../../client/src/i18n/en.js';
 import { fr } from '../../client/src/i18n/fr.js';
 import { es } from '../../client/src/i18n/es.js';
 
-/** Luminance relative d'une couleur #rrggbb (formule WCAG). */
+/** Relative luminance of a #rrggbb colour (WCAG formula). */
 function luminance(hex: string): number {
   const value = hex.replace('#', '');
   const channels = [0, 2, 4].map((i) => Number.parseInt(value.slice(i, i + 2), 16) / 255);
@@ -18,13 +19,13 @@ function luminance(hex: string): number {
   return 0.2126 * linear[0]! + 0.7152 * linear[1]! + 0.0722 * linear[2]!;
 }
 
-/** Rapport de contraste WCAG entre deux couleurs. */
+/** WCAG contrast ratio between two colours. */
 function contrast(a: string, b: string): number {
   const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (high! + 0.05) / (low! + 0.05);
 }
 
-/** Valeur d'un jeton, lue dans la feuille de style. */
+/** Value of a token, read from the stylesheet. */
 function token(name: string, theme: 'light' | 'dark'): string {
   const css = readTokens();
   const block =
@@ -33,7 +34,7 @@ function token(name: string, theme: 'light' | 'dark'): string {
       : css.slice(css.indexOf(":root[data-theme='dark']"));
   const match = new RegExp(`${name}:\\s*(#[0-9a-fA-F]{3,8})`).exec(block);
   if (!match) {
-    throw new Error(`jeton introuvable : ${name} (${theme})`);
+    throw new Error(`token not found: ${name} (${theme})`);
   }
   return match[1]!;
 }
@@ -47,33 +48,33 @@ function readTokens(): string {
   return cache;
 }
 
-describe('preference de theme', () => {
-  it('propose exactement automatique, clair et sombre', () => {
+describe('theme preference', () => {
+  it('offers exactly automatic, light and dark', () => {
     expect(THEME_PREFERENCES).toEqual(['auto', 'light', 'dark']);
   });
 
-  it('resout « auto » selon le systeme, et impose les autres', () => {
+  it('resolves "auto" from the device and enforces the others', () => {
     expect(resolveTheme('auto', true)).toBe('dark');
     expect(resolveTheme('auto', false)).toBe('light');
     expect(resolveTheme('light', true)).toBe('light');
     expect(resolveTheme('dark', false)).toBe('dark');
   });
 
-  it('tourne en boucle sur les trois choix', () => {
+  it('cycles through the three choices', () => {
     expect(nextThemePreference('auto')).toBe('light');
     expect(nextThemePreference('light')).toBe('dark');
     expect(nextThemePreference('dark')).toBe('auto');
   });
 
-  it('refuse une valeur stockee invalide', () => {
+  it('refuses an invalid stored value', () => {
     expect(isThemePreference('dark')).toBe(true);
     expect(isThemePreference('AUTO')).toBe(false);
     expect(isThemePreference(null)).toBe(false);
     expect(isThemePreference(undefined)).toBe(false);
   });
 
-  it('traduit les trois choix dans les deux langues', () => {
-    for (const catalogue of [fr, es]) {
+  it('names the three choices in every language', () => {
+    for (const catalogue of [en, fr, es]) {
       for (const key of ['theme.label', 'theme.auto', 'theme.light', 'theme.dark'] as const) {
         expect(catalogue[key].trim().length).toBeGreaterThan(0);
       }
@@ -82,32 +83,35 @@ describe('preference de theme', () => {
   });
 });
 
-describe('lisibilite des deux themes', () => {
-  // AA exige 4,5:1 pour du texte courant, 3:1 pour du grand texte.
+describe('readability of both themes', () => {
+  // AA asks for 4.5:1 for body text, 3:1 for large text.
   const pairs: [string, string, string, number][] = [
-    ['--c-ink', '--c-paper', 'texte sur panneau', 4.5],
-    ['--c-ink', '--c-cream', 'texte sur fond de page', 4.5],
-    ['--c-ink-soft', '--c-paper', 'texte secondaire sur panneau', 4.5],
-    ['--c-ink-soft', '--c-cream', 'texte secondaire sur fond de page', 4.5],
-    ['--c-violet', '--c-paper', 'accent sur panneau', 3],
+    ['--c-ink', '--c-paper', 'text on a panel', 4.5],
+    ['--c-ink', '--c-cream', 'text on the page', 4.5],
+    ['--c-ink-soft', '--c-paper', 'secondary text on a panel', 4.5],
+    ['--c-ink-soft', '--c-cream', 'secondary text on the page', 4.5],
+    ['--c-violet', '--c-paper', 'accent on a panel', 3],
+    ['--c-violet', '--c-cream', 'titles on the page', 3],
+    ['--c-gold', '--c-paper', '"your turn" title', 3],
+    ['--c-magenta', '--c-cream', 'tagline on the home screen', 3],
   ];
 
   for (const theme of ['light', 'dark'] as const) {
     for (const [fg, bg, label, minimum] of pairs) {
-      it(`${theme} : ${label} reste lisible`, () => {
+      it(`${theme}: ${label} stays readable`, () => {
         const ratio = contrast(token(fg, theme), token(bg, theme));
-        expect(ratio, `${fg} sur ${bg} = ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(minimum);
+        expect(ratio, `${fg} on ${bg} = ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(minimum);
       });
     }
   }
 
-  it('la barre du navigateur suit le theme', () => {
+  it('the browser bar follows the theme', () => {
     expect(THEME_COLORS.light.toLowerCase()).toBe(token('--c-cream', 'light').toLowerCase());
     expect(THEME_COLORS.dark.toLowerCase()).toBe(token('--c-cream', 'dark').toLowerCase());
   });
 
-  it('les couleurs des tuiles sont identiques dans les deux themes', () => {
-    // Sinon la fiche de deduction ne correspondrait plus au plateau.
+  it('constellation colours are the same in both themes', () => {
+    // Otherwise the star chart would no longer match the table.
     const css = readTokens();
     const dark = css.slice(css.indexOf(":root[data-theme='dark']"));
     for (const family of ['--t-green', '--t-pink', '--t-blue', '--t-red', '--t-orange']) {

@@ -1,17 +1,17 @@
 import { randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 import { ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH } from '@noctalis/shared';
 
-/** Identifiant opaque (joueur, room interne...). */
+/** Opaque identifier (player, internal room...). */
 export function createId(prefix: string): string {
   return `${prefix}_${randomBytes(9).toString('base64url')}`;
 }
 
-/** Jeton de session prive, utilise uniquement pour la reconnexion. */
+/** Private session token, only used to reconnect. */
 export function createToken(): string {
   return randomBytes(32).toString('base64url');
 }
 
-/** Code de room court, lisible, sans caracteres ambigus. */
+/** Short, readable room code without look-alike characters. */
 export function createRoomCode(): string {
   let code = '';
   for (let i = 0; i < ROOM_CODE_LENGTH; i += 1) {
@@ -20,7 +20,7 @@ export function createRoomCode(): string {
   return code;
 }
 
-/** Comparaison a temps constant, pour eviter toute fuite par chronometrage. */
+/** Constant-time comparison, so that timing reveals nothing. */
 export function safeCompare(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
   const bufB = Buffer.from(b);

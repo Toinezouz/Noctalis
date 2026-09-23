@@ -10,9 +10,9 @@ import type { TileColor } from '../types/tiles.js';
 export type Validated<T> = { ok: true; value: T } | { ok: false; reason: string };
 
 /**
- * Nettoie un pseudo : espaces normalises, caracteres de controle et
- * caracteres dangereux (<, >, &, ", ', `) supprimes. Aucune balise ne peut
- * donc survivre a cette etape, cote serveur comme cote client.
+ * Cleans a display name: whitespace normalised, control characters and
+ * dangerous characters (<, >, &, ", ', `) removed. No markup can survive this
+ * step, on the server as on the client.
  */
 export function sanitizeName(raw: unknown): string {
   if (typeof raw !== 'string') {
@@ -28,76 +28,76 @@ export function sanitizeName(raw: unknown): string {
     .slice(0, NAME_MAX_LENGTH);
 }
 
-/** Valide un pseudo apres nettoyage. */
+/** Validates a display name after cleaning. */
 export function validateName(raw: unknown): Validated<string> {
   const name = sanitizeName(raw);
   if (name.length < NAME_MIN_LENGTH) {
     return {
       ok: false,
-      reason: `Le pseudo doit contenir au moins ${String(NAME_MIN_LENGTH)} caracteres.`,
+      reason: `A name needs at least ${String(NAME_MIN_LENGTH)} characters.`,
     };
   }
   if (name.length > NAME_MAX_LENGTH) {
     return {
       ok: false,
-      reason: `Le pseudo ne doit pas depasser ${String(NAME_MAX_LENGTH)} caracteres.`,
+      reason: `A name must not exceed ${String(NAME_MAX_LENGTH)} characters.`,
     };
   }
   return { ok: true, value: name };
 }
 
-/** Normalise et valide un code de room (majuscules, alphabet restreint). */
+/** Normalises and validates a room code (upper case, restricted alphabet). */
 export function validateRoomCode(raw: unknown): Validated<string> {
   if (typeof raw !== 'string') {
-    return { ok: false, reason: 'Code de partie invalide.' };
+    return { ok: false, reason: 'Invalid room code.' };
   }
   const code = raw.trim().toUpperCase().replace(/\s/g, '');
   if (code.length !== ROOM_CODE_LENGTH) {
-    return { ok: false, reason: `Le code doit contenir ${String(ROOM_CODE_LENGTH)} caracteres.` };
+    return { ok: false, reason: `A room code has ${String(ROOM_CODE_LENGTH)} characters.` };
   }
   for (const char of code) {
     if (!ROOM_CODE_ALPHABET.includes(char)) {
-      return { ok: false, reason: 'Ce code contient des caracteres invalides.' };
+      return { ok: false, reason: 'This code contains invalid characters.' };
     }
   }
   return { ok: true, value: code };
 }
 
-/** Valide une constellation recue du reseau. */
+/** Validates a constellation received from the network. */
 export function validateColor(raw: unknown): Validated<TileColor> {
   if (typeof raw === 'string' && (COLOR_ORDER as readonly string[]).includes(raw)) {
     return { ok: true, value: raw as TileColor };
   }
-  return { ok: false, reason: 'Couleur invalide.' };
+  return { ok: false, reason: 'Invalid constellation.' };
 }
 
-/** Valide un numero de etoile recu du reseau. */
+/** Validates a star number received from the network. */
 export function validateTileNumber(raw: unknown): Validated<number> {
   if (Number.isInteger(raw) && (raw as number) >= 1 && (raw as number) <= TILE_COUNT) {
     return { ok: true, value: raw as number };
   }
-  return { ok: false, reason: 'Numero de tuile invalide.' };
+  return { ok: false, reason: 'Invalid star number.' };
 }
 
-/** Valide un entier borne (positions, encoches...). */
+/** Validates a bounded integer (positions, gaps...). */
 export function validateIndex(raw: unknown, max: number): Validated<number> {
   if (Number.isInteger(raw) && (raw as number) >= 0 && (raw as number) < max) {
     return { ok: true, value: raw as number };
   }
-  return { ok: false, reason: 'Valeur hors limites.' };
+  return { ok: false, reason: 'Value out of range.' };
 }
 
-/** Valide une liste de numeros d'etoiles (forme brute, avant regles). */
+/** Validates a list of star numbers (raw shape, before the rules). */
 export function validateNumberList(raw: unknown, length: number): Validated<number[]> {
   if (!Array.isArray(raw) || raw.length !== length) {
-    return { ok: false, reason: `Il faut exactement ${String(length)} numeros.` };
+    return { ok: false, reason: `Exactly ${String(length)} numbers are needed.` };
   }
   const out: number[] = [];
   for (const item of raw) {
     if (!Number.isInteger(item) || (item as number) < 1 || (item as number) > TILE_COUNT) {
       return {
         ok: false,
-        reason: `Chaque numero doit etre un entier entre 1 et ${String(TILE_COUNT)}.`,
+        reason: `Each number must be an integer between 1 and ${String(TILE_COUNT)}.`,
       };
     }
     out.push(item as number);

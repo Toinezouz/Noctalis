@@ -1,15 +1,15 @@
 export interface BrandMarkProps {
-  /** `xl` pour l'accueil et la fin de partie, `sm` pour le bandeau de jeu. */
+  /** `xl` for the home and end screens, `sm` for the game header. */
   size?: 'sm' | 'xl';
-  /** Balise du titre : `h1` sur l'accueil, `span` ailleurs. */
+  /** Title tag: `h1` on the home screen, `span` elsewhere. */
   as?: 'h1' | 'p' | 'span';
   className?: string;
 }
 
 /**
- * Marque de NOCTALIS : un disque de nuit portant cinq etoiles reliees par les
- * traits d'une constellation, suivi du nom. Entierement dessinee en SVG dans
- * le projet, sans dependance ni ressource externe.
+ * The NOCTALIS mark: a disc of night carrying stars joined by the lines of a
+ * constellation, followed by the name. Drawn in SVG within the project, with
+ * no dependency and no external resource.
  */
 export function BrandMark({ size = 'sm', as = 'span', className = '' }: BrandMarkProps): JSX.Element {
   const Tag = as;

@@ -2,10 +2,10 @@ import type { PlayerCredentials } from '@noctalis/shared';
 import { isThemePreference, type ThemePreference } from './theme.js';
 
 /**
- * Persistance locale.
- * ATTENTION : on ne stocke jamais d'information secrete de jeu ici. Seulement
- * les identifiants de session (room, playerId, jeton) et les deductions
- * *personnelles* du joueur (numeros barres, hypotheses).
+ * Local persistence.
+ * NEVER store secret game information here: only session credentials (room,
+ * playerId, token) and the player's *own* deductions (crossed numbers,
+ * guesses).
  */
 
 const SESSION_KEY = 'noctalis:session';
@@ -24,7 +24,7 @@ function writeJson(key: string, value: unknown): void {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* mode navigation privee ou quota : le jeu reste fonctionnel */
+    /* private browsing or quota: the game still works */
   }
 }
 
@@ -49,19 +49,19 @@ export function clearSession(): void {
   try {
     window.localStorage.removeItem(SESSION_KEY);
   } catch {
-    /* rien a faire */
+    /* nothing to do */
   }
 }
 
 export interface Preferences {
-  /** Pseudo memorise pour ne pas le retaper a chaque partie. */
+  /** Remembered name, so it need not be typed every game. */
   name: string;
   soundEnabled: boolean;
-  /** Le tutoriel a-t-il deja ete vu ? */
+  /** Has the tutorial been seen already? */
   onboardingDone: boolean;
-  /** Langue choisie ('fr' | 'es'), vide = detection automatique. */
+  /** Chosen language ('fr' | 'en' | 'es'); empty = detected automatically. */
   language: string;
-  /** Theme : 'auto' suit le systeme, sinon 'light' ou 'dark'. */
+  /** Theme: 'auto' follows the device, otherwise 'light' or 'dark'. */
   theme: ThemePreference;
 }
 
@@ -76,8 +76,8 @@ const DEFAULT_PREFS: Preferences = {
 export function loadPreferences(): Preferences {
   const stored = readJson<Partial<Preferences>>(PREFS_KEY) ?? {};
   const prefs = { ...DEFAULT_PREFS, ...stored };
-  // Une valeur abimee (edition manuelle, ancienne version) ne doit pas laisser
-  // le document sans theme : on retombe sur la detection automatique.
+  // A damaged value (manual edit, older version) must not leave the page
+  // without a theme: fall back to automatic detection.
   if (!isThemePreference(prefs.theme)) {
     prefs.theme = 'auto';
   }
@@ -90,15 +90,15 @@ export function savePreferences(prefs: Partial<Preferences>): Preferences {
   return next;
 }
 
-/** Cle de la carte du ciel : une fiche par (partie, joueur). */
+/** Star chart key: one chart per (room, player). */
 export function deductionKey(roomCode: string, playerId: string): string {
   return `noctalis:sheet:${roomCode}:${playerId}`;
 }
 
 export interface StoredDeduction {
-  /** Numeros barres au feutre. */
+  /** Numbers crossed out. */
   crossed: number[];
-  /** Les 5 hypotheses (chaines libres pour permettre la saisie partielle). */
+  /** The five guesses (free strings, to allow partial input). */
   guesses: string[];
 }
 
@@ -123,6 +123,6 @@ export function clearDeduction(key: string): void {
   try {
     window.localStorage.removeItem(key);
   } catch {
-    /* rien a faire */
+    /* nothing to do */
   }
 }

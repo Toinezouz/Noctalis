@@ -20,8 +20,8 @@ import {
 } from '../lib/theme.js';
 
 /**
- * Aiguillage des ecrans : accueil -> lobby -> table de jeu.
- * L'etat vient du serveur ; aucun ecran n'est simule localement.
+ * Screen routing: home -> lobby -> table.
+ * The state comes from the server; no screen is simulated locally.
  */
 export function App(): JSX.Element {
   const {
@@ -39,10 +39,10 @@ export function App(): JSX.Element {
   const [helpOpen, setHelpOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   /**
-   * Le tutoriel est *demande* a la premiere partie, mais il ne s'affiche que
-   * lorsque rien de plus urgent n'occupe l'ecran : l'annonce du tirage au sort
-   * passe devant, une etape obligatoire aussi. Il attend son tour au lieu de se
-   * superposer, quel que soit l'ordre d'arrivee des messages du serveur.
+   * The tutorial is *requested* on the first game, but only shows when
+   * nothing more urgent is on screen: the opening draw goes first, and so
+   * does a question to answer. It waits its turn instead of piling up,
+   * whatever order the server's messages arrive in.
    */
   const [onboardingWanted, setOnboardingWanted] = useState(false);
 
@@ -50,14 +50,14 @@ export function App(): JSX.Element {
     setSoundEnabled(prefs.soundEnabled);
   }, [prefs.soundEnabled]);
 
-  // Theme : 'auto' suit le systeme et reagit a ses changements en direct.
+  // Theme: 'auto' follows the device and reacts to its changes live.
   const systemPrefersDark = useMediaQuery(DARK_MEDIA_QUERY);
   const theme = resolveTheme(prefs.theme, systemPrefersDark);
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
 
-  // Tutoriel a la toute premiere partie uniquement.
+  // Tutorial on the very first game only.
   useEffect(() => {
     if (publicState && !prefs.onboardingDone) {
       setOnboardingWanted(true);
@@ -134,7 +134,7 @@ export function App(): JSX.Element {
         />
       ) : null}
 
-      {/* Pied de page : hors partie seulement, pour ne rien encombrer. */}
+      {/* Footer: outside games only, to keep the table uncluttered. */}
       {!inGame ? (
         <SiteFooter
           onOpenAbout={() => {

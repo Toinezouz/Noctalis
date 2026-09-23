@@ -1,28 +1,29 @@
 import { useEffect, useRef } from 'react';
 import type { LogEntry, LogKind } from '@noctalis/shared';
 import { useI18n, type MessageKey } from '../../i18n/index.js';
+import { Icon, type IconName } from '../ui/Icon.js';
 
-const ICONS: Record<LogKind, string> = {
-  system: '🎲',
-  reveal: '🃏',
-  'hint-request': '❓',
-  classify: '📥',
-  compare: '⚖️',
-  turn: '🔄',
-  guess: '🏆',
-  connection: '🔌',
+const ICONS: Record<LogKind, IconName> = {
+  system: 'dice',
+  reveal: 'eye',
+  'hint-request': 'help',
+  classify: 'place',
+  compare: 'gauge',
+  turn: 'turn',
+  guess: 'crown',
+  connection: 'plug',
 };
 
 export interface GameLogProps {
   entries: LogEntry[];
-  /** Hauteur limitee en panneau lateral, libre en plein ecran. */
+  /** Limited height in the side panel, free in full screen. */
   compact?: boolean;
 }
 
 /**
- * Historique public : jamais d'information secrete, uniquement les faits.
- * Le serveur envoie un code et ses parametres ; la phrase est construite ici,
- * dans la langue du joueur.
+ * Public history: facts only, never secret information. The server sends a
+ * code and its parameters; the sentence is built here, in the player's
+ * language.
  */
 export function GameLog({ entries, compact = true }: GameLogProps): JSX.Element {
   const { t, slot } = useI18n();
@@ -37,7 +38,7 @@ export function GameLog({ entries, compact = true }: GameLogProps): JSX.Element 
 
   const render = (entry: LogEntry): string => {
     const params = { ...entry.params };
-    // Le libelle d'encoche depend aussi de la langue.
+    // The gap label depends on the language too.
     if (typeof params['slot'] === 'number') {
       params['slot'] = slot(params['slot']).toLowerCase();
     }
@@ -62,7 +63,7 @@ export function GameLog({ entries, compact = true }: GameLogProps): JSX.Element 
       {entries.map((entry) => (
         <li className="game-log__item" key={entry.id} data-kind={entry.kind}>
           <span className="game-log__icon" aria-hidden="true">
-            {ICONS[entry.kind]}
+            <Icon name={ICONS[entry.kind]} size={16} />
           </span>
           <span>{render(entry)}</span>
         </li>

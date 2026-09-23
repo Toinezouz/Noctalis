@@ -5,10 +5,10 @@ const NODE_ENV = process.env['NODE_ENV'] ?? 'development';
 const ROOM_TTL_MS = Number(process.env['ROOM_TTL_MS'] ?? 15 * 60 * 1000);
 
 /**
- * Origines autorisees. En dehors de la production, tout est accepte.
+ * Allowed origins. Outside production, anything goes.
  *
- * Un hebergeur peut ne fournir que le nom d'hote, sans schema (c'est le cas
- * de `fromService` chez Render) : une origine CORS en exige un, on le remet.
+ * A host may only provide the host name, without a scheme (Render's
+ * `fromService` does): a CORS origin needs one, so it is added back.
  */
 function toOrigin(raw: string): string {
   const value = raw.trim();
@@ -30,16 +30,16 @@ const { httpServer, close } = createNoctalisServer({
   serveClient: true,
 });
 
-// 0.0.0.0 : indispensable derriere un hebergeur conteneurise (Render), ou
-// ecouter seulement sur localhost rendrait le service injoignable.
+// 0.0.0.0 is required behind a containerised host (Render), where listening
+// on localhost only would make the service unreachable.
 const HOST = process.env['HOST'] ?? '0.0.0.0';
 
 httpServer.listen(PORT, HOST, () => {
-  console.log(`NOCTALIS — serveur pret sur ${HOST}:${String(PORT)} (${NODE_ENV})`);
+  console.log(`NOCTALIS — server ready on ${HOST}:${String(PORT)} (${NODE_ENV})`);
 });
 
 function shutdown(signal: string): void {
-  console.log(`\n[${signal}] arret du serveur...`);
+  console.log(`\n[${signal}] shutting down...`);
   void close().then(() => {
     process.exit(0);
   });

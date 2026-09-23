@@ -1,20 +1,20 @@
 /**
- * Identite publique du projet, en un seul endroit : interface, pied de page
- * et fenetre A propos lisent ces constantes, jamais une URL recopiee.
+ * The project's public identity, in one place: the interface, the footer and
+ * the About dialog read these constants, never a copied URL.
  */
 
 export const PROJECT_NAME = 'NOCTALIS';
 
-/** Version affichee. Suit `package.json`. */
-export const PROJECT_VERSION = '1.0.0';
+/** Displayed version. Follows `package.json`. */
+export const PROJECT_VERSION = '1.1.0';
 
 export const GITHUB_OWNER = 'Toinezouz';
 export const GITHUB_REPO = 'Noctalis';
 export const GITHUB_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}`;
 
 /**
- * GitHub Sponsors — **le seul** moyen de soutenir le projet.
- * Forme canonique d'une page Sponsors : `github.com/sponsors/<compte>`.
+ * GitHub Sponsors — **the only** way to support the project.
+ * Canonical form of a Sponsors page: `github.com/sponsors/<account>`.
  */
 export const SPONSORS_URL = `https://github.com/sponsors/${GITHUB_OWNER}`;
 

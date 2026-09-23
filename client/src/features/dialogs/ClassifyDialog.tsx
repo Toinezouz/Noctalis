@@ -9,7 +9,7 @@ import { Tile } from '../../components/game/Tile.js';
 export interface ClassifyDialogProps {
   open: boolean;
   tileNumber: number;
-  /** Les vrais numeros du demandeur : je les vois, c'est la regle du jeu. */
+  /** The asker's real numbers: I can see them, that is the whole game. */
   askerSecretNumbers: number[];
   askerName: string;
   onSubmit: (slot: number) => void;
@@ -17,8 +17,8 @@ export interface ClassifyDialogProps {
 }
 
 /**
- * Reponse a SITUER. Le joueur designe l'encoche ; le serveur calcule et
- * applique de toute facon la position exacte.
+ * Answer to PLACE. The player points at the gap; the server works out and
+ * applies the exact position anyway.
  */
 export function ClassifyDialog({
   open,

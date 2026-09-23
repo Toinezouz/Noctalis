@@ -3,19 +3,20 @@ import { useI18n } from '../../i18n/index.js';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { playSound } from '../../lib/audio.js';
 import { Button } from '../../components/ui/Button.js';
+import { Icon } from '../../components/ui/Icon.js';
 import { sectorCenter, sectorSize, spinAngle } from '../../lib/roulette.js';
 
-/** Duree de la rotation, calee sur la transition CSS. */
+/** Spin duration, matching the CSS transition. */
 export const SPIN_MS = 2600;
-/** Temps d'affichage du resultat avant fermeture automatique. */
+/** How long the result stays before closing by itself. */
 export const HOLD_MS = 2400;
-/** Tours complets avant l'arret. */
+/** Full turns before stopping. */
 const TURNS = 5;
-/** Un instant avant de lancer la roue : le navigateur doit avoir peint 0 deg. */
+/** A short pause before spinning: the browser must have painted 0 deg first. */
 const KICK_MS = 60;
 
-/** Constellations des secteurs, dans l'ordre des joueurs. */
-const SECTOR_COLORS = ['var(--t-blue)', 'var(--t-pink)', 'var(--t-green)', 'var(--t-orange)'];
+/** Sector colours, one constellation per player. */
+const SECTOR_COLORS = ['var(--t-blue-deep)', 'var(--t-pink-deep)', 'var(--t-green-deep)', 'var(--t-orange-deep)'];
 
 export interface StartRoulettePlayer {
   id: string;
@@ -24,16 +25,16 @@ export interface StartRoulettePlayer {
 
 export interface StartRouletteProps {
   players: StartRoulettePlayer[];
-  /** Joueur tire au sort par le serveur. La roue ne fait que le montrer. */
+  /** Player drawn by the server. The wheel only shows it. */
   startingPlayerId: string;
   myId: string;
   onDone: () => void;
 }
 
 /**
- * Annonce du tirage au sort : une roue tourne puis s'arrete sur le joueur qui
- * commence. Le resultat vient du serveur (`startingPlayerId`) : l'animation ne
- * decide rien, elle raconte.
+ * The opening draw: a wheel spins and stops on the player who starts. The
+ * result comes from the server (`startingPlayerId`): the animation decides
+ * nothing, it only tells the story.
  */
 export function StartRoulette({
   players,
@@ -46,7 +47,7 @@ export function StartRoulette({
 
   const count = players.length;
   const index = players.findIndex((p) => p.id === startingPlayerId);
-  // Decalage tire une fois : la roue ne s'arrete pas toujours pile au centre.
+  // Drawn once: the wheel does not always stop dead in the middle of a sector.
   const [offset] = useState(() => Math.random() * 2 - 1);
   const rotation = useMemo(
     () => (index < 0 || count === 0 ? 0 : spinAngle(index, count, TURNS, offset)),
@@ -75,7 +76,7 @@ export function StartRoulette({
     };
   }, [reduceMotion, rotation]);
 
-  // Fermeture automatique : personne ne reste bloque devant l'animation.
+  // Closes by itself: nobody stays stuck in front of the animation.
   useEffect(() => {
     if (!landed) {
       return;
@@ -138,7 +139,7 @@ export function StartRoulette({
           </div>
           <span className="roulette__pointer" aria-hidden="true" />
           <span className="roulette__hub" aria-hidden="true">
-            🎲
+            <Icon name="star" size={28} />
           </span>
         </div>
 
@@ -146,7 +147,7 @@ export function StartRoulette({
           {landed
             ? iStart
               ? t('roulette.youStart')
-              : t('roulette.opponentStarts', { name: starter.name })
+              : t('roulette.othersStart', { name: starter.name })
             : t('roulette.drawing')}
         </p>
 

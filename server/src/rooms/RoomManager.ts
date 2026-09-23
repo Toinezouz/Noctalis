@@ -4,8 +4,12 @@ import {
   type PlayerCredentials,
   type RoomState,
   type RoomStatus,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
   createGame,
   defaultRng,
+  getPlayer,
+  reassignResponder,
   setPlayerConnected,
 } from '@noctalis/shared';
 import { createId, createRoomCode, createToken, safeCompare } from '../security/tokens.js';
@@ -13,7 +17,7 @@ import { createId, createRoomCode, createToken, safeCompare } from '../security/
 export interface RoomPlayer {
   id: string;
   name: string;
-  /** Jeton prive de reconnexion. Ne quitte jamais le serveur sauf vers son proprietaire. */
+  /** Private reconnection token. Only ever sent to its owner. */
   token: string;
   socketId: string | null;
   connected: boolean;
@@ -48,14 +52,14 @@ export class Room {
   }
 
   get isFull(): boolean {
-    return this.players.length >= 2;
+    return this.players.length >= MAX_PLAYERS;
   }
 
   get hasConnectedPlayer(): boolean {
     return this.players.some((p) => p.connected);
   }
 
-  /** Etat public du lobby (aucun jeton, aucun secret). */
+  /** Public lobby state (no token, no secret). */
   toRoomState(): RoomState {
     return {
       code: this.code,
@@ -66,7 +70,7 @@ export class Room {
         connected: p.connected,
         isHost: p.isHost,
       })),
-      canStart: this.players.length === 2 && this.game === null,
+      canStart: this.players.length >= MIN_PLAYERS && this.game === null,
       rematchReady: [...this.rematchReady],
       createdAt: this.createdAt,
     };
@@ -82,9 +86,9 @@ export class Room {
   }
 
   /**
-   * Demarre (ou relance) une partie avec les 2 joueurs presents.
-   * Renvoie l'evenement d'ouverture, qui annonce le joueur tire au sort : les
-   * clients s'en servent pour l'animation de roulette.
+   * Starts (or restarts) a game with everybody in the room.
+   * Returns the opening event announcing the player drawn at random: clients
+   * use it for the roulette animation.
    */
   startGame(): GameEvent[] {
     const game = createGame(
@@ -107,6 +111,7 @@ export class Room {
 export type JoinError =
   | 'ROOM_NOT_FOUND'
   | 'ROOM_FULL'
+  | 'ROOM_STARTED'
   | 'ROOM_FINISHED'
   | 'NAME_TAKEN'
   | 'BAD_TOKEN'
@@ -115,9 +120,9 @@ export type JoinError =
 export type RoomResult<T> = { ok: true; value: T } | { ok: false; error: JoinError };
 
 export interface RoomManagerOptions {
-  /** Duree de survie d'une room sans joueur connecte (ms). */
+  /** How long a room survives with nobody connected (ms). */
   ttlMs?: number;
-  /** Nombre maximal de rooms simultanees (garde-fou memoire). */
+  /** Maximum number of rooms at once (memory guard). */
   maxRooms?: number;
 }
 
@@ -139,7 +144,7 @@ export class RoomManager {
     return this.rooms.get(code);
   }
 
-  /** Cree une room et son premier joueur (l'hote). */
+  /** Creates a room and its first player (the host). */
   create(name: string, socketId: string): RoomResult<{ room: Room; player: RoomPlayer }> {
     if (this.rooms.size >= this.maxRooms) {
       return { ok: false, error: 'TOO_MANY_ROOMS' };
@@ -170,7 +175,7 @@ export class RoomManager {
     return { ok: true, value: { room, player } };
   }
 
-  /** Ajoute un second joueur a une room existante. */
+  /** Adds a player to a room that has not started yet. */
   join(
     code: string,
     name: string,
@@ -180,8 +185,10 @@ export class RoomManager {
     if (!room) {
       return { ok: false, error: 'ROOM_NOT_FOUND' };
     }
-    if (room.status === 'finished' && room.players.length >= 2) {
-      return { ok: false, error: 'ROOM_FINISHED' };
+    // Seats are only open in the lobby: nobody joins a game in progress, whose
+    // stars have already been dealt.
+    if (room.game) {
+      return { ok: false, error: room.status === 'playing' ? 'ROOM_STARTED' : 'ROOM_FINISHED' };
     }
     if (room.isFull) {
       return { ok: false, error: 'ROOM_FULL' };
@@ -205,7 +212,7 @@ export class RoomManager {
     return { ok: true, value: { room, player } };
   }
 
-  /** Reconnecte un joueur apres un refresh ou une coupure reseau. */
+  /** Reconnects a player after a reload or a network drop. */
   reconnect(
     code: string,
     playerId: string,
@@ -230,31 +237,55 @@ export class RoomManager {
     return { ok: true, value: { room, player } };
   }
 
-  /** Marque un joueur comme deconnecte (la room survit pendant le TTL). */
-  markDisconnected(socketId: string): { room: Room; player: RoomPlayer } | null {
+  /**
+   * Marks a player as disconnected (the room survives for the TTL). If they
+   * were expected to answer a hint, the question moves on to someone online:
+   * the returned events announce it.
+   */
+  markDisconnected(
+    socketId: string,
+  ): { room: Room; player: RoomPlayer; events: GameEvent[] } | null {
     for (const room of this.rooms.values()) {
       const player = room.getPlayerBySocket(socketId);
       if (player) {
         player.connected = false;
         player.socketId = null;
         player.disconnectedAt = Date.now();
+        const events: GameEvent[] = [];
         if (room.game) {
           setPlayerConnected(room.game, player.id, false);
+          events.push(...reassignResponder(room.game));
         }
         room.touch();
-        return { room, player };
+        return { room, player, events };
       }
     }
     return null;
   }
 
-  /** Retire definitivement un joueur (quitter volontairement). */
+  /**
+   * Removes a player for good (they chose to leave). When the host leaves,
+   * the longest-seated player takes over, so that someone can still start
+   * the next game.
+   */
   removePlayer(room: Room, playerId: string): void {
+    const leaving = room.getPlayer(playerId);
     room.players = room.players.filter((p) => p.id !== playerId);
     room.rematchReady.delete(playerId);
     room.touch();
     if (room.players.length === 0) {
       this.rooms.delete(room.code);
+      return;
+    }
+    if (leaving?.isHost) {
+      const heir = room.players[0]!;
+      heir.isHost = true;
+      if (room.game) {
+        const seat = getPlayer(room.game, heir.id);
+        if (seat) {
+          seat.isHost = true;
+        }
+      }
     }
   }
 
@@ -262,7 +293,7 @@ export class RoomManager {
     this.rooms.delete(code);
   }
 
-  /** Supprime les rooms inactives : appele periodiquement. */
+  /** Deletes idle rooms: called periodically. */
   sweep(now = Date.now()): number {
     let removed = 0;
     for (const [code, room] of this.rooms) {

@@ -2,36 +2,41 @@ import { getTileByNumber } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface DeductionCellProps {
-  /** Seule donnee necessaire : le numero. Constellation et eclats viennent de la
-   * source de verite partagee (aucune valeur codee en dur ici). */
+  /** The only data needed: the number. Constellation and brightness come
+   * from the shared source of truth (nothing hard-coded here). */
   number: number;
   crossed: boolean;
   onToggle: (n: number) => void;
-  /** L'etoile est-elle deja visible au centre de la table ? */
+  /** Is this star already visible in the middle of the table? */
   revealed?: boolean;
+  /** Is this star on someone else's rack (so it cannot be mine)? */
+  held?: boolean;
 }
 
 /**
- * Une case de la fiche : fond colore, gros numero, eclats sous le numero,
- * et, si elle est barree, une croix au feutre volontairement irreguliere.
+ * One cell of the chart: tinted background, large number, brightness below
+ * it and, when crossed out, a deliberately uneven felt-pen cross.
  */
 export function DeductionCell({
   number,
   crossed,
   onToggle,
   revealed = false,
+  held = false,
 }: DeductionCellProps): JSX.Element {
   const { t, color: colorName, points: pointsLabel } = useI18n();
   const tile = getTileByNumber(number);
-  // Irregularite deterministe : chaque case a "sa" croix, stable d'un rendu
-  // a l'autre, mais aucune n'est identique a sa voisine.
+  // Deterministic unevenness: each cell has "its" cross, stable across
+  // renders, but no two neighbours look the same.
   const wobble = ((number * 37) % 9) - 4;
   const drift = ((number * 53) % 7) - 3;
 
   return (
     <button
       type="button"
-      className={`sheet-cell ${crossed ? 'is-crossed' : ''} ${revealed ? 'is-revealed' : ''}`.trim()}
+      className={['sheet-cell', crossed ? 'is-crossed' : '', revealed ? 'is-revealed' : '', held ? 'is-held' : '']
+        .filter(Boolean)
+        .join(' ')}
       data-color={tile.color}
       data-number={number}
       data-testid={`sheet-cell-${String(number)}`}
@@ -47,6 +52,7 @@ export function DeductionCell({
           state: crossed ? t('sheet.cellCrossed') : t('sheet.cellAvailable'),
         }),
         revealed ? t('sheet.cellRevealed') : null,
+        held ? t('sheet.cellHeld') : null,
       ]
         .filter(Boolean)
         .join(', ')}
@@ -59,6 +65,9 @@ export function DeductionCell({
       </span>
       {revealed ? (
         <span className="sheet-cell__revealed" aria-hidden="true" title={t('sheet.cellRevealed')} />
+      ) : null}
+      {held ? (
+        <span className="sheet-cell__held" aria-hidden="true" title={t('sheet.cellHeld')} />
       ) : null}
       {crossed ? (
         <svg

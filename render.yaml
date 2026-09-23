@@ -1,10 +1,10 @@
 # ---------------------------------------------------------------------------
-# NOCTALIS — deploiement Render
+# NOCTALIS — Render deployment
 #
-# Un seul Web Service : le serveur Express sert a la fois le client compile,
-# l'API et Socket.IO. Meme origine, donc aucun probleme de CORS.
+# A single Web Service: the Express server serves the built client, the API
+# and Socket.IO. Same origin, so no CORS trouble.
 #
-# Aucun secret ici : le projet n'en utilise aucun.
+# No secret here: the project uses none.
 # ---------------------------------------------------------------------------
 services:
   - type: web
@@ -13,25 +13,25 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    # `--include=dev` est indispensable : NODE_ENV vaut `production` ci-dessous,
-    # et sans ce drapeau `npm ci` sauterait les devDependencies — donc esbuild,
-    # TypeScript et Vite, qui sont precisement ce qui construit le projet.
+    # `--include=dev` is essential: NODE_ENV is `production` below, and
+    # without this flag `npm ci` would skip devDependencies — esbuild,
+    # TypeScript and Vite, which are precisely what builds the project.
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /health
-    # Deploie seulement quand les verifications GitHub sont passees.
+    # Deploys only once the GitHub checks have passed.
     autoDeployTrigger: checksPass
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
         value: "20"
-      # Origine publique du service : Render la renseigne lui-meme.
+      # Public origin of the service: Render fills it in itself.
       - key: CLIENT_URL
         fromService:
           type: web
           name: noctalis
           property: host
-      # Duree de survie d'une observation sans joueur connecte (15 minutes).
+      # How long a game survives with nobody connected (15 minutes).
       - key: ROOM_TTL_MS
         value: "900000"

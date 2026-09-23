@@ -1,100 +1,141 @@
-# Identité du projet — NOCTALIS
+# Project identity — NOCTALIS
 
-## Nom
+## Name
 
 **NOCTALIS**
 
-Mot inventé, de *nox / noctis* (la nuit). Une seule forme en français, en
-espagnol et en anglais : pas de traduction à maintenir, pas de déclinaison.
-Aucun lien, phonétique ou sémantique, avec le jeu dont ce projet réutilise
-l'architecture technique.
+An invented word, from Latin *nox / noctis* (the night). The same in every
+language: nothing to translate, nothing to decline. It has no link, in sound
+or in meaning, with the game whose technical architecture this project
+started from.
 
-## Slogan
+## Tagline
 
-- **fr** — « Devine ta constellation avant lui. »
-- **es** — « Adivina tu constelación antes que él. »
+- **en** — "Find your constellation before anyone else."
+- **fr** — « Devine ta constellation avant les autres. »
+- **es** — «Adivina tu constelación antes que nadie.»
+
+The first taglines ("… avant lui", "… antes que él") assumed a single rival
+and a gender; they were rewritten with 1.1, when tables grew to four.
 
 ## Pitch
 
-Deux astronomes observent le même ciel. Chacun voit parfaitement la
-constellation de l'autre, jamais la sienne. En posant des questions sur les
-étoiles du relevé commun, il faut reconstituer ses cinq étoiles avant son
-rival — et annoncer **CONSTELLATION !**
+Two to four stargazers under the same sky. Everyone can see everybody's
+stars, except their own. By asking questions about the stars of the open sky,
+each person pieces their own five stars together — and the first to call them
+right, **CONSTELLATION!**, wins.
 
-## Univers
+## World
 
-Un relevé astronomique nocturne. Étoiles gravées, lignes de constellation,
-carte du ciel annotée à la main. L'identité visuelle s'appuie sur le thème
-sombre comme état naturel du jeu, le thème clair jouant le rôle d'une planche
-d'atlas imprimée.
+A night-time survey of the sky, drawn like an astronomical instrument: brass
+rings and graduations, engraved capitals, constellation figures, a chart
+annotated by hand.
 
-## Vocabulaire
+- **Dark theme** — the night itself: deep blue, a field of stars, brass.
+- **Light theme** — an old celestial atlas: parchment, indigo ink, brass.
 
-Ce tableau est la référence unique. Aucun autre terme ne doit apparaître dans
-l'interface ou la documentation.
+## Vocabulary
 
-| Concept | Terme retenu (fr) | Terme retenu (es) |
-| --- | --- | --- |
-| Élément numéroté 1–60 | **étoile** | estrella |
-| Famille de couleur (5) | **constellation** | constelación |
-| Valeur 1 à 3 | **éclat** | brillo |
-| Zone commune | **relevé** | registro |
-| Réserve | **ciel** | cielo |
-| Support du joueur | **voûte** | bóveda |
-| Indice « classer » | **SITUER** | SITUAR |
-| Indice « comparer » | **JAUGER** | MEDIR |
-| Annonce finale | **CONSTELLATION !** | ¡CONSTELACIÓN! |
-| Fiche de déduction | **carte du ciel** | carta celeste |
-| Partie | **observation** | observación |
-| Code de partie | **code d'observation** | código de observación |
+This table is the single reference. No other term should appear in the
+interface.
 
-Les cinq constellations, par ordre interne (`green`, `pink`, `blue`, `red`,
-`orange` — identifiants techniques inchangés) :
+| Concept | English | French | Spanish |
+| --- | --- | --- | --- |
+| Numbered item 1–60 | **star** | étoile | estrella |
+| Colour family (5) | **constellation** | constellation | constelación |
+| Value 1 to 3 | **spark** | éclat | destello |
+| Shared area | **the open sky** | le ciel commun | el cielo común |
+| A player's stars | **row** | rangée | fila |
+| "classify" hint | **PLACE** | SITUER | SITUAR |
+| "compare" hint | **GAUGE** | JAUGER | MEDIR |
+| Final call | **CONSTELLATION!** | CONSTELLATION ! | ¡CONSTELACIÓN! |
+| Deduction sheet | **star chart** | carte du ciel | carta celeste |
+| Wrong call | **out of the race** | hors course | fuera de la carrera |
+| People | **everyone at the table, the others** | astronomes, adversaires, les autres | personas, el resto |
 
-| Identifiant | Nom (fr) | Nom (es) |
-| --- | --- | --- |
-| `green` | Lyre | Lira |
-| `pink` | Aurore | Aurora |
-| `blue` | Cygne | Cisne |
-| `red` | Braise | Brasa |
-| `orange` | Phénix | Fénix |
+The five constellations, in internal order (`green`, `pink`, `blue`, `red`,
+`orange` — technical identifiers, unchanged):
 
-Les identifiants techniques restent en anglais et inchangés : ils désignent
-des teintes, pas la marque, et les figer évite une migration inutile du
-moteur, des tests et du CSS.
+| Identifier | English | French | Spanish | Figure |
+| --- | --- | --- | --- | --- |
+| `green` | Lyra | Lyre | Lira | a bright star above a parallelogram |
+| `pink` | Aurora | Aurore | Aurora | an arc of light and its curtain |
+| `blue` | Cygnus | Cygne | Cisne | a swan in flight, a cross |
+| `red` | Ember | Braise | Brasa | a flame over a glowing coal |
+| `orange` | Phoenix | Phénix | Fénix | wings spread above a long tail |
+
+The technical identifiers stay as they are: they are never shown, and
+freezing them avoids a pointless migration of the engine, tests and CSS.
+
+## Writing for players
+
+- **Talk about the game, never the machinery.** No "server", "data" or
+  "session" in the interface; they belong in the README.
+- **Write for everyone at the table.** In French and Spanish, words that do
+  not assume anybody's gender (« astronome », « adversaire », « personne »,
+  « persona », « quien juega »), no median dots or other markers.
+- **Be warm and brief.** The rules read like a friend explaining the game.
+
+These principles are partly enforced by `tests/unit/i18n.test.ts`.
 
 ## Logo
 
-Un disque de nuit portant cinq étoiles reliées par les traits d'une
-constellation — dessiné en SVG, sans dépendance, décliné en favicon et en
-marque de l'en-tête. Aucune police propriétaire, aucun tracé importé.
+A disc of night carrying stars joined by the lines of a constellation, ringed
+with brass — drawn in SVG, with no dependency, used as favicon and in the
+header.
+
+## Type
+
+| Role | Typeface | Why |
+| --- | --- | --- |
+| Titles, star numbers | **Cinzel** | capitals inspired by engraved inscriptions, like the lettering of an astrolabe |
+| Everything else | **Jost** | a clear geometric sans-serif, very legible at small sizes |
+
+Both are self-hosted and released under the SIL Open Font License.
 
 ## Palette
 
-Reprend la structure de jetons existante, avec des teintes propres.
-
-| Rôle | Clair | Sombre |
+| Role | Light | Dark |
 | --- | --- | --- |
-| Fond de page | `#f3efe6` parchemin | `#0b1022` nuit profonde |
-| Surface | `#fbf8f2` | `#141b33` |
-| Encre | `#1a1f3c` | `#eef1ff` |
-| Accent | `#3f57c9` bleu nuit | `#8aa2ff` |
-| Accent secondaire | `#c2456f` aurore | `#ff7ba6` |
-| Signal | `#e0a82e` or stellaire | `#ffc94a` |
+| Page | `#f2ecdf` parchment | `#070b1a` deep night |
+| Panels | `#faf6ec` | `#10163a` |
+| Ink | `#1b1d3f` indigo | `#ecebf8` |
+| Accent | `#3d3fa0` night indigo | `#a4a8ff` |
+| Second accent | `#9c3f6e` dusky rose | `#f08cc4` |
+| Brass | `#a57a23` | `#e8bd5a` |
 
-Les cinq couleurs d'étoiles restent identiques dans les deux thèmes, comme
-dans l'architecture d'origine : la carte du ciel doit correspondre au relevé.
+The five constellations are jewel tones that glow on dark discs, identical in
+both themes, so the star chart always matches the table:
 
-## Personnages
+| Constellation | Colour | Deep | Light |
+| --- | --- | --- | --- |
+| Lyra | `#27b39b` | `#0c5d5a` | `#9ef0d8` |
+| Aurora | `#cf5fb5` | `#6a1f63` | `#f7b8e6` |
+| Cygnus | `#4d8ef0` | `#1b3b8f` | `#b6d4ff` |
+| Ember | `#e2583f` | `#7c1f1c` | `#ffc0a8` |
+| Phoenix | `#e0a02c` | `#7a4c07` | `#ffe2a0` |
 
-Remplacés par des **figures stellaires** : cinq glyphes gravés (étoile à
-quatre branches, à six branches, étoile double, amas, nébuleuse), choisis de
-façon déterministe à partir du numéro. Dessinés en SVG dans le projet.
+Contrast is measured, not guessed: `tests/unit/theme.test.ts` checks the WCAG
+ratios of the main text and accent pairs in both themes.
 
-## Positionnement
+## The stars
 
-NOCTALIS est un **projet open source indépendant**. Il n'est affilié à aucun
-éditeur, ne reprend aucun contenu protégé, et ne se présente comme la version
-officielle d'aucun jeu existant. Il réutilise l'architecture technique d'un
-projet personnel antérieur du même auteur, avec son accord, ce que la présente
-documentation expose ouvertement.
+Stars are **round medallions**, like the dial of an astronomical instrument:
+
+- face up — a glowing sphere in the constellation's colour, a brass rim with
+  graduations, the constellation's figure at the top, the number engraved in
+  Cinzel, and one to three four-pointed **sparks** underneath;
+- my own, hidden — an **eclipsed** disc: dark heart, coloured halo, the
+  constellation's figure, a question mark, and the position in a small moon;
+- gauged with a NO — dimmed, inside a dashed halo.
+
+The constellation figures carry the identity even without colour, which
+matters for colour-blind players.
+
+## Positioning
+
+NOCTALIS is an **independent open-source project**. It is not affiliated with
+any publisher, reuses no protected content, and does not present itself as
+the official version of any existing game. It reuses the technical
+architecture of an earlier personal project by the same author, which this
+documentation says openly.

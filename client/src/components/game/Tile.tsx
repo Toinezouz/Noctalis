@@ -1,26 +1,26 @@
 import type { Tile as TileData } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
-import { StarGlyph } from './StarGlyph.js';
+import { ConstellationSigil } from './ConstellationSigil.js';
 
 export type TileSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export interface TileProps {
   tile: TileData;
   size?: TileSize;
-  /** Etoile inclinee : reponse NON a une mesure. */
+  /** Gauged star that got a NO: shown dimmed, with a dashed ring. */
   tilted?: boolean;
   selected?: boolean;
-  /** Rend l'etoile cliquable (choix d'une etoile publique, par exemple). */
+  /** Makes the star clickable (picking a public star, for instance). */
   onClick?: () => void;
   disabled?: boolean;
-  /** Suffixe ajoute au libelle accessible. */
+  /** Appended to the accessible label. */
   labelSuffix?: string;
-  /** Petite animation d'apparition. */
+  /** Small entrance animation. */
   animate?: boolean;
   className?: string;
 }
 
-/** Les eclats, affiches sous le numero, comme sur le materiel physique. */
+/** Brightness, as one to three small four-pointed sparkles. */
 export function TilePoints({ points }: { points: number }): JSX.Element {
   return (
     <span className="tile__points" aria-hidden="true">
@@ -31,6 +31,10 @@ export function TilePoints({ points }: { points: number }): JSX.Element {
   );
 }
 
+/**
+ * A star, face up: a small celestial medallion with its constellation's
+ * sigil, its number and its brightness.
+ */
 export function Tile({
   tile,
   size = 'md',
@@ -69,9 +73,11 @@ export function Tile({
 
   const content = (
     <>
+      {size !== 'xs' ? (
+        <ConstellationSigil color={tile.color} className="tile__sigil" size={size === 'lg' ? 22 : 15} />
+      ) : null}
       <span className="tile__number">{tile.number}</span>
       <TilePoints points={tile.points} />
-      {size !== 'xs' ? <StarGlyph seed={tile.number} color={tile.color} size={size === 'lg' ? 28 : 20} /> : null}
       <span className="visually-hidden">{label}</span>
     </>
   );

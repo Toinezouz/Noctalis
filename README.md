@@ -1,245 +1,261 @@
 # NOCTALIS
 
-> Deux observateurs, un même ciel. Tu vois parfaitement la constellation de ton
-> rival, jamais la tienne. Reconstitue tes cinq étoiles avant lui — et annonce
-> **CONSTELLATION !**
+> Everyone at the table can see your stars. Everyone but you.
 
-Jeu de déduction à deux joueurs, en temps réel, dans le navigateur. Libre,
-gratuit, open source. Sans compte, sans publicité, sans fonctionnalité payante.
+A small online deduction game for **two to four people**, played in the
+browser. Free, open source, no account, no ads.
 
 [![CI](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml/badge.svg)](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml)
 [![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
-**▶ [Jouer maintenant](https://noctalis.onrender.com)** — rien à installer.
+**▶ [Play now at noctalis.onrender.com](https://noctalis.onrender.com)**
+
+![A game for four in the dark theme: three other players' rows of stars at the top, the open sky in the middle, and your own eclipsed stars at the bottom](docs/images/table-dark.png)
 
 ---
 
-## Sommaire
+## What is it?
 
-1. [Le jeu](#le-jeu)
-2. [Jouer](#jouer)
-3. [Installation](#installation)
-4. [Architecture](#architecture)
-5. [Confidentialité : le cœur du projet](#confidentialité--le-cœur-du-projet)
-6. [Développement](#développement)
-7. [Tests](#tests)
-8. [Déploiement](#déploiement)
-9. [Contribuer](#contribuer)
-10. [Licence](#licence)
-11. [Soutenir le projet](#soutenir-le-projet)
+Picture a few friends around a table at night, each holding five cards with
+the pictures facing out. You can read everybody's cards but your own. To find
+out what you are holding, you ask the others questions — carefully, because
+every answer they give you is also something they learned about the sky.
 
----
+That is NOCTALIS, with stars instead of cards. It works on a phone as well as
+on a computer, and speaks English, French and Spanish.
 
-## Le jeu
+## How a game goes
 
-Le ciel compte **60 étoiles**, numérotées de 1 à 60. Le numéro détermine tout :
+There are **60 stars**, numbered 1 to 60. A star's number tells you
+everything about it:
 
-- la **constellation** — cycle de 5 : Lyre, Aurore, Cygne, Braise, Phénix ;
-- l'**éclat** — 1, 2 ou 3, par paquets de cinq numéros.
+- its **constellation** — Lyra, Aurora, Cygnus, Ember or Phoenix, in turn
+  (1 is Lyra, 2 is Aurora, and so on), each with its own colour *and* its own
+  little figure, so you can tell them apart even without colours;
+- its **sparks** — one, two or three, shown under the number.
 
-Chaque observateur reçoit **cinq étoiles secrètes**, une par constellation,
-rangées par ordre croissant. Il en voit la constellation et la position,
-**jamais le numéro**. Son rival, lui, les voit entièrement.
+Everyone gets **five secret stars**, one per constellation, lined up from the
+smallest number to the largest. You see their constellations and their
+order, never their numbers. Everyone else sees them plainly.
 
-**Un tour, deux étapes.**
+**Your turn, in two moves.**
 
-1. **Révéler** — choisissez une constellation ; le serveur tire au hasard une
-   de ses étoiles encore au ciel, qui rejoint le relevé commun.
-2. **Demander un indice** sur n'importe quelle étoile du relevé. Elle quitte
-   alors le relevé et rejoint votre voûte.
-   - **SITUER** — votre rival range cette étoile parmi vos cinq secrètes :
-     six positions possibles.
-   - **JAUGER** — vous désignez une de vos positions ; il répond OUI ou NON
-     selon que les éclats sont égaux. La constellation n'entre jamais en compte.
+1. **Reveal a star.** Pick a constellation: one of its hidden stars appears
+   in the open sky, in the middle of the table.
+2. **Ask a question** about any star of the open sky. The person sitting
+   after you answers — they can see your stars.
+   - **PLACE** — where would this star fit among your five? Before the first,
+     between two of them, or after the last.
+   - **GAUGE** — point at one of your stars: does this one have the same
+     number of sparks? YES or NO.
 
-**CONSTELLATION !** — À tout moment, une seule fois par observateur, annoncez
-vos cinq étoiles. Exact : vous gagnez. Faux : vous êtes éliminé, mais vous
-continuez de répondre aux indices de votre rival.
+**Your star chart** is a private notebook with all sixty numbers. Cross out
+what cannot be yours, jot down your guesses. Stars already revealed, and those
+you can see on other rows, are gently marked — but nothing is ever crossed out
+for you. The reasoning is yours.
 
-Une **carte du ciel** interactive et strictement privée vous aide à raisonner :
-barrez les numéros impossibles, notez vos hypothèses. Rien n'est barré
-automatiquement — la déduction vous appartient.
+**CONSTELLATION!** When you think you know your five stars, call them — on
+your turn or anyone else's. You only get one call. All five right: you win on
+the spot. One wrong: you are out of the race, but you stay at the table and
+keep answering the others.
 
-## Jouer
+With three or four people, turns go round the table. If the person who should
+answer your question steps away, the next one takes over, so a closed tab
+never freezes the game.
 
-Une instance publique tourne sur
-**[noctalis.onrender.com](https://noctalis.onrender.com)**. Elle est hébergée
-sur le plan gratuit de Render : après quinze minutes sans trafic le service
-s'endort, et le **premier chargement prend alors 30 à 60 secondes**. Ensuite,
-le jeu répond normalement.
+The full rules, with pictures, are one click away in the game itself.
 
-Un joueur crée une observation et obtient un **code à 5 caractères**. L'autre
-le saisit. Rien à installer, rien à créer comme compte.
+## Playing
 
-L'interface est disponible en **français** et en **espagnol**, avec un thème
-**clair** et un thème **sombre** (automatique selon votre système). Chaque
-joueur choisit les siens : deux personnes peuvent jouer la même partie dans
-deux langues différentes.
+The easiest way is the public table at
+**[noctalis.onrender.com](https://noctalis.onrender.com)**: start a game, share
+the five-character code with up to three friends, and you are off. Nothing to
+install, nothing to sign up for.
 
-## Installation
+It runs on Render's free plan, which falls asleep after fifteen quiet
+minutes: **the first visit can take 30 to 60 seconds** while it wakes up.
+After that, it is quick.
 
-Pré-requis : **Node.js ≥ 20**.
+Everyone chooses their own **language** (English, French or Spanish) and
+**theme** (a light one like an old star atlas, a dark one like the night sky,
+or automatic). Four people can share a table in three languages.
+
+### Hosting a game from your own computer
+
+If you would rather not depend on the public table, you can run the game on
+your machine and invite friends through a temporary link:
+
+```bash
+npm install
+npm run share
+```
+
+On Windows, double-clicking **`play.cmd`** does the same thing. The script
+builds the game, opens a free Cloudflare tunnel, checks the link really works
+and prints it in a box. Press Ctrl+C to stop: the link disappears with it.
+
+## Under the hood
+
+The whole game rests on one promise: **you can never find out your own stars
+by peeking.** Not in the page, not in your browser's storage, not in the
+network traffic. Most technical choices follow from that.
+
+### Keeping secrets secret
+
+- The complete game state **never leaves the server**.
+- Each browser receives two views built for it alone: `PublicGameState`
+  (what everybody may see) and `PrivatePlayerState` (what only that person may
+  see — including everyone else's stars, never their own).
+- Of their own stars, a player receives **the constellation and the position,
+  nothing else** — not even the sparks, which would narrow 60 candidates down
+  to 12.
+- Answers to questions are **recomputed by the server**: a modified client
+  cannot lie.
+- A guard (`findSecretLeak`) inspects every message during development and
+  tests, and would rather stop the game than let a number slip through.
+
+The end-to-end tests check all of this in a real browser, at two and at four
+players, by inspecting the page, local storage **and every WebSocket frame
+received**.
+
+### How the code is organised
+
+```
+Noctalis/
+├── shared/          the game engine — no React, no Socket.IO
+│   └── src/
+│       ├── data/        the 60 stars, single source of truth
+│       ├── game/        engine, deck, rules, randomness, what each player sees
+│       ├── types/       stars, games, actions, rooms
+│       ├── protocol/    typed Socket.IO contract
+│       └── validation/  checks on everything clients send
+├── server/          Express + Socket.IO, the only authority on a game
+├── client/          React 18 + Vite
+├── tests/           unit/ (Vitest) and e2e/ (Playwright)
+└── docs/            contract, deployment, identity, licensing, assets
+```
+
+| Layer | Tools |
+| --- | --- |
+| Client | React 18, strict TypeScript, Vite, self-hosted fonts (Cinzel, Jost) |
+| Server | Node.js 20, Express, Socket.IO 4 |
+| Shared | TypeScript, no dependency |
+| Tests | Vitest, Testing Library, Playwright |
+| Quality | ESLint 9, strict TypeScript, a contract checker |
+
+The engine knows nothing about networks or screens, so it can be tested like
+any library. Public names and signatures are frozen in
+[`docs/PROJECT_CONTRACT.md`](docs/PROJECT_CONTRACT.md), and
+`npm run check:contract` fails if the code drifts from it.
+
+Every drawing in the game — the star medallions, the constellation figures,
+the astrolabe, the icons — is original SVG or CSS made for this project, and
+the sounds are synthesised on the fly. See [docs/ASSETS.md](docs/ASSETS.md).
+
+## Running it yourself
+
+You need **Node.js 20 or later**.
 
 ```bash
 git clone https://github.com/Toinezouz/Noctalis.git
-cd noctalis
+cd Noctalis
 npm install
 npm run dev
 ```
 
-- Client : http://localhost:5173
-- Serveur : http://localhost:3001 — état : `GET /health`
+- Client: http://localhost:5173
+- Server: http://localhost:3001 — health check: `GET /health`
 
-Pour une partie locale, ouvrez deux navigateurs (ou une fenêtre privée) :
-chaque onglet est un observateur distinct.
+Open two to four browser windows (private windows work well) to fill a table.
 
-## Architecture
-
-```
-noctalis/
-├── shared/          moteur pur — ni React, ni Socket.IO
-│   └── src/
-│       ├── data/        les 60 étoiles, source de vérité unique
-│       ├── game/        moteur, paquet, règles, hasard, sérialisation
-│       ├── types/       étoiles, partie, actions, salon
-│       ├── protocol/    contrat Socket.IO typé
-│       └── validation/  validation des entrées clientes
-├── server/          Express + Socket.IO, autorité sur la partie
-├── client/          React 18 + Vite
-├── tests/           unit/ (Vitest) et e2e/ (Playwright)
-└── docs/            contrat, identité, audits, assets, licence
-```
-
-| Couche | Technologies |
+| Command | What it does |
 | --- | --- |
-| Client | React 18, TypeScript strict, Vite |
-| Serveur | Node.js 20, Express, Socket.IO 4 |
-| Partagé | TypeScript, aucune dépendance |
-| Tests | Vitest, Testing Library, Playwright |
-| Qualité | ESLint 9, TypeScript strict, vérificateur de contrat |
-
-Le **moteur ne connaît ni le réseau ni l'affichage** : il se teste comme une
-bibliothèque. Les signatures publiques sont figées par
-[`docs/PROJECT_CONTRACT.md`](docs/PROJECT_CONTRACT.md), et `npm run check:contract`
-échoue si le code s'en écarte.
-
-## Confidentialité : le cœur du projet
-
-Un joueur ne doit **jamais** pouvoir obtenir ses propres numéros. Ce n'est pas
-une préférence, c'est la condition d'existence du jeu.
-
-- L'état complet de la partie ne quitte **jamais** le serveur.
-- Chaque client reçoit deux projections : `PublicGameState` (ce que tout le
-  monde voit) et `PrivatePlayerState` (ce que lui seul voit).
-- De ses propres étoiles, un joueur reçoit **la constellation et la position,
-  rien d'autre** — pas même les éclats, qui réduiraient les candidats de 60 à 12.
-- Les réponses aux indices sont **recalculées par le serveur** : un client
-  modifié ne peut pas mentir.
-- Un garde-fou (`findSecretLeak`) inspecte chaque envoi en développement et en
-  test, et interrompt la partie plutôt que de laisser fuir un numéro.
-
-Les tests bout en bout le vérifient dans un vrai navigateur, en inspectant le
-DOM, le stockage local **et les trames WebSocket reçues**.
-
-## Développement
-
-| Commande | Rôle |
-| --- | --- |
-| `npm run dev` | serveur + client en développement |
-| `npm run build` | construit `shared`, `server`, puis `client` |
-| `npm start` | démarre le serveur compilé |
-| `npm test` | tests unitaires et d'intégration |
-| `npm run test:e2e` | tests bout en bout |
-| `npm run typecheck` | TypeScript strict, 4 projets |
+| `npm run dev` | server + client in development mode |
+| `npm run build` | builds `shared`, `server`, then `client` |
+| `npm start` | starts the built server, which also serves the client |
+| `npm run share` | plays with friends far away through a temporary link |
+| `npm test` | unit and integration tests |
+| `npm run test:e2e` | end-to-end tests |
+| `npm run typecheck` | strict TypeScript, 4 projects |
 | `npm run lint` | ESLint |
-| `npm run check:contract` | vérifie que le code respecte le contrat |
-| `npm run share` | partie à distance via un tunnel éphémère |
+| `npm run check:contract` | checks the code against the contract |
 
-## Tests
+### Tests
 
 ```bash
-npm test          # 154 tests Vitest
-npm run test:e2e  # 29 scénarios Playwright, desktop et mobile
+npm test          # 193 Vitest tests
+npm run test:e2e  # 32 Playwright scenarios, run on desktop and on mobile
 ```
 
-Les tests bout en bout lancent **le serveur de production** (`npm run build &&
-npm start`) et jouent contre lui : même binaire, même origine, même façon de
-servir le client que sur l'hébergeur. Playwright attend une vraie réponse de
-`/health` avant de commencer.
+The end-to-end tests start **the production server** (`npm run build &&
+npm start`) and play against it: same binary, same origin, same way of serving
+the client as the real host.
 
-| Fichier | Couverture |
+| File | What it covers |
 | --- | --- |
-| `tiles.test.ts` | les 60 étoiles, constellations et éclats, grille de la carte |
-| `engine.test.ts` | mise en place, tirage du premier joueur, SITUER, JAUGER, annonce, états impossibles |
-| `secrecy.test.ts` | projections publique et privée, absence de fuite, garde-fou |
-| `multiplayer.test.ts` | vrai serveur Socket.IO : salon, synchronisation, mensonge impossible, reconnexion, revanche |
-| `deduction.dom.test.tsx` | carte du ciel rendue : 60 cases, bascule, persistance, confidentialité |
-| `theme.test.ts` | résolution du thème, **contrastes WCAG mesurés dans les deux thèmes** |
-| `roulette.test.ts` | géométrie du tirage au sort |
-| `secrecy.spec.ts` | anti-triche dans le navigateur : DOM, stockage, trames WebSocket |
-| `game-flow.spec.ts` | partie complète à deux clients réels, reconnexion, revanche |
+| `tiles.test.ts` | the 60 stars, constellations, sparks, the chart's grid |
+| `engine.test.ts` | setup, the opening draw, PLACE, GAUGE, calls, impossible states |
+| `tableSize.test.ts` | tables of 3 and 4: turn order, who answers, wrong calls, people leaving |
+| `secrecy.test.ts` | public and private views, no leak, the guard itself |
+| `multiplayer.test.ts` | a real Socket.IO server with 2 to 4 clients: rooms, sync, reconnection, rematch |
+| `i18n.test.ts` | three languages with the same keys, no tech words, no gendered words |
+| `deduction.dom.test.tsx` | the star chart as rendered: 60 cells, toggling, persistence, privacy |
+| `theme.test.ts` | theme resolution and **WCAG contrast measured in both themes** |
+| `secrecy.spec.ts` | anti-cheat in a real browser: page, storage, WebSocket frames |
+| `game-flow.spec.ts` | full two-player games, reconnection, rematch |
+| `table-size.spec.ts` | full games for three and four people |
 
-## Déploiement
+### Deploying
 
-Le serveur sert **lui-même** le client compilé : un seul service, une seule
-origine, aucun problème de CORS.
+The server serves the built client **itself**: one service, one origin, no
+CORS headaches.
 
 ```
-git push → GitHub Actions (types, style, contrat, tests, build, E2E) → Render
+git push → GitHub Actions (types, lint, contract, tests, build, E2E) → Render
 ```
 
-[`render.yaml`](render.yaml) décrit le service : `npm ci && npm run build` pour
-construire, `npm start` pour démarrer, sonde sur `/health`, déploiement
-déclenché seulement quand les vérifications passent (`autoDeployTrigger:
-checksPass`).
+[`render.yaml`](render.yaml) describes the service, and Render only deploys
+once the checks have passed. The step-by-step guide, with a checklist to run
+after going live, is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). To host your
+own table: fork the repository, create a *Blueprint* on
+[Render](https://render.com) from your fork, and check that `GET /health`
+answers `{"status":"ok"}`. No secret is needed: the project uses none.
 
-La marche à suivre complète, avec la liste de vérification après mise en
-ligne, est dans [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+One deliberate limit: games live in memory. Restarting the service loses the
+games in progress. That is fine for a game played in one sitting, and it keeps
+the project free of a database it does not need.
 
-Pour déployer votre propre instance :
+## Contributing
 
-1. forkez ce dépôt ;
-2. sur [Render](https://render.com), *New → Blueprint*, pointez sur votre fork ;
-3. Render lit `render.yaml` et crée le service ;
-4. vérifiez que `GET /health` répond `{"status":"ok"}`.
+Contributions are very welcome — code, translations, accessibility,
+proofreading, ideas. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to get
+started, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) the spirit of the place.
 
-Aucun secret n'est nécessaire : le projet n'en utilise aucun.
-
-**Limite assumée** : les observations vivent en mémoire. Un redémarrage du
-service perd les parties en cours. C'est suffisant pour des parties de
-quelques dizaines de minutes, et ça évite une base de données dont le projet
-n'a pas besoin.
-
-## Contribuer
-
-Les contributions sont bienvenues — code, traduction, accessibilité,
-relecture. Lisez [CONTRIBUTING.md](CONTRIBUTING.md) pour l'installation, les
-commandes et les conventions, et [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) pour
-l'esprit des échanges.
-
-Une faille de sécurité ne se signale **pas** en issue publique :
-voir [SECURITY.md](SECURITY.md).
+Please report security problems privately, never in a public issue: see
+[SECURITY.md](SECURITY.md).
 
 ## Licence
 
-**AGPL-3.0-or-later** — voir [LICENSE](LICENSE).
+**AGPL-3.0-or-later** — see [LICENSE](LICENSE).
 
-NOCTALIS est joué à travers un réseau : l'AGPL garantit que toute version
-modifiée et hébergée pour d'autres reste, elle aussi, libre. Le raisonnement
-complet est dans [docs/LICENSING.md](docs/LICENSING.md).
+NOCTALIS is played over a network: the AGPL makes sure that any modified
+version hosted for others stays free too. The full reasoning is in
+[docs/LICENSING.md](docs/LICENSING.md).
 
-Ce projet est indépendant. Il n'est affilié à aucun éditeur de jeux de société
-et ne se présente comme la version officielle d'aucun jeu existant.
+This is an independent project. It is not affiliated with any board game
+publisher and does not present itself as the official version of any existing
+game.
 
-## Soutenir le projet
+## Supporting the project
 
-NOCTALIS est libre et open source. **Tout le jeu est accessible gratuitement**,
-sans compte, sans publicité, sans abonnement, et aucune fonctionnalité n'est
-réservée à qui que ce soit — y compris aux personnes qui soutiennent le projet.
+NOCTALIS is free and open source. **The whole game is free to play**, with no
+account, no ads and no subscription, and nothing is reserved for anyone —
+including people who support the project.
 
-Si le jeu vous plaît, vous pouvez soutenir son développement et sa maintenance :
+If you enjoy it and would like to help it live on, you can support its
+development here:
 
 ### ♥ [github.com/sponsors/Toinezouz](https://github.com/sponsors/Toinezouz)
 
-C'est le **seul** moyen de soutien du projet : pas de Patreon, pas de Ko-fi,
-pas de Stripe, pas de PayPal. Et c'est entièrement facultatif.
+It is the **only** way to support the project — no Patreon, no Ko-fi, no
+Stripe, no PayPal — and it is entirely optional.

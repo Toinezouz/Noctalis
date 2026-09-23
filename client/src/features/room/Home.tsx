@@ -6,6 +6,7 @@ import { Field } from '../../components/ui/Field.js';
 import { LanguageSwitch } from '../../components/ui/LanguageSwitch.js';
 import { ThemeSwitch } from '../../components/ui/ThemeSwitch.js';
 import { BrandMark } from '../../components/ui/BrandMark.js';
+import { Astrolabe } from '../../components/ui/Astrolabe.js';
 import type { ThemePreference } from '../../lib/theme.js';
 import { errorMessageKey, useGame } from '../../app/GameContext.js';
 
@@ -19,7 +20,7 @@ export interface HomeProps {
 
 type Mode = 'menu' | 'create' | 'join';
 
-/** Ecran d'accueil : creer ou rejoindre une partie, et apprendre a jouer. */
+/** Home screen: start or join a game, and learn how to play. */
 export function Home({
   initialName,
   onNameChange,
@@ -66,10 +67,11 @@ export function Home({
   return (
     <div className="home">
       <div className="home__hero">
-        <div className="home__rays" aria-hidden="true" />
+        <Astrolabe />
         <BrandMark size="xl" as="h1" />
         <p className="home__tagline">{t('home.tagline')}</p>
-        <p className="home__sub muted">{t('home.pitch')}</p>
+        <p className="home__sub">{t('home.pitch')}</p>
+        <p className="home__players">{t('home.players')}</p>
       </div>
 
       <div className="home__card panel">
@@ -99,13 +101,14 @@ export function Home({
             <Button size="lg" variant="secondary" block onClick={onOpenHelp} data-testid="menu-help">
               {t('home.help')}
             </Button>
-            <p className="center muted" style={{ margin: 0, fontSize: 'var(--fs-sm)' }}>
+            <p className={`home__status ${status === 'online' ? 'is-online' : ''}`.trim()}>
+              <span className="home__status-dot" aria-hidden="true" />
               {status === 'online' ? t('home.connected') : t('home.connecting')}
             </p>
           </div>
         ) : (
           <form className="stack" onSubmit={(event) => void submit(event)}>
-            <h2 style={{ marginBottom: 0 }}>
+            <h2 className="home__form-title">
               {mode === 'create' ? t('home.createTitle') : t('home.joinTitle')}
             </h2>
             <Field

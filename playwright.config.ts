@@ -4,8 +4,8 @@ import { defineConfig, devices } from '@playwright/test';
 const PORT = 3001;
 
 /**
- * Certains environnements (CI, conteneurs) fournissent deja un Chromium :
- * on l'utilise s'il existe, sinon Playwright prend celui qu'il a installe.
+ * Some environments (CI, containers) already ship a Chromium: use it when it
+ * exists, otherwise Playwright takes the one it installed.
  */
 const PREINSTALLED_CHROMIUM = process.env['PW_CHROMIUM_PATH'] ?? '/opt/pw-browsers/chromium';
 const launchOptions = existsSync(PREINSTALLED_CHROMIUM)
@@ -22,6 +22,8 @@ export default defineConfig({
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : [['list']],
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
+    // English, the game's default language; translation specs set their own.
+    locale: 'en-US',
     trace: 'retain-on-failure',
     launchOptions,
   },
@@ -30,16 +32,15 @@ export default defineConfig({
     { name: 'mobile-chromium', use: { ...devices['Pixel 5'] } },
   ],
   /**
-   * Un seul serveur, celui de production : Express sert le client compile,
-   * l'API et Socket.IO sur la meme origine. C'est exactement ce que lance
-   * l'hebergeur, donc les tests traversent le vrai chemin — et il n'y a plus
-   * de serveur d'apercu separe qui puisse ne pas demarrer.
+   * A single server, the production one: Express serves the built client,
+   * the API and Socket.IO on the same origin. That is exactly what the host
+   * runs, so the tests go through the real path.
    *
-   * `NODE_ENV=test` garde le garde-fou anti-fuite actif pendant les tests.
+   * `NODE_ENV=test` keeps the leak guard on during the tests.
    */
   webServer: {
     command: 'npm run build && npm start',
-    // On attend une vraie reponse de l'application, pas juste un port ouvert.
+    // Wait for a real answer from the app, not just an open port.
     url: `http://127.0.0.1:${String(PORT)}/health`,
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',

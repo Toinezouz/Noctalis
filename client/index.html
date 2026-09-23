@@ -1,21 +1,21 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f3efe6" />
+    <meta name="theme-color" content="#f2ecdf" />
     <meta
       name="description"
-      content="NOCTALIS - jeu de deduction a deux joueurs, en ligne, libre et open source."
+      content="NOCTALIS - an online deduction game for 2 to 4 people. Free and open source."
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>NOCTALIS - Devine ta constellation avant lui</title>
+    <title>NOCTALIS - Find your constellation before anyone else</title>
     <script>
       /*
-        Theme pose AVANT le premier rendu : sans cela, un joueur en mode sombre
-        verrait un eclair blanc au chargement. Le script est volontairement
-        minuscule et sans dependance ; React reprend ensuite la main
-        (cf. client/src/lib/theme.ts).
+        The theme is set BEFORE the first paint: without it, someone in dark
+        mode would see a white flash while loading. The script is tiny on
+        purpose and has no dependency; React takes over afterwards
+        (see client/src/lib/theme.ts).
       */
       (function () {
         try {
@@ -29,7 +29,7 @@
               window.matchMedia('(prefers-color-scheme: dark)').matches);
           document.documentElement.dataset.theme = dark ? 'dark' : 'light';
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', dark ? '#0b1022' : '#f3efe6');
+          if (meta) meta.setAttribute('content', dark ? '#070b1a' : '#f2ecdf');
         } catch (error) {
           document.documentElement.dataset.theme = 'light';
         }

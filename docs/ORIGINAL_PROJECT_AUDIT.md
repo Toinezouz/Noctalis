@@ -1,49 +1,50 @@
-# Audit du projet d'origine
+# Audit of the original project
 
-> Rapport d'inspection réalisé **avant toute copie**, en lecture seule.
-> Le projet d'origine n'a été ni modifié, ni renommé, ni déplacé.
-> Il reste à `/home/user/Got-Five`, sur son dépôt `Toinezouz/Got-Five`, commit
-> `f650a15`, arbre de travail propre — état vérifié avant et après la copie.
+> Inspection report made **before any copy**, read-only. It describes the
+> project NOCTALIS 1.0 was derived from. The original project was neither
+> modified, renamed nor moved. It stays at `/home/user/Got-Five`, on its own
+> repository `Toinezouz/Got-Five`, commit `f650a15`, clean working tree —
+> checked before and after the copy.
 
-## 1. Vue d'ensemble
+## 1. Overview
 
 | | |
 | --- | --- |
-| Nature | Jeu de déduction à 2 joueurs, navigateur, temps réel |
-| Monorepo | npm workspaces : `shared`, `server`, `client` + `tests/` à la racine |
-| Langages | TypeScript strict (`noUncheckedIndexedAccess`), React 18, Node 20+ |
-| Réseau | Socket.IO 4, serveur autoritaire |
-| Tests | Vitest (unitaires + jsdom), Playwright (E2E, desktop + mobile) |
-| Qualité | ESLint 9 (flat config), typecheck sur 4 projets TS |
-| Licence déclarée | MIT (`package.json`) |
+| Nature | 2-player deduction game, browser, real time |
+| Monorepo | npm workspaces: `shared`, `server`, `client` + `tests/` at the root |
+| Languages | strict TypeScript (`noUncheckedIndexedAccess`), React 18, Node 20+ |
+| Network | Socket.IO 4, authoritative server |
+| Tests | Vitest (unit + jsdom), Playwright (E2E, desktop + mobile) |
+| Quality | ESLint 9 (flat config), typecheck over 4 TS projects |
+| Declared licence | MIT (`package.json`) |
 
-## 2. Volumétrie
+## 2. Size
 
-| Zone | Lignes | Fichiers |
+| Area | Lines | Files |
 | --- | --- | --- |
-| `shared/src` | 1 805 | 14 |
-| `server/src` | 1 014 | 6 |
-| `client/src` | 8 271 | 57 |
-| `tests/` | 3 538 | 21 |
-| `scripts/` | 1 043 | 1 |
-| **Total source** | **~15 700** | **103** |
+| `shared/src` | 1,805 | 14 |
+| `server/src` | 1,014 | 6 |
+| `client/src` | 8,271 | 57 |
+| `tests/` | 3,538 | 21 |
+| `scripts/` | 1,043 | 1 |
+| **Total source** | **~15,700** | **103** |
 
-## 3. Arborescence
+## 3. Tree
 
 ```
 Got-Five/
 ├── shared/src/
-│   ├── data/tiles.ts            source de vérité des 60 tuiles
+│   ├── data/tiles.ts            source of truth of the 60 tiles
 │   ├── game/                    engine, deck, rules, rng, serialize
 │   ├── types/                   tiles, game, actions, room
-│   ├── protocol/events.ts       contrat Socket.IO typé
-│   └── validation/              validation des entrées client
+│   ├── protocol/events.ts       typed Socket.IO contract
+│   └── validation/              validation of client input
 ├── server/src/
-│   ├── index.ts                 point d'entrée (PORT, CLIENT_URL, NODE_ENV)
-│   ├── createServer.ts          Express + Socket.IO + /health + statique
-│   ├── rooms/RoomManager.ts     salons en mémoire, TTL, jetons
+│   ├── index.ts                 entry point (PORT, CLIENT_URL, NODE_ENV)
+│   ├── createServer.ts          Express + Socket.IO + /health + static files
+│   ├── rooms/RoomManager.ts     in-memory rooms, TTL, tokens
 │   ├── security/                rateLimit, tokens (timingSafeEqual)
-│   └── socket/handlers.ts       tous les événements, revalidés
+│   └── socket/handlers.ts       every event, re-validated
 ├── client/src/
 │   ├── app/                     App, GameContext
 │   ├── components/              game (17), ui (7)
@@ -52,108 +53,108 @@ Got-Five/
 │   ├── lib/                     audio, socket, storage, theme, roulette
 │   └── styles/                  tokens, base, ui, game, deduction, screens
 ├── tests/unit/ (13)  tests/e2e/ (8)
-└── scripts/share.mjs            tunnel Cloudflare + diagnostic
+└── scripts/share.mjs            Cloudflare tunnel + diagnosis
 ```
 
-## 4. Moteur de jeu
+## 4. Game engine
 
-Entièrement pur : `shared/src/game/` ne connaît ni React ni Socket.IO, et se
-teste comme une bibliothèque.
+Entirely pure: `shared/src/game/` knows neither React nor Socket.IO, and is
+tested like a library.
 
-- **Données** : 60 tuiles numérotées 1–60. Le numéro détermine la couleur
-  (cycle de 5) et les points (`(⌊(n-1)/5⌋ mod 3) + 1`). Source unique.
-- **RNG injectable** (`Rng`), `defaultRng` en production, `createSeededRng`
-  pour des parties reproductibles en test.
-- **Machine à états** : `WAITING_FOR_PLAYER` → `LOBBY_READY` → `SETUP` →
+- **Data**: 60 tiles numbered 1–60. The number decides the colour (cycle of
+  5) and the points (`(⌊(n-1)/5⌋ mod 3) + 1`). Single source.
+- **Injectable RNG** (`Rng`), `defaultRng` in production, `createSeededRng`
+  for reproducible games in tests.
+- **State machine**: `WAITING_FOR_PLAYER` → `LOBBY_READY` → `SETUP` →
   `TURN_REVEAL` ⇄ `TURN_HINT` → `WAITING_FOR_CLASSIFY` / `WAITING_FOR_COMPARE`
   → `GAME_OVER`.
-- **Tour** : révéler une tuile (couleur choisie, tirage serveur) puis demander
-  un indice. La tuile utilisée quitte la zone commune.
-- **Indices** : classement parmi les tuiles secrètes (6 encoches) ou
-  comparaison de points (OUI/NON). La réponse du client est **ignorée** et
-  recalculée par le serveur.
-- **Fin** : tentative unique par joueur ; exacte → victoire, fausse →
-  élimination ; réserve vide → nul.
-- **Premier joueur tiré au sort**, annoncé par une animation.
+- **Turn**: reveal a tile (chosen colour, drawn by the server), then ask for a
+  hint. The tile used leaves the shared area.
+- **Hints**: placement among the secret tiles (6 gaps) or comparison of
+  points (YES/NO). The client's answer is **ignored** and recomputed by the
+  server.
+- **End**: a single call per player; right → victory, wrong → elimination;
+  empty reserve → draw.
+- **First player drawn at random**, announced by an animation.
 
-## 5. Sécurité et confidentialité
+## 5. Security and confidentiality
 
-C'est la propriété centrale du projet, à préserver intégralement.
+The project's central property, to be preserved in full.
 
-- Le `GameState` serveur ne sort **jamais** tel quel.
-- Deux projections : `toPublicGameState(state)` et
+- The server's `GameState` **never** leaves as is.
+- Two projections: `toPublicGameState(state)` and
   `toPlayerPrivateState(state, playerId)`.
-- Un joueur reçoit de ses propres tuiles **uniquement couleur + position** —
-  jamais le numéro, et volontairement pas les points (ils réduiraient les
-  candidats de 60 à 12).
-- `findSecretLeak()` : garde-fou exécuté en dev/test avant chaque diffusion.
-- Jetons de reconnexion comparés en temps constant, limitation de débit par
-  socket, charge utile Socket.IO plafonnée à 16 Kio.
+- Of their own tiles, a player receives **colour and position only** —
+  never the number, and deliberately not the points (they would narrow the
+  candidates from 60 to 12).
+- `findSecretLeak()`: a guard run in dev/test before every broadcast.
+- Reconnection tokens compared in constant time, per-socket rate limiting,
+  Socket.IO payload capped at 16 KiB.
 
 ## 6. Interface
 
-Table de jeu (adversaire en haut, zone commune au centre, joueur en bas),
-fiche de déduction 1–60 interactive et privée, design system en jetons CSS,
-thèmes clair et sombre, bilingue fr/es, animations respectant
-`prefers-reduced-motion`, responsive de 375 px à 1440 px.
+Game table (opponent at the top, shared area in the middle, player at the
+bottom), interactive and private 1–60 deduction sheet, CSS-token design
+system, light and dark themes, French/Spanish, animations respecting
+`prefers-reduced-motion`, responsive from 375 px to 1440 px.
 
-## 7. Assets — inventaire complet
+## 7. Assets — complete inventory
 
-| Asset | Nature | Origine | Verdict |
+| Asset | Nature | Origin | Verdict |
 | --- | --- | --- | --- |
-| `client/public/favicon.svg` | SVG 5 lignes | écrit dans le projet | à remplacer (identité) |
-| Personnages des tuiles | SVG inline, 5 variantes | écrits dans le projet | à remplacer (identité) |
-| Tuiles, supports, textures | CSS pur (gradients, ombres) | écrits dans le projet | génériques, réutilisables |
-| Fredoka Variable | police | `@fontsource-variable/fredoka` (SIL OFL) | libre, mais liée à l'identité |
-| Nunito Variable | police | `@fontsource-variable/nunito` (SIL OFL) | libre, réutilisable |
-| Sons | synthétisés à la volée (Web Audio) | aucun fichier | génériques, réutilisables |
-| Images bitmap | **aucune** | — | — |
+| `client/public/favicon.svg` | 5-line SVG | written in the project | to replace (identity) |
+| Characters on the tiles | inline SVG, 5 variants | written in the project | to replace (identity) |
+| Tiles, racks, textures | pure CSS (gradients, shadows) | written in the project | generic, reusable |
+| Fredoka Variable | font | `@fontsource-variable/fredoka` (SIL OFL) | free, but tied to the identity |
+| Nunito Variable | font | `@fontsource-variable/nunito` (SIL OFL) | free, reusable |
+| Sounds | synthesised on the fly (Web Audio) | no file | generic, reusable |
+| Bitmap images | **none** | — | — |
 
-**Aucun asset propriétaire, aucune image hotlinkée, aucune ressource de
-l'éditeur du jeu de plateau.** Une recherche sur le nom de l'éditeur ne
-retourne aucune occurrence dans le dépôt.
+**No proprietary asset, no hotlinked image, no resource from the publisher
+of the board game.** A search for the publisher's name returns nothing in
+the repository.
 
-## 8. Empreinte de l'identité à remplacer
+## 8. Footprint of the identity to replace
 
 | Nature | Occurrences |
 | --- | --- |
-| Imports `@gotfive/*` (noms de paquets) | 67 |
-| Chaînes visibles « GOT FIVE » (UI, commentaires) | 66 |
-| Clés de stockage `gotfive:*` | 6 |
-| Favicon, `<title>`, métadonnées HTML | 1 fichier |
-| README, `.env.example`, `jouer.cmd`, `scripts/share.mjs` | 4 fichiers |
+| `@gotfive/*` imports (package names) | 67 |
+| Visible "GOT FIVE" strings (UI, comments) | 66 |
+| `gotfive:*` storage keys | 6 |
+| Favicon, `<title>`, HTML metadata | 1 file |
+| README, `.env.example`, `jouer.cmd`, `scripts/share.mjs` | 4 files |
 
 ## 9. Configuration
 
-- **Git** : dépôt unique `Toinezouz/Got-Five`, branche de travail
+- **Git**: single repository `Toinezouz/Got-Five`, working branch
   `claude/got-five-browser-game-fe95e7`.
-- **Render** : aucune configuration présente (`render.yaml` absent).
-- **Cloudflare** : pas d'intégration permanente ; `scripts/share.mjs` ouvre un
-  tunnel éphémère à la demande, en téléchargeant `cloudflared` dans un cache
-  local. Aucun jeton, aucun compte.
-- **Variables d'environnement** : `PORT`, `NODE_ENV`, `CLIENT_URL`,
-  `ROOM_TTL_MS`, `VITE_SERVER_URL`. `.env.example` sans aucun secret.
-- **CI** : aucune (pas de `.github/`).
+- **Render**: no configuration (`render.yaml` absent).
+- **Cloudflare**: no permanent integration; `scripts/share.mjs` opens a
+  temporary tunnel on demand, downloading `cloudflared` into a local cache.
+  No token, no account.
+- **Environment variables**: `PORT`, `NODE_ENV`, `CLIENT_URL`, `ROOM_TTL_MS`,
+  `VITE_SERVER_URL`. `.env.example` without any secret.
+- **CI**: none (no `.github/`).
 
-## 10. Points déjà favorables à un déploiement Render
+## 10. Things already in favour of a Render deployment
 
-Constatés à l'audit, sans modification :
+Found during the audit, without any change:
 
-- le serveur lit déjà `process.env.PORT` ;
-- il sert déjà le client compilé (`express.static` + repli SPA) — un seul
-  service suffit donc ;
-- `GET /health` existe déjà ;
-- `SIGTERM` est déjà géré proprement.
+- the server already reads `process.env.PORT`;
+- it already serves the built client (`express.static` + SPA fallback) — so
+  a single service is enough;
+- `GET /health` already exists;
+- `SIGTERM` is already handled cleanly.
 
-## 11. Conclusion de l'audit
+## 11. Conclusion of the audit
 
-Le projet se sépare nettement en deux couches :
+The project splits cleanly into two layers:
 
-1. une **infrastructure générique** (réseau, salons, reconnexion, sérialisation
-   public/privé, design system, tests, outillage) — réutilisable telle quelle ;
-2. une **identité** (nom, vocabulaire, personnages, favicon, textes) — à
-   remplacer intégralement.
+1. **generic infrastructure** (network, rooms, reconnection, public/private
+   serialisation, design system, tests, tooling) — reusable as is;
+2. an **identity** (name, vocabulary, characters, favicon, texts) — to be
+   replaced entirely.
 
-Aucun obstacle technique à la copie. Aucun asset à écarter pour des raisons de
-droits : tout ce qui est remplacé l'est pour créer une identité propre, pas
-parce qu'il serait impubliable.
+No technical obstacle to the copy. No asset to set aside for rights reasons:
+everything that is replaced is replaced to create an identity of its own,
+not because it could not be published.

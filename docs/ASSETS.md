@@ -1,63 +1,67 @@
-# Inventaire des assets
+# Asset inventory
 
-Chaque ressource publiée avec NOCTALIS, son origine et sa licence. Une
-ressource dont l'origine serait incertaine ne serait pas publiée.
+Every resource published with NOCTALIS, where it comes from, and its licence.
+A resource of uncertain origin would not be published.
 
-## Images et illustrations
+## Drawings
 
-| Asset | Type | Origine | Licence | Emplacement |
+| Asset | Kind | Origin | Licence | Location |
 | --- | --- | --- | --- | --- |
-| Marque NOCTALIS | SVG inline | dessiné pour ce projet | AGPL-3.0-or-later | `client/src/components/ui/BrandMark.tsx` |
-| Favicon | SVG | dessiné pour ce projet | AGPL-3.0-or-later | `client/public/favicon.svg` |
-| Figures stellaires (5 variantes) | SVG inline | dessinées pour ce projet | AGPL-3.0-or-later | `client/src/components/game/StarGlyph.tsx` |
-| Étoiles, voûtes, textures | CSS pur (dégradés, ombres) | écrites pour ce projet | AGPL-3.0-or-later | `client/src/styles/` |
-| Roue du tirage au sort | SVG + CSS | écrite pour ce projet | AGPL-3.0-or-later | `client/src/features/game/StartRoulette.tsx` |
-| Grain du fond, rayons | CSS (`radial-gradient`, `conic-gradient`) | écrits pour ce projet | AGPL-3.0-or-later | `client/src/styles/base.css`, `screens.css` |
+| NOCTALIS mark | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/BrandMark.tsx` |
+| Favicon | SVG | drawn for this project | AGPL-3.0-or-later | `client/public/favicon.svg` |
+| Constellation figures (5) | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/game/ConstellationSigil.tsx` |
+| Line icons | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/Icon.tsx` |
+| Astrolabe of the home screen | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/Astrolabe.tsx` |
+| Star medallions, rows, name plates, starfield | pure CSS (gradients, masks, shadows) | written for this project | AGPL-3.0-or-later | `client/src/styles/` |
+| Opening wheel | CSS | written for this project | AGPL-3.0-or-later | `client/src/features/game/StartRoulette.tsx`, `game.css` |
 
-**Aucune image bitmap.** Pas de PNG, pas de JPEG, pas de capture : tout le
-visuel est vectoriel ou calculé par le navigateur.
+**The game ships no bitmap image.** Everything players see is vector or
+computed by the browser.
 
-## Polices
+## Screenshots
 
-| Police | Origine | Licence | Fourniture |
+| File | What | Licence |
+| --- | --- | --- |
+| `docs/images/table-dark.png` | a game for four, dark theme | AGPL-3.0-or-later |
+| `docs/images/home-light.png` | the home screen, light theme | AGPL-3.0-or-later |
+
+They are captures of this project, used by the README only. They are not
+part of the game.
+
+## Fonts
+
+| Font | Origin | Licence | Delivery |
 | --- | --- | --- | --- |
-| Fredoka Variable | `@fontsource-variable/fredoka` (npm) | SIL Open Font License 1.1 | empaquetée au build, servie depuis le même domaine |
-| Nunito Variable | `@fontsource-variable/nunito` (npm) | SIL Open Font License 1.1 | idem |
+| Cinzel Variable | `@fontsource-variable/cinzel` (npm), by the Cinzel Project Authors | SIL Open Font License 1.1 | bundled at build time, served from the same domain |
+| Jost Variable | `@fontsource-variable/jost` (npm), by the Jost Project Authors | SIL Open Font License 1.1 | same |
 
-La SIL OFL autorise l'usage, la modification et la redistribution, y compris
-dans un projet sous AGPL. Les polices sont **auto-hébergées** : aucune requête
-vers un service tiers, donc aucune fuite d'adresse IP des joueurs.
+The SIL OFL allows use, modification and redistribution, including in an
+AGPL project. The fonts are **self-hosted**: no request to a third-party
+service, so players' IP addresses leak nowhere.
 
-## Sons
+## Sounds
 
-Aucun fichier audio. Tous les sons sont **synthétisés à la volée** par la Web
-Audio API (`client/src/lib/audio.ts`) : oscillateurs et enveloppes décrits en
-quelques lignes. Rien à télécharger, rien à créditer, et le jeu reste
-parfaitement jouable sans audio.
+No audio file. Every sound is **synthesised on the fly** with the Web Audio
+API (`client/src/lib/audio.ts`): oscillators and envelopes in a few lines.
+Nothing to download, nothing to credit, and the game is perfectly playable
+without sound.
 
-## Emoji
+## External resources
 
-Quelques emoji apparaissent dans l'interface (☀️ 🌙 🌗 ♥ 📋). Ils sont rendus
-par la police système du lecteur : aucun fichier n'est distribué avec le
-projet.
+**None.** No CDN, no remote image, no online font, no third-party script, no
+analytics. The game only loads what its own server sends.
 
-## Ressources externes
-
-**Aucune.** Ni CDN, ni image distante, ni police en ligne, ni script tiers, ni
-outil de mesure d'audience. Le jeu ne charge que ce que son propre serveur
-lui envoie.
-
-## Vérifier
+## Checking
 
 ```bash
-# Aucun fichier binaire dans les sources :
+# No binary file among the game's sources:
 find client/src client/public shared/src server/src -type f \
   ! -name '*.ts' ! -name '*.tsx' ! -name '*.css' ! -name '*.svg'
 
-# Aucune ressource distante référencée :
+# No remote resource referenced:
 grep -rn "https\?://" client/src --include='*.ts' --include='*.tsx' --include='*.css' \
   | grep -v "github.com" | grep -v "w3.org"
 ```
 
-La seconde commande ne doit remonter que les liens GitHub (code source,
-licence, Sponsors) et l'espace de noms SVG du W3C.
+The first command should print nothing; the second only the GitHub links
+(source code, licence, Sponsors) and the W3C SVG namespace.

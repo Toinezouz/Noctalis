@@ -3,11 +3,11 @@ import { GITHUB_URL, LICENSE_NAME, LICENSE_URL, PROJECT_NAME } from '../../lib/p
 import { SupportLink } from './SupportLink.js';
 
 export interface SiteFooterProps {
-  /** Ouvre la fenetre A propos. */
+  /** Opens the About dialog. */
   onOpenAbout: () => void;
 }
 
-/** Pied de page discret : projet, code, licence, soutien. */
+/** Quiet footer: project, code, licence, support. */
 export function SiteFooter({ onOpenAbout }: SiteFooterProps): JSX.Element {
   const { t } = useI18n();
   return (

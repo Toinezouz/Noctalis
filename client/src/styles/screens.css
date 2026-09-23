@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Ecrans : accueil, lobby, regles, tutoriel, dialogues, fin de partie
+   Screens: home, lobby, rules, tutorial, dialogs, end of game
    ========================================================================== */
 
-/* --- Accueil --------------------------------------------------------------- */
+/* --- Home ------------------------------------------------------------------- */
 
 .home {
   flex: 1;
@@ -11,54 +11,151 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-5);
-  padding: var(--sp-5) var(--sp-4) var(--sp-7);
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
 }
 
 .home__hero {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: var(--sp-5) var(--sp-3);
-  /* Les rayons restent derriere le titre et ne debordent pas sur la carte. */
-  overflow: hidden;
-  border-radius: var(--r-xl);
-}
-
-.home__rays {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(560px, 120vw);
-  height: min(560px, 120vw);
-  transform: translate(-50%, -50%);
-  background: repeating-conic-gradient(
-    from 0deg,
-    var(--c-rays) 0deg 9deg,
-    transparent 9deg 18deg
-  );
-  border-radius: 50%;
-  z-index: -1;
-  animation: gf-rays 60s linear infinite;
-  mask-image: radial-gradient(circle, #000 35%, transparent 70%);
-  -webkit-mask-image: radial-gradient(circle, #000 35%, transparent 70%);
+  padding: var(--sp-7) var(--sp-3) var(--sp-4);
+  isolation: isolate;
 }
 
 .home__tagline {
   font-family: var(--font-title);
   font-size: var(--fs-xl);
   color: var(--c-magenta);
-  margin: var(--sp-2) 0 var(--sp-2);
+  margin: var(--sp-3) 0 var(--sp-3);
+  letter-spacing: 0.03em;
 }
 
 .home__sub {
-  max-width: 46ch;
-  margin: 0 auto;
+  max-width: 50ch;
+  margin: 0 auto var(--sp-3);
+  color: var(--c-ink-soft);
+  font-size: var(--fs-md);
+}
+
+.home__players {
+  display: inline-flex;
+  margin: 0;
+  padding: 0.3em 1em;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-rule);
+  background: var(--c-gloss-panel);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.04em;
+  color: var(--c-ink);
 }
 
 .home__card {
-  width: min(460px, 100%);
+  width: min(440px, 100%);
 }
 
-/* --- Lobby ----------------------------------------------------------------- */
+.home__form-title {
+  margin-bottom: 0;
+  font-size: var(--fs-xl);
+  color: var(--c-violet);
+}
+
+.home__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--c-ink-soft);
+}
+
+.home__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-warning);
+}
+
+.home__status.is-online .home__status-dot {
+  background: var(--c-success);
+  box-shadow: 0 0 0 3px rgba(47, 143, 111, 0.18);
+}
+
+/* The astrolabe behind the brand. */
+.astrolabe {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  width: min(520px, 112vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -34%);
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle, #000 60%, transparent 74%);
+  mask-image: radial-gradient(circle, #000 60%, transparent 74%);
+}
+
+.astrolabe__rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: gf-rays 240s linear infinite;
+}
+
+.astrolabe__line {
+  fill: none;
+  stroke: var(--c-rays);
+  stroke-width: 1.2;
+}
+
+.astrolabe__line--soft {
+  stroke-dasharray: 2 5;
+}
+
+.astrolabe__tick {
+  stroke: var(--c-rays);
+  stroke-width: 1.2;
+}
+
+.astrolabe__rete {
+  position: absolute;
+  inset: 0;
+  animation: gf-rays 160s linear infinite reverse;
+}
+
+.astrolabe__sigil {
+  position: absolute;
+  color: var(--tile-face);
+  opacity: 0.6;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 6px var(--tile-face));
+  /* Counter-rotates, so that each sigil stays upright while the rete turns. */
+  animation: gf-rays 160s linear infinite;
+}
+
+/* The hero text keeps a soft halo of the page colour over the rings. */
+.home__hero .brand,
+.home__tagline,
+.home__sub {
+  text-shadow:
+    0 0 10px var(--c-cream),
+    0 0 18px var(--c-cream);
+}
+
+@media (max-width: 520px) {
+  .home__hero {
+    padding-top: var(--sp-6);
+  }
+
+  .home__tagline {
+    font-size: var(--fs-lg);
+  }
+}
+
+/* --- Lobby ------------------------------------------------------------------- */
 
 .lobby {
   flex: 1;
@@ -71,10 +168,16 @@
 }
 
 .lobby__card {
-  width: min(520px, 100%);
+  width: min(540px, 100%);
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+}
+
+.lobby__share {
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
 }
 
 .lobby__code {
@@ -86,19 +189,28 @@
 .lobby__char {
   display: grid;
   place-items: center;
-  width: clamp(44px, 12vw, 62px);
-  height: clamp(54px, 15vw, 76px);
+  width: clamp(44px, 12vw, 60px);
+  height: clamp(54px, 15vw, 72px);
   border-radius: var(--r-md);
-  background: var(--c-violet);
-  color: #fff;
+  background: var(--plate-face);
+  color: var(--plate-ink);
+  border: 1px solid rgba(232, 189, 90, 0.55);
   font-family: var(--font-title);
-  font-size: clamp(1.6rem, 6vw, 2.4rem);
-  box-shadow: 0 5px 0 var(--c-violet-dark);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  box-shadow: 0 8px 20px -8px rgba(var(--shadow-rgb), 0.5);
 }
 
 .lobby__players {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-2);
+}
+
+@media (max-width: 460px) {
+  .lobby__players {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .lobby__player {
@@ -107,26 +219,53 @@
   gap: var(--sp-3);
   padding: var(--sp-3);
   border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.7);
-  border: 2px dashed rgba(var(--shadow-rgb), 0.2);
+  background: var(--c-gloss-panel);
+  border: 1px dashed var(--c-line);
+  min-width: 0;
 }
 
 .lobby__player.is-ready {
   border-style: solid;
-  border-color: var(--t-green);
-  background: rgba(47, 176, 97, 0.12);
+  border-color: var(--c-rule);
+  background: var(--c-wash);
 }
 
 .lobby__avatar {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
+  flex: none;
   border-radius: 50%;
-  background: var(--c-magenta);
-  color: #fff;
+  background: var(--plate-face);
+  color: var(--plate-ink);
+  border: 1px solid rgba(232, 189, 90, 0.6);
   font-family: var(--font-title);
+  font-weight: 700;
   font-size: var(--fs-lg);
+}
+
+.lobby__player.is-waiting .lobby__avatar {
+  background: transparent;
+  color: var(--c-ink-soft);
+  border: 1px dashed var(--c-line);
+  font-size: var(--fs-md);
+}
+
+.lobby__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lobby__who strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lobby__who .muted {
+  font-size: var(--fs-xs);
 }
 
 .lobby__actions {
@@ -136,29 +275,92 @@
   align-items: stretch;
 }
 
-/* --- Regles et tutoriel ---------------------------------------------------- */
+.lobby__wait {
+  margin: 0;
+  font-weight: 600;
+}
+
+.lobby__more {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+/* --- Rules and tutorial ---------------------------------------------------------- */
+
+.howto__intro {
+  font-size: var(--fs-lg);
+  line-height: 1.55;
+  color: var(--c-ink);
+  margin-bottom: var(--sp-5);
+}
 
 .howto {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--sp-5);
   margin: 0;
   padding: 0;
   list-style: none;
-  counter-reset: howto;
 }
 
-.howto h3 {
+.howto__item {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+}
+
+.howto__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--plate-face);
+  color: var(--c-gold-bright);
+  border: 1px solid rgba(232, 189, 90, 0.55);
+}
+
+.howto__body h3 {
   font-size: var(--fs-lg);
   color: var(--c-violet);
   margin-bottom: var(--sp-1);
 }
 
-.howto__row {
+.howto__body p {
+  margin-bottom: var(--sp-2);
+}
+
+.howto__row,
+.howto__legend {
   display: flex;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
   flex-wrap: wrap;
   padding: var(--sp-2) 0;
+}
+
+.howto__constellation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-title);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--c-ink);
+}
+
+.howto__sigils {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0 0;
+}
+
+.howto__sigils span {
+  color: var(--tile-face);
+  opacity: 0.7;
 }
 
 .onboarding {
@@ -169,29 +371,69 @@
   gap: var(--sp-2);
 }
 
-.onboarding__icon {
-  font-size: 3rem;
+.onboarding__picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  min-height: 92px;
+  width: 100%;
+  margin-bottom: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--rack-face);
+  border: 1px solid rgba(var(--rack-line-rgb), 0.3);
+}
+
+.onboarding__picture--sky {
+  background: var(--c-gloss-panel);
+  border-color: var(--c-rule);
+}
+
+.onboarding__slot {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 52px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-gold);
+  background: var(--rack-slot-filled);
+}
+
+.onboarding__vs {
+  color: var(--c-gold);
+}
+
+.onboarding__big-icon {
+  color: var(--c-violet);
+}
+
+.onboarding__big-icon--gold {
+  color: var(--c-gold-bright);
+  filter: drop-shadow(0 0 10px rgba(216, 169, 63, 0.5));
 }
 
 .onboarding__dots {
   display: flex;
-  gap: 6px;
+  gap: 7px;
   margin-top: var(--sp-2);
 }
 
 .onboarding__dots span {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(var(--shadow-rgb), 0.2);
+  background: var(--c-line);
+  transition: transform var(--mo-fast) var(--ease-out);
 }
 
 .onboarding__dots span.is-active {
-  background: var(--c-violet);
-  transform: scale(1.2);
+  background: var(--c-gold-bright);
+  transform: scale(1.3);
 }
 
-/* --- Dialogues ------------------------------------------------------------- */
+/* --- Dialogs -------------------------------------------------------------------- */
 
 .hint-dialog {
   display: flex;
@@ -213,16 +455,19 @@
   gap: var(--sp-2);
   padding: var(--sp-4);
   border-radius: var(--r-lg);
-  border: 3px solid var(--c-violet);
-  background: var(--c-paper);
+  border: 1px solid var(--c-rule);
+  background: var(--c-gloss-panel);
   cursor: pointer;
   text-align: left;
-  box-shadow: 0 5px 0 rgba(106, 43, 174, 0.35);
-  transition: transform var(--mo-fast) var(--ease-out);
+  transition:
+    transform var(--mo-fast) var(--ease-out),
+    border-color var(--mo-fast),
+    background var(--mo-fast);
 }
 
 .hint-choice:hover:not(:disabled) {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+  border-color: var(--c-gold);
   background: var(--c-surface-hi);
 }
 
@@ -234,7 +479,9 @@
 .hint-choice__title {
   font-family: var(--font-title);
   font-size: var(--fs-xl);
-  color: var(--c-magenta);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--c-violet);
 }
 
 .hint-choice__text {
@@ -245,7 +492,7 @@
 .hint-dialog__rack,
 .dialog-tile-row {
   display: flex;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
   justify-content: center;
   flex-wrap: wrap;
   padding: var(--sp-2) 0;
@@ -253,14 +500,14 @@
 
 .slot-picker {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
-  gap: 2px;
+  gap: 4px;
   flex-wrap: nowrap;
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  padding: var(--sp-3) 0;
+  padding: var(--sp-3) 2px;
   scrollbar-width: thin;
 }
 
@@ -272,33 +519,35 @@
 
 .slot-picker__cell {
   display: flex;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: center;
+  gap: 4px;
 }
 
 .slot-picker__slot {
   display: grid;
   place-items: center;
-  width: clamp(34px, 9vw, 46px);
-  min-height: clamp(48px, 13vw, 70px);
-  border-radius: var(--r-md);
-  border: 3px dashed var(--c-violet);
-  background: rgba(106, 43, 174, 0.08);
+  width: clamp(34px, 9vw, 44px);
+  min-height: clamp(52px, 14vw, 66px);
+  border-radius: var(--r-pill);
+  border: 1px dashed var(--c-violet);
+  background: rgba(61, 63, 160, 0.06);
   color: var(--c-violet);
   font-size: var(--fs-lg);
-  font-weight: 800;
   cursor: pointer;
-  transition: transform var(--mo-fast) var(--ease-out);
+  transition:
+    transform var(--mo-fast) var(--ease-out),
+    background var(--mo-fast);
 }
 
 .slot-picker__slot:hover:not(:disabled) {
-  transform: translateY(-3px);
-  background: rgba(106, 43, 174, 0.16);
+  transform: translateY(-2px);
+  background: rgba(61, 63, 160, 0.14);
 }
 
 .slot-picker__slot.is-selected {
   border-style: solid;
-  background: var(--c-gold);
+  border-color: var(--c-gold);
+  background: rgba(216, 169, 63, 0.22);
 }
 
 .compare-dialog {
@@ -319,9 +568,8 @@
 }
 
 .compare-dialog__vs {
-  font-family: var(--font-title);
   font-size: var(--fs-2xl);
-  color: var(--c-violet);
+  color: var(--c-gold);
 }
 
 .guess-dialog__inputs {
@@ -335,12 +583,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: var(--sp-2) 2px;
-  border-radius: var(--r-md);
-  background: var(--tile-face, rgba(255, 255, 255, 0.8));
-  border: 2px solid rgba(var(--shadow-rgb), 0.2);
-  box-shadow: 0 3px 0 rgba(var(--shadow-rgb), 0.16);
+  aspect-ratio: 1;
+  max-width: 88px;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--c-field);
+  border: 1px dashed var(--c-line);
+  transition: background var(--mo-base) var(--ease-out);
+}
+
+.guess-dialog__cell[data-color] {
+  border: none;
+  background:
+    radial-gradient(circle at 33% 27%, var(--tile-light) 0%, transparent 44%),
+    radial-gradient(circle at 50% 50%, var(--tile-face) 0%, var(--tile-edge) 80%);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 236, 190, 0.6), 0 0 16px -4px var(--tile-face);
 }
 
 .guess-dialog__input {
@@ -349,13 +609,13 @@
   background: transparent;
   text-align: center;
   font-family: var(--font-title);
-  font-size: clamp(1.2rem, 5vw, 1.9rem);
-  font-weight: 600;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  font-weight: 700;
 }
 
 .guess-dialog__cell[data-color] .guess-dialog__input {
   color: #fff;
-  text-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.45);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .guess-dialog__input:focus {
@@ -363,8 +623,13 @@
 }
 
 .guess-dialog__cell:focus-within {
-  outline: 3px solid var(--c-violet);
-  outline-offset: 2px;
+  outline: 2px solid var(--c-gold-bright);
+  outline-offset: 3px;
+}
+
+.guess-dialog__cell .badge {
+  font-size: 0.6rem;
+  padding: 0.1em 0.5em;
 }
 
 .guess-dialog__preview {
@@ -374,7 +639,7 @@
   flex-wrap: wrap;
 }
 
-/* --- Fin de partie --------------------------------------------------------- */
+/* --- End of game --------------------------------------------------------------- */
 
 .game-over {
   position: fixed;
@@ -384,17 +649,17 @@
   align-items: center;
   justify-content: center;
   padding: var(--sp-4);
-  background: rgba(var(--shadow-rgb), 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(6, 8, 22, 0.66);
+  backdrop-filter: blur(5px);
   overflow-y: auto;
 }
 
 .game-over__card {
-  width: min(760px, 100%);
+  width: min(820px, 100%);
   max-height: 92vh;
   overflow-y: auto;
   text-align: center;
-  animation: gf-pop-in var(--mo-slow) var(--ease-bounce) both;
+  animation: gf-pop-in var(--mo-slow) var(--ease-out) both;
 }
 
 .game-over__title {
@@ -410,16 +675,29 @@
 
 .game-over__reveal {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--sp-3);
+}
+
+.game-over__player {
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--c-wash);
+  border: 1px solid transparent;
+}
+
+.game-over__player.is-winner {
+  border-color: var(--c-gold);
+  background: rgba(216, 169, 63, 0.14);
 }
 
 .game-over__player h3 {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-md);
   display: flex;
   align-items: center;
   gap: var(--sp-2);
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .game-over__tiles {
@@ -448,20 +726,27 @@
   margin-top: var(--sp-5);
 }
 
-.game-over__confetti {
+.game-over__rematch {
+  margin: var(--sp-3) 0 0;
+  font-weight: 600;
+}
+
+/* Winning sparks: small four-pointed stars that twinkle all over the sky. */
+.game-over__sparks {
   position: fixed;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
 }
 
-.game-over__confetti span {
+.game-over__sparks span {
   position: absolute;
-  top: -10vh;
-  width: 10px;
+  width: 16px;
   height: 16px;
-  border-radius: 2px;
-  animation: gf-confetti 2.8s linear infinite;
+  background: var(--tile-light);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 6px var(--tile-face));
+  animation: gf-twinkle 2.4s var(--ease-out) infinite;
 }
 
 @media (max-width: 560px) {
@@ -474,12 +759,12 @@
   }
 
   .modal {
-    padding: var(--sp-4) var(--sp-3);
+    padding: var(--sp-5) var(--sp-3) var(--sp-4);
   }
 
   .slot-picker__slot {
     width: 30px;
-    min-height: 52px;
+    min-height: 48px;
     font-size: var(--fs-md);
   }
 
@@ -494,9 +779,18 @@
   .compare-dialog {
     gap: var(--sp-3);
   }
+
+  .howto__item {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .howto__icon {
+    width: 34px;
+    height: 34px;
+  }
 }
 
-/* Preferences de l'accueil : langue et theme, cote a cote puis empiles. */
+/* Home preferences: language and theme side by side, then stacked. */
 .home__prefs {
   display: flex;
   flex-wrap: wrap;
@@ -505,8 +799,8 @@
   gap: var(--sp-3) var(--sp-5);
 }
 
-/* Sur un telephone, chaque groupe prend sa ligne plutot que de se couper. */
-@media (max-width: 460px) {
+/* On a phone, each group gets its own line rather than breaking. */
+@media (max-width: 520px) {
   .home__prefs {
     flex-direction: column;
     gap: var(--sp-3);

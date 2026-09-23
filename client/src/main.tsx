@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@fontsource-variable/fredoka';
-import '@fontsource-variable/nunito';
+import '@fontsource-variable/cinzel';
+import '@fontsource-variable/jost';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/ui.css';
@@ -16,7 +16,7 @@ import { loadPreferences, savePreferences } from './lib/storage.js';
 
 const container = document.getElementById('root');
 if (!container) {
-  throw new Error("Element #root introuvable dans index.html");
+  throw new Error("#root element missing from index.html");
 }
 
 const preferences = loadPreferences();

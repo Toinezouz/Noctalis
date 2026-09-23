@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Base : reset doux, typographie, fond de table, utilitaires, animations
+   Base: gentle reset, type, the sky behind everything, utilities, motion
    ========================================================================== */
 
 *,
@@ -18,20 +18,33 @@ body {
   margin: 0;
   font-family: var(--font-body);
   font-size: var(--fs-md);
+  line-height: 1.5;
   color: var(--c-ink);
   background-color: var(--c-cream);
-  /* Motif imprime original : petits eclats et pois, cree en CSS pur. */
+  /* A starfield in pure CSS: three layers of dots on tiles of different
+     sizes, so that the pattern never looks like a grid, and a faint glow. */
   background-image:
-    radial-gradient(circle at 12% 18%, rgba(240, 90, 156, 0.13) 0 12px, transparent 13px),
-    radial-gradient(circle at 86% 12%, rgba(42, 167, 224, 0.13) 0 16px, transparent 17px),
-    radial-gradient(circle at 78% 82%, rgba(47, 176, 97, 0.12) 0 18px, transparent 19px),
-    radial-gradient(circle at 18% 88%, rgba(247, 144, 32, 0.12) 0 14px, transparent 15px),
-    radial-gradient(var(--c-dot) 1.1px, transparent 1.2px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 22px 22px;
+    radial-gradient(circle at 20% 30%, var(--c-dot) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 80%, var(--c-dot-soft) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 40% 60%, var(--c-dot) 0 1.3px, transparent 2px),
+    radial-gradient(ellipse at 15% 0%, rgba(61, 63, 160, 0.1), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(184, 138, 45, 0.09), transparent 50%);
+  background-size: 97px 89px, 61px 67px, 173px 157px, 100% 100%, 100% 100%;
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+}
+
+:root[data-theme='dark'] body {
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--c-dot) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 80%, var(--c-dot-soft) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 40% 60%, var(--c-dot) 0 1.3px, transparent 2px),
+    radial-gradient(ellipse at 15% 0%, rgba(92, 70, 190, 0.28), transparent 55%),
+    radial-gradient(ellipse at 95% 90%, rgba(30, 110, 160, 0.2), transparent 50%),
+    linear-gradient(180deg, #070b1a, #0b1027 60%, #070b1a);
+  background-size: 97px 89px, 61px 67px, 173px 157px, 100% 100%, 100% 100%, 100% 100%;
 }
 
 h1,
@@ -40,14 +53,18 @@ h3,
 h4 {
   font-family: var(--font-title);
   font-weight: 600;
-  line-height: 1.08;
+  line-height: 1.12;
   margin: 0 0 var(--sp-3);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
 }
 
 p {
   margin: 0 0 var(--sp-3);
-  line-height: 1.55;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--c-violet);
 }
 
 button,
@@ -59,12 +76,16 @@ textarea {
 }
 
 :focus-visible {
-  outline: 3px solid var(--c-violet);
+  outline: 2px solid var(--c-gold-bright);
   outline-offset: 3px;
   border-radius: var(--r-sm);
 }
 
-/* --- Utilitaires ---------------------------------------------------------- */
+::selection {
+  background: rgba(184, 138, 45, 0.35);
+}
+
+/* --- Utilities ------------------------------------------------------------ */
 
 .visually-hidden {
   position: absolute !important;
@@ -105,10 +126,19 @@ textarea {
   flex-direction: column;
 }
 
-/* --- Titre de marque ------------------------------------------------------ */
+.icon {
+  flex: none;
+  vertical-align: -0.2em;
+}
 
-/* Marque : le disque de nuit, puis le nom grave. Pas d'ombre portee : on
-   cherche la planche d'atlas, pas l'affiche. */
+.sigil {
+  flex: none;
+  display: block;
+}
+
+/* --- Brand ---------------------------------------------------------------- */
+
+/* The brand: a disc of night, then the engraved name. */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -119,7 +149,7 @@ textarea {
   line-height: 1;
   color: var(--c-ink);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
 }
 
 .brand__glyph {
@@ -129,42 +159,43 @@ textarea {
 }
 
 .brand__disc {
-  fill: var(--c-violet-dark);
+  fill: #1d2050;
+  stroke: var(--c-gold);
+  stroke-width: 2;
 }
 
 .brand__lines {
-  stroke: var(--c-violet);
-  stroke-width: 2.4;
+  stroke: rgba(214, 196, 255, 0.7);
+  stroke-width: 1.8;
 }
 
 .brand__stars {
-  fill: #f4f7ff;
+  fill: #f4f2ff;
 }
 
 .brand__nova {
-  fill: var(--c-gold);
+  fill: var(--c-gold-bright);
 }
 
 .brand__word {
-  /* Le nom respire : c'est lui qui porte l'identite. */
   padding-top: 0.06em;
 }
 
 .brand--xl {
-  font-size: calc(var(--fs-3xl) * 0.66);
+  font-size: calc(var(--fs-3xl) * 0.62);
 }
 
 .brand--sm {
   font-size: var(--fs-lg);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
 }
 
-/* --- Animations ----------------------------------------------------------- */
+/* --- Motion --------------------------------------------------------------- */
 
 @keyframes gf-pop-in {
   from {
     opacity: 0;
-    transform: scale(0.82) translateY(8px);
+    transform: scale(0.9) translateY(8px);
   }
   to {
     opacity: 1;
@@ -183,17 +214,21 @@ textarea {
   }
 }
 
+/* A star appears: it lights up from a point, with a brief flare. */
 @keyframes gf-flip-in {
   0% {
-    transform: rotateY(90deg) scale(0.9);
+    transform: scale(0.2);
     opacity: 0;
+    filter: brightness(2.2);
   }
   60% {
-    transform: rotateY(-8deg) scale(1.04);
+    transform: scale(1.08);
     opacity: 1;
+    filter: brightness(1.4);
   }
   100% {
-    transform: rotateY(0) scale(1);
+    transform: scale(1);
+    filter: brightness(1);
   }
 }
 
@@ -223,7 +258,7 @@ textarea {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.04);
   }
 }
 
@@ -236,14 +271,25 @@ textarea {
   }
 }
 
-@keyframes gf-confetti {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 1;
-  }
+@keyframes gf-twinkle {
+  0%,
   100% {
-    transform: translateY(110vh) rotate(680deg);
-    opacity: 0.9;
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@keyframes gf-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(216, 169, 63, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(216, 169, 63, 0);
   }
 }
 
@@ -255,7 +301,7 @@ textarea {
   animation: gf-slide-up var(--mo-base) var(--ease-out) both;
 }
 
-/* Respect strict des preferences de mouvement reduit. */
+/* Reduced motion is strictly respected. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

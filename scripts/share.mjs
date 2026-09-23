@@ -1,29 +1,29 @@
 #!/usr/bin/env node
 /**
  * ---------------------------------------------------------------------------
- * NOCTALIS — observation à distance, en une commande
+ * NOCTALIS — play with friends far away, in one command
  * ---------------------------------------------------------------------------
- * Construit le jeu si besoin, ouvre un tunnel public temporaire (Cloudflare),
- * puis démarre le serveur en n'autorisant que l'adresse de ce tunnel.
+ * Builds the game if needed, opens a temporary public tunnel (Cloudflare),
+ * then starts the server, only allowing that tunnel's address.
  *
- *   npm run share                    # port 3001 par défaut
- *   npm run share -- --port 4000     # autre port
- *   npm run share -- --build         # force une reconstruction
- *   npm run share -- --local         # aucun tunnel : partie en local
- *   npm run share -- --check         # teste le tunnel, puis s'arrête
- *   npm run share -- --verify URL    # teste un lien déjà ouvert
- *   npm run share -- --verbose       # affiche la sortie de cloudflared
+ *   npm run share                    # port 3001 by default
+ *   npm run share -- --port 4000     # another port
+ *   npm run share -- --build         # force a rebuild
+ *   npm run share -- --local         # no tunnel: local game only
+ *   npm run share -- --check         # test the tunnel, then stop
+ *   npm run share -- --verify URL    # test a link that is already open
+ *   npm run share -- --verbose       # show cloudflared's output
  *
- * RÉSOLUTION DU NOM SANS DÉPENDRE DU RÉSOLVEUR LOCAL
- * Beaucoup de réseaux domestiques (fournisseur d'accès, antivirus, contrôle
- * parental) filtrent le nom `trycloudflare.com` : le tunnel s'ouvre très bien,
- * mais la machine hôte ne sait pas traduire son adresse. Cela n'empêche en rien
- * l'ami d'ouvrir le lien. Le script résout donc le nom en cascade — résolveur
- * système, puis DNS publics en direct, puis DNS-over-HTTPS — et vérifie le lien
- * sur l'adresse IP obtenue. Un filtrage local n'empêche plus de partager.
+ * NAME RESOLUTION WITHOUT RELYING ON THE LOCAL RESOLVER
+ * Many home networks (internet provider, antivirus, parental control) filter
+ * the `trycloudflare.com` name: the tunnel opens fine, but the host machine
+ * cannot translate its address. That does not stop friends from opening the
+ * link. So the script resolves the name in cascade — system resolver, then
+ * public DNS directly, then DNS-over-HTTPS — and checks the link on the IP it
+ * got. Local filtering no longer prevents sharing.
  *
- * Le lien est temporaire : il disparaît dès que tu arrêtes la commande
- * (Ctrl+C). Rien n'est publié, rien n'est indexé.
+ * The link is temporary: it disappears as soon as you stop the command
+ * (Ctrl+C). Nothing is published, nothing is indexed.
  */
 import { spawn } from 'node:child_process';
 import dnsPromises, { Resolver } from 'node:dns/promises';
@@ -40,16 +40,22 @@ const BIN_PATH = path.join(BIN_DIR, IS_WINDOWS ? 'cloudflared.exe' : 'cloudflare
 const RELEASE_BASE = 'https://github.com/cloudflare/cloudflared/releases/latest/download';
 const TUNNEL_URL_PATTERN = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/i;
 
-/** Résolveurs publics interrogés quand le résolveur du système échoue. */
+/** Public resolvers asked when the system resolver fails. */
 const PUBLIC_DNS = ['1.1.1.1', '8.8.8.8', '9.9.9.9'];
-/** Mêmes résolveurs, en DNS-over-HTTPS : franchit aussi un port 53 filtré. */
+/** Same resolvers, over DNS-over-HTTPS: gets past a filtered port 53 too. */
 const DOH_ENDPOINTS = [
   { name: '1.1.1.1', url: (host) => `https://1.1.1.1/dns-query?name=${host}&type=A` },
   { name: '8.8.8.8', url: (host) => `https://8.8.8.8/resolve?name=${host}&type=A` },
 ];
 
-/** Lignes par lesquelles cloudflared annonce que le tunnel est etabli. */
+/** Lines by which cloudflared announces that the tunnel is up. */
 const REGISTERED_PATTERN = /registered tunnel connection|connection [a-z0-9-]+ registered/i;
+
+/** Label of a name resolved by the system's own resolver. */
+const SYSTEM = 'system';
+/** Notes this script appends to a tunnel's output, read back for advice. */
+const NOT_PUBLISHED = /name not published/;
+const NOT_REGISTERED = /no registered connection/;
 
 const args = process.argv.slice(2);
 const hasFlag = (flag) => args.includes(flag);
@@ -61,32 +67,33 @@ const readOption = (flag, fallback) => {
 
 if (hasFlag('--help') || hasFlag('-h')) {
   console.log(`
-NOCTALIS — observer à distance avec un ami
+NOCTALIS — play with friends far away
 
-  npm run share                     Construit le jeu, ouvre un tunnel Cloudflare
-                                    et démarre le serveur. Partage le lien.
-  npm run share -- --port 4000      Utilise un autre port local.
-  npm run share -- --build          Force la reconstruction avant de démarrer.
-  npm run share -- --local          Démarre sans tunnel (jeu accessible en local).
-  npm run share -- --check          Teste le tunnel et la résolution, puis sort.
-  npm run share -- --verify URL     Teste un lien existant (nom + réponse du jeu).
-  npm run share -- --verbose        Affiche toute la sortie de cloudflared.
+  npm run share                     Builds the game, opens a Cloudflare tunnel
+                                    and starts the server. Share the link.
+  npm run share -- --port 4000      Uses another local port.
+  npm run share -- --build          Forces a rebuild before starting.
+  npm run share -- --local          Starts without a tunnel (local game).
+  npm run share -- --check          Tests the tunnel and name resolution, then exits.
+  npm run share -- --verify URL     Tests an existing link (name + game answer).
+  npm run share -- --verbose        Shows all of cloudflared's output.
 
-Ctrl+C arrête le serveur et ferme le tunnel.
+Ctrl+C stops the server and closes the tunnel.
 
-Le binaire cloudflared est cherché dans le PATH, sinon téléchargé une fois dans
-node_modules/.cache/noctalis/. Pour imposer un binaire précis :
-  CLOUDFLARED_BIN=/chemin/vers/cloudflared npm run share
+The cloudflared binary is looked up in the PATH, otherwise downloaded once
+into node_modules/.cache/noctalis/. To force a given binary:
+  CLOUDFLARED_BIN=/path/to/cloudflared npm run share
 
-Si ton réseau filtre le nom trycloudflare.com, le script le résout par un DNS
-public (direct, puis DNS-over-HTTPS) : le lien reste valable pour ton ami.
+If your network filters the trycloudflare.com name, the script resolves it
+through a public DNS (directly, then DNS-over-HTTPS): the link still works
+for your friends.
 `);
   process.exit(0);
 }
 
 const port = Number(readOption('--port', process.env['PORT'] ?? '3001'));
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  console.error(`Port invalide : ${String(readOption('--port', ''))}`);
+  console.error(`Invalid port: ${String(readOption('--port', ''))}`);
   process.exit(1);
 }
 
@@ -94,7 +101,7 @@ const verbose = hasFlag('--verbose');
 const children = new Set();
 let shuttingDown = false;
 
-/** Tue un processus, et toute sa descendance sous Windows. */
+/** Kills a process, and all its children on Windows. */
 function killChild(child) {
   if (!child.pid) {
     return;
@@ -106,7 +113,7 @@ function killChild(child) {
   }
 }
 
-/** Lance une ligne de commande en affichant sa sortie (build, archives). */
+/** Runs a command line, showing its output (build, archives). */
 function run(commandLine, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(commandLine, { cwd: ROOT, stdio: 'inherit', shell: true, ...options });
@@ -117,13 +124,13 @@ function run(commandLine, options = {}) {
       if (code === 0) {
         resolve();
       } else {
-        reject(new Error(`« ${commandLine} » a échoué (code ${String(code)})`));
+        reject(new Error(`"${commandLine}" failed (code ${String(code)})`));
       }
     });
   });
 }
 
-/** Lance un binaire (sans interpréteur) et renvoie sa sortie complète. */
+/** Runs a binary (no shell) and returns its whole output. */
 function capture(command, commandArgs, timeoutMs) {
   return new Promise((resolve) => {
     let output = '';
@@ -155,10 +162,10 @@ function capture(command, commandArgs, timeoutMs) {
 }
 
 // ---------------------------------------------------------------------------
-// cloudflared : binaire officiel
+// cloudflared: the official binary
 // ---------------------------------------------------------------------------
 
-/** Nom de l'archive ou du binaire publié par Cloudflare pour ce système. */
+/** Name of the archive or binary Cloudflare publishes for this system. */
 function releaseAsset() {
   const arch = process.arch;
   if (IS_WINDOWS) {
@@ -174,25 +181,25 @@ function releaseAsset() {
   return null;
 }
 
-/** Télécharge le binaire officiel dans node_modules/.cache/noctalis/. */
+/** Downloads the official binary into node_modules/.cache/noctalis/. */
 async function downloadCloudflared() {
   const asset = releaseAsset();
   if (!asset) {
-    return { error: `Système non reconnu : ${process.platform}/${process.arch}` };
+    return { error: `Unknown system: ${process.platform}/${process.arch}` };
   }
   const url = `${RELEASE_BASE}/${asset}`;
-  console.log(`Téléchargement de cloudflared (${asset})…`);
+  console.log(`Downloading cloudflared (${asset})…`);
 
   let buffer;
   try {
     const response = await fetch(url, { redirect: 'follow' });
     if (!response.ok) {
-      return { error: `Téléchargement impossible : HTTP ${String(response.status)} sur ${url}` };
+      return { error: `Download failed: HTTP ${String(response.status)} on ${url}` };
     }
     buffer = Buffer.from(await response.arrayBuffer());
   } catch (error) {
     return {
-      error: `Téléchargement impossible (${error instanceof Error ? error.message : String(error)})`,
+      error: `Download failed (${error instanceof Error ? error.message : String(error)})`,
     };
   }
 
@@ -204,7 +211,7 @@ async function downloadCloudflared() {
       await run(`tar -xzf "${archive}" -C "${BIN_DIR}"`, { stdio: 'ignore' });
     } catch (error) {
       return {
-        error: `Archive illisible (${error instanceof Error ? error.message : String(error)})`,
+        error: `Unreadable archive (${error instanceof Error ? error.message : String(error)})`,
       };
     }
   } else {
@@ -214,12 +221,12 @@ async function downloadCloudflared() {
     chmodSync(BIN_PATH, 0o755);
   }
   if (!existsSync(BIN_PATH) || statSync(BIN_PATH).size < 1_000_000) {
-    return { error: 'Le binaire téléchargé semble incomplet.' };
+    return { error: 'The downloaded binary looks incomplete.' };
   }
   return { command: BIN_PATH };
 }
 
-/** Trouve un cloudflared utilisable : PATH, cache, puis téléchargement. */
+/** Finds a working cloudflared: PATH, cache, then download. */
 async function resolveCloudflared() {
   const custom = process.env['CLOUDFLARED_BIN'];
   if (custom) {
@@ -237,19 +244,19 @@ async function resolveCloudflared() {
     return { error: downloaded.error };
   }
   if (!(await capture(downloaded.command, ['--version'], 30_000)).ok) {
-    return { error: 'Le binaire téléchargé ne démarre pas.' };
+    return { error: 'The downloaded binary does not start.' };
   }
   return { command: downloaded.command };
 }
 
-/** Lignes de politesse de cloudflared, sans intérêt pour le diagnostic. */
+/** cloudflared's courtesy lines, useless for diagnosis. */
 const NOISE = [
   /Thank you for trying Cloudflare Tunnel/i,
   /cloudflare\.com\/website-terms/i,
   /connect-apps/i,
 ];
 
-/** Garde les dernières lignes utiles d'une sortie de commande. */
+/** Keeps the last useful lines of a command's output. */
 function tail(text, lines = 10) {
   return text
     .split(/\r?\n/)
@@ -260,9 +267,9 @@ function tail(text, lines = 10) {
 }
 
 /**
- * Ouvre un tunnel rapide et renvoie son adresse publique.
- * L'objet rendu permet aussi d'attendre d'autres lignes de journal : l'URL est
- * annoncee avant que la connexion ne soit etablie et le nom publie.
+ * Opens a quick tunnel and returns its public address.
+ * The returned object can also wait for more log lines: the URL is announced
+ * before the connection is up and the name is published.
  */
 function openTunnel(command, localPort, protocol) {
   return new Promise((resolve) => {
@@ -276,7 +283,7 @@ function openTunnel(command, localPort, protocol) {
     let settled = false;
     let output = '';
     let child;
-    /** Motifs attendus par `waitForPattern`, resolus a leur apparition. */
+    /** Patterns awaited by `waitForPattern`, resolved when they show up. */
     const watchers = new Set();
 
     try {
@@ -291,7 +298,7 @@ function openTunnel(command, localPort, protocol) {
     }
     children.add(child);
 
-    /** Attend l'apparition d'un motif dans la sortie du tunnel. */
+    /** Waits for a pattern in the tunnel's output. */
     const waitForPattern = (pattern, timeoutMs) =>
       new Promise((resolveWatcher) => {
         if (pattern.test(output)) {
@@ -353,28 +360,28 @@ function openTunnel(command, localPort, protocol) {
     const timer = setTimeout(() => {
       if (!settled) {
         killChild(child);
-        finish({ output: `${output}\n(aucune adresse publique après 60 secondes)` });
+        finish({ output: `${output}\n(no public address after 60 seconds)` });
       }
     }, 60_000);
   });
 }
 
 // ---------------------------------------------------------------------------
-// Résolution du nom, sans dépendre du résolveur local
+// Name resolution, without relying on the local resolver
 // ---------------------------------------------------------------------------
 
-/** Interroge un résolveur public en direct (UDP 53). */
+/** Asks a public resolver directly (UDP 53). */
 async function resolveWithServer(hostname, server) {
   const resolver = new Resolver({ timeout: 4000, tries: 1 });
   resolver.setServers([server]);
   const addresses = await resolver.resolve4(hostname);
   if (addresses.length === 0) {
-    throw new Error('aucune adresse');
+    throw new Error('no address');
   }
   return addresses[0];
 }
 
-/** Interroge un résolveur public en DNS-over-HTTPS (par son adresse IP). */
+/** Asks a public resolver over DNS-over-HTTPS (by its IP address). */
 async function resolveWithDoh(hostname, endpoint) {
   const response = await fetch(endpoint.url(encodeURIComponent(hostname)), {
     headers: { accept: 'application/dns-json' },
@@ -386,30 +393,30 @@ async function resolveWithDoh(hostname, endpoint) {
   const payload = await response.json();
   const answer = (payload.Answer ?? []).find((entry) => entry.type === 1);
   if (!answer) {
-    throw new Error('aucune réponse de type A');
+    throw new Error('no A record in the answer');
   }
   return answer.data;
 }
 
 /**
- * Traduit un nom en adresse IP, en essayant dans l'ordre :
- * le résolveur du système, les DNS publics en direct, puis DNS-over-HTTPS.
- * `via` indique quelle méthode a réussi — c'est le diagnostic du filtrage.
+ * Turns a name into an IP address, trying in order: the system resolver,
+ * public DNS directly, then DNS-over-HTTPS. `via` tells which method worked —
+ * that is the diagnosis of any filtering.
  */
 async function resolveHostname(hostname) {
   const attempts = [];
   try {
     const entry = await dnsPromises.lookup(hostname);
-    return { ip: entry.address, via: 'système' };
+    return { ip: entry.address, via: SYSTEM };
   } catch (error) {
-    attempts.push(`système : ${error instanceof Error ? error.message : String(error)}`);
+    attempts.push(`system: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   for (const server of PUBLIC_DNS) {
     try {
       return { ip: await resolveWithServer(hostname, server), via: `DNS ${server}` };
     } catch (error) {
-      attempts.push(`DNS ${server} : ${error instanceof Error ? error.message : String(error)}`);
+      attempts.push(`DNS ${server}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -418,7 +425,7 @@ async function resolveHostname(hostname) {
       return { ip: await resolveWithDoh(hostname, endpoint), via: `DNS-over-HTTPS ${endpoint.name}` };
     } catch (error) {
       attempts.push(
-        `DNS-over-HTTPS ${endpoint.name} : ${error instanceof Error ? error.message : String(error)}`,
+        `DNS-over-HTTPS ${endpoint.name}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -427,9 +434,9 @@ async function resolveHostname(hostname) {
 }
 
 /**
- * Requête HTTP(S) dirigée vers une adresse IP précise, tout en gardant le nom
- * d'origine (en-tête Host et SNI). C'est ce qui permet de tester un lien que le
- * résolveur local refuse de traduire.
+ * HTTP(S) request sent to a given IP address while keeping the original name
+ * (Host header and SNI). This is what makes it possible to test a link the
+ * local resolver refuses to translate.
  */
 function requestPinned(urlString, ip, timeoutMs = 20_000) {
   return new Promise((resolve, reject) => {
@@ -444,9 +451,9 @@ function requestPinned(urlString, ip, timeoutMs = 20_000) {
         method: 'GET',
         headers: { host: url.hostname, accept: 'application/json, text/html' },
         servername: secure ? url.hostname : undefined,
-        // Node interroge ce « lookup » soit pour une adresse unique, soit pour
-        // une liste (algorithme « happy eyeballs ») : les deux formes doivent
-        // etre honorees, sinon la connexion part sur une adresse indefinie.
+        // Node calls this lookup either for a single address or for a list
+        // ("happy eyeballs"): both forms must be honoured, otherwise the
+        // connection goes to an undefined address.
         lookup: ip
           ? (_host, lookupOptions, callback) => {
               if (lookupOptions && lookupOptions.all) {
@@ -472,7 +479,7 @@ function requestPinned(urlString, ip, timeoutMs = 20_000) {
       },
     );
     request.on('timeout', () => {
-      request.destroy(new Error('délai dépassé'));
+      request.destroy(new Error('timed out'));
     });
     request.on('error', reject);
     request.end();
@@ -480,10 +487,10 @@ function requestPinned(urlString, ip, timeoutMs = 20_000) {
 }
 
 /**
- * Résout un nom en réessayant : l'adresse d'un tunnel rapide est annoncée par
- * cloudflared avant d'être publiée dans le DNS public, et un premier échec est
- * mis en cache négatif par les résolveurs. Quelques secondes de patience
- * évitent de conclure à tort que le réseau filtre.
+ * Resolves a name, retrying: cloudflared announces a quick tunnel's address
+ * before it is published in public DNS, and resolvers cache a first failure.
+ * A few seconds of patience avoid wrongly concluding that the network
+ * filters it.
  */
 async function resolveHostnameWithPatience(hostname, totalMs = 45_000, onWait) {
   const deadline = Date.now() + totalMs;
@@ -499,8 +506,8 @@ async function resolveHostnameWithPatience(hostname, totalMs = 45_000, onWait) {
 }
 
 /**
- * Le lien est-il joignable ? On accepte n'importe quelle réponse HTTP : avant
- * que le serveur local ne démarre, le tunnel répond légitimement une erreur.
+ * Can the link be reached? Any HTTP answer will do: before the local server
+ * starts, the tunnel legitimately answers with an error.
  */
 async function probeReachable(url) {
   const hostname = new URL(url).hostname;
@@ -509,17 +516,17 @@ async function probeReachable(url) {
     return {
       ok: false,
       kind: 'dns',
-      detail: `le nom ${hostname} n'a pu être résolu par aucun DNS (${resolved.error})`,
+      detail: `no DNS could resolve ${hostname} (${resolved.error})`,
     };
   }
   try {
-    await requestPinned(url, resolved.via === 'système' ? null : resolved.ip);
+    await requestPinned(url, resolved.via === SYSTEM ? null : resolved.ip);
     return { ok: true, via: resolved.via, ip: resolved.ip };
   } catch (error) {
     return {
       ok: false,
       kind: 'network',
-      detail: `${hostname} (${resolved.ip}) ne répond pas depuis cette machine (${
+      detail: `${hostname} (${resolved.ip}) does not answer from this machine (${
         error instanceof Error ? error.message : String(error)
       })`,
       via: resolved.via,
@@ -527,7 +534,7 @@ async function probeReachable(url) {
   }
 }
 
-/** Vérifie qu'au bout du lien se trouve bien CE serveur. */
+/** Checks that THIS server really is at the end of the link. */
 async function verifyPublicLink(url) {
   const reachable = await probeReachable(url);
   if (!reachable.ok) {
@@ -536,13 +543,13 @@ async function verifyPublicLink(url) {
   try {
     const response = await requestPinned(
       `${url}/health`,
-      reachable.via === 'système' ? null : reachable.ip,
+      reachable.via === SYSTEM ? null : reachable.ip,
     );
     if (response.status < 200 || response.status >= 300) {
       return {
         ok: false,
         kind: 'http',
-        detail: `l'adresse répond, mais avec une erreur HTTP ${String(response.status)}`,
+        detail: `the address answers, but with an HTTP ${String(response.status)} error`,
         via: reachable.via,
       };
     }
@@ -556,7 +563,7 @@ async function verifyPublicLink(url) {
       return {
         ok: false,
         kind: 'wrong-service',
-        detail: "quelque chose répond à cette adresse, mais ce n'est pas le serveur NOCTALIS",
+        detail: 'something answers at this address, but it is not the NOCTALIS server',
         via: reachable.via,
       };
     }
@@ -565,7 +572,7 @@ async function verifyPublicLink(url) {
     return {
       ok: false,
       kind: 'network',
-      detail: `impossible d'atteindre ${url} (${
+      detail: `cannot reach ${url} (${
         error instanceof Error ? error.message : String(error)
       })`,
       via: reachable.via,
@@ -573,62 +580,62 @@ async function verifyPublicLink(url) {
   }
 }
 
-/** Conseils ciblés quand le tunnel lui-même n'aboutit pas. */
+/** Targeted advice when the tunnel itself fails. */
 function explainTunnelFailure(tunnel) {
-  console.warn(`\nTunnel indisponible : ${String(tunnel.error)}`);
+  console.warn(`\nTunnel unavailable: ${String(tunnel.error)}`);
   if (tunnel.output) {
-    console.warn("\n--- ce qu'a répondu cloudflared ---");
+    console.warn('\n--- what cloudflared said ---');
     console.warn(tunnel.output);
-    console.warn('-----------------------------------');
+    console.warn('------------------------------');
   }
   const text = String(tunnel.output ?? '');
-  if (/nom non publié/.test(text)) {
+  if (NOT_PUBLISHED.test(text)) {
     console.warn(
       [
         '',
-        "L'adresse a bien été attribuée, mais aucun résolveur public ne la",
-        "connaissait encore : la publication côté Cloudflare a pris du retard.",
+        'The address was assigned, but no public resolver knew it yet:',
+        'publishing it on the Cloudflare side is running late.',
         '',
-        '  → Relance simplement la commande : une nouvelle adresse est tirée.',
-        "  → Si cela se répète, le tunnel ne s'établit sans doute pas vraiment ;",
-        '    relance avec --verbose pour voir la négociation en direct.',
+        '  → Just run the command again: a new address is drawn.',
+        '  → If it keeps happening, the tunnel probably never really comes up;',
+        '    run it again with --verbose to watch the handshake live.',
       ].join('\n'),
     );
     return;
   }
-  if (/aucune connexion enregistrée/.test(text)) {
+  if (NOT_REGISTERED.test(text)) {
     console.warn(
       [
         '',
-        "cloudflared n'a pas réussi à établir sa connexion vers Cloudflare.",
-        'Souvent : UDP sortant bloqué (le repli HTTP/2 a aussi été tenté), ou',
-        'sortie HTTPS filtrée.',
+        'cloudflared could not connect to Cloudflare.',
+        'Often: outgoing UDP is blocked (the HTTP/2 fallback was tried too), or',
+        'outgoing HTTPS is filtered.',
         '',
-        '  → Teste depuis un partage de connexion mobile.',
-        "  → Si rien ne passe, un hébergement permanent contourne le problème",
-        '    (section « Build et déploiement » du README).',
+        '  → Try again from a phone hotspot.',
+        '  → If nothing gets through, a permanent host works around it',
+        '    (see docs/DEPLOYMENT.md).',
       ].join('\n'),
     );
     return;
   }
-  console.warn('\nRelance avec --verbose pour voir toute la sortie de cloudflared.');
+  console.warn('\nRun again with --verbose to see all of cloudflared\'s output.');
 }
 
-/** Conseils ciblés quand un lien ne répond pas. */
+/** Targeted advice when a link does not answer. */
 function explainLinkFailure(result, url) {
-  console.warn(`\nAttention : ${result.detail}.`);
+  console.warn(`\nCareful: ${result.detail}.`);
   if (result.kind === 'dns') {
     console.warn(
       [
         '',
-        'Aucun résolveur n\'a pu traduire ce nom, pas même les DNS publics :',
-        'ton réseau bloque sans doute aussi le port 53 et le DNS-over-HTTPS.',
+        'No resolver could translate this name, not even public DNS:',
+        'your network probably blocks port 53 and DNS-over-HTTPS as well.',
         '',
-        'À essayer :',
-        '  1. teste depuis un partage de connexion mobile ;',
-        '  2. change de DNS (1.1.1.1 ou 8.8.8.8) sur ta machine ou ta box ;',
-        '  3. si rien ne passe, un hébergement permanent contourne le problème',
-        '     (section « Build et déploiement » du README).',
+        'Things to try:',
+        '  1. try again from a phone hotspot;',
+        '  2. switch DNS (1.1.1.1 or 8.8.8.8) on your machine or your router;',
+        '  3. if nothing gets through, a permanent host works around it',
+        '     (see docs/DEPLOYMENT.md).',
       ].join('\n'),
     );
     return;
@@ -637,8 +644,8 @@ function explainLinkFailure(result, url) {
     console.warn(
       [
         '',
-        "Le tunnel fonctionne mais n'atteint pas le jeu : un autre programme",
-        'occupe sans doute le port. Relance sur un port libre :',
+        'The tunnel works but does not reach the game: another program is',
+        'probably using the port. Run again on a free port:',
         '  npm run share -- --port 4000',
       ].join('\n'),
     );
@@ -647,46 +654,46 @@ function explainLinkFailure(result, url) {
   console.warn(
     [
       '',
-      'Le lien ne répond pas depuis cette machine. Fais-le tester à ton ami :',
-      `si ${url} s'ouvre chez lui, c'est ton réseau local qui filtre, et la`,
-      'partie reste jouable pour vous deux.',
+      'The link does not answer from this machine. Ask a friend to try it:',
+      `if ${url} opens on their side, your local network is filtering it, and`,
+      'the game is still playable for everyone.',
     ].join('\n'),
   );
 }
 
 /**
- * Explique la situation quand le nom n'a été résolu que par un DNS public :
- * le lien est bon, mais le navigateur de la machine hôte le refusera.
+ * Explains the situation when only a public DNS could resolve the name: the
+ * link is fine, but the host machine's browser will refuse it.
  */
 function explainLocalDnsBlocked(via, url, ip, localPort) {
   const hostname = new URL(url).hostname;
   console.log(
     [
       '',
-      `Ton résolveur ne connaît pas (encore) ${hostname}, mais ${via} l'a résolu`,
-      `en ${ip} et le jeu répond bien à cette adresse.`,
+      `Your resolver does not know ${hostname} (yet), but ${via} resolved it`,
+      `to ${ip} and the game answers at that address.`,
       '',
-      "  → Le lien est valable : ton ami peut l'ouvrir normalement.",
-      `  → Toi, joue sur http://localhost:${String(localPort)} : c'est la même partie.`,
+      '  → The link works: your friends can open it normally.',
+      `  → You can play on http://localhost:${String(localPort)}: it is the same game.`,
       '',
-      'Deux causes possibles, deux remèdes :',
-      '  - simple cache négatif (le nom venait juste d\'être créé) : réessaie',
-      '    dans une minute, il s\'ouvrira ;',
-      '  - filtrage de ton réseau : passe ton DNS à 1.1.1.1 ou 8.8.8.8, ou',
-      '    ajoute cette ligne à ton fichier hosts :',
+      'Two possible causes, two remedies:',
+      '  - a plain negative cache (the name was only just created): try again',
+      '    in a minute, it will open;',
+      '  - your network filters it: switch your DNS to 1.1.1.1 or 8.8.8.8, or',
+      '    add this line to your hosts file:',
       `      ${ip}  ${hostname}`,
       IS_WINDOWS
-        ? '    (C:\\Windows\\System32\\drivers\\etc\\hosts, à ouvrir en administrateur)'
-        : '    (/etc/hosts, avec sudo)',
+        ? '    (C:\\Windows\\System32\\drivers\\etc\\hosts, opened as administrator)'
+        : '    (/etc/hosts, with sudo)',
     ].join('\n'),
   );
 }
 
 // ---------------------------------------------------------------------------
-// Ouverture du tunnel, avec repli HTTP/2
+// Opening the tunnel, with an HTTP/2 fallback
 // ---------------------------------------------------------------------------
 
-/** Ouvre un tunnel Cloudflare et s'assure que son adresse est joignable. */
+/** Opens a Cloudflare tunnel and makes sure its address can be reached. */
 async function startTunnel(localPort) {
   const bin = await resolveCloudflared();
   if (bin.error) {
@@ -694,10 +701,10 @@ async function startTunnel(localPort) {
   }
 
   const attempts = [];
-  // Protocole par défaut (QUIC, sur UDP), puis HTTP/2 si l'UDP est bloqué.
+  // Default protocol (QUIC, over UDP), then HTTP/2 if UDP is blocked.
   for (const protocol of [null, 'http2']) {
     if (protocol) {
-      console.log("Nouvelle tentative en HTTP/2 (réseaux bloquant l'UDP)…");
+      console.log('Trying again over HTTP/2 (for networks that block UDP)…');
     }
     const tunnel = await openTunnel(bin.command, localPort, protocol);
     if (!tunnel.url) {
@@ -705,19 +712,19 @@ async function startTunnel(localPort) {
       continue;
     }
 
-    // cloudflared annonce l'adresse avant d'avoir établi la connexion : on
-    // attend l'enregistrement, sans quoi le nom n'est pas encore publié.
+    // cloudflared announces the address before the connection is up: wait
+    // for the registration, without which the name is not published yet.
     const registered = await tunnel.waitForPattern(REGISTERED_PATTERN, 25_000);
     if (!registered) {
       attempts.push({
         ...tunnel,
-        output: `${tunnel.readOutput()}\n(aucune connexion enregistrée après 25 secondes)`,
+        output: `${tunnel.readOutput()}\n(no registered connection after 25 seconds)`,
       });
       killChild(tunnel.child);
       continue;
     }
 
-    process.stdout.write('Publication de l\'adresse dans le DNS');
+    process.stdout.write('Publishing the address in DNS');
     const resolved = await resolveHostnameWithPatience(new URL(tunnel.url).hostname, 45_000, () => {
       process.stdout.write('.');
     });
@@ -727,19 +734,19 @@ async function startTunnel(localPort) {
       attempts.push({
         ...tunnel,
         dnsError: resolved.error,
-        output: `${tunnel.readOutput()}\n(nom non publié après ${String(resolved.waited)} secondes)`,
+        output: `${tunnel.readOutput()}\n(name not published after ${String(resolved.waited)} seconds)`,
       });
       killChild(tunnel.child);
       continue;
     }
 
-    // Le nom répond : on vérifie enfin que l'acheminement fonctionne.
+    // The name resolves: finally check that routing works.
     try {
-      await requestPinned(tunnel.url, resolved.via === 'système' ? null : resolved.ip);
+      await requestPinned(tunnel.url, resolved.via === SYSTEM ? null : resolved.ip);
     } catch (error) {
       attempts.push({
         ...tunnel,
-        dnsError: `${resolved.ip} ne répond pas (${
+        dnsError: `${resolved.ip} does not answer (${
           error instanceof Error ? error.message : String(error)
         })`,
       });
@@ -760,20 +767,20 @@ async function startTunnel(localPort) {
   const report = attempts
     .map((attempt) => {
       const status =
-        attempt.code === undefined ? 'en cours' : `terminé avec le code ${String(attempt.code)}`;
-      const dns = attempt.dnsError ? `\n  DNS : ${String(attempt.dnsError)}` : '';
-      const body = tail(attempt.output ?? attempt.readOutput?.() ?? '') || '(aucune sortie)';
-      return `$ ${attempt.commandLine}\n  → ${status} après ${String(attempt.seconds)} s${dns}\n${body}`;
+        attempt.code === undefined ? 'still running' : `ended with code ${String(attempt.code)}`;
+      const dns = attempt.dnsError ? `\n  DNS: ${String(attempt.dnsError)}` : '';
+      const body = tail(attempt.output ?? attempt.readOutput?.() ?? '') || '(no output)';
+      return `$ ${attempt.commandLine}\n  → ${status} after ${String(attempt.seconds)} s${dns}\n${body}`;
     })
     .join('\n\n');
-  return { error: "aucun tunnel utilisable.", output: report };
+  return { error: 'no usable tunnel.', output: report };
 }
 
 // ---------------------------------------------------------------------------
-// Fraîcheur du build
+// Is the build fresh?
 // ---------------------------------------------------------------------------
 
-/** Sources dont une modification impose une reconstruction. */
+/** Sources whose changes require a rebuild. */
 const SOURCE_PATHS = [
   'shared/src',
   'server/src',
@@ -787,7 +794,7 @@ const SOURCE_PATHS = [
   'shared/package.json',
 ];
 
-/** Date de modification la plus récente sous un chemin (fichier ou dossier). */
+/** Most recent modification time under a path (file or folder). */
 function newestMtime(target) {
   let newest = 0;
   const visit = (entryPath) => {
@@ -810,43 +817,43 @@ function newestMtime(target) {
 }
 
 /**
- * Le build est-il à jour ?
- * Après un « git pull », `dist/` existe toujours mais date d'avant : sans
- * cette vérification, la partie se jouerait avec l'ancienne version.
- */
-/**
- * Les dépendances installées correspondent-elles au `package-lock.json` ?
- * npm recopie le verrou dans `node_modules/.package-lock.json` à chaque
- * installation : comparer les deux dates suffit, et évite un `npm install`
- * inutile à chaque démarrage.
+ * Do the installed dependencies match `package-lock.json`?
+ * npm copies the lock file into `node_modules/.package-lock.json` on every
+ * install: comparing both dates is enough, and avoids a needless
+ * `npm install` on every start.
  */
 function dependenciesAreStale() {
   const installed = path.join(ROOT, 'node_modules/.package-lock.json');
   if (!existsSync(path.join(ROOT, 'node_modules'))) {
-    return { stale: true, reason: 'aucune dépendance installée' };
+    return { stale: true, reason: 'no dependency installed' };
   }
   if (!existsSync(installed)) {
-    return { stale: true, reason: 'installation incomplète' };
+    return { stale: true, reason: 'incomplete install' };
   }
   const lock = path.join(ROOT, 'package-lock.json');
   if (existsSync(lock) && statSync(lock).mtimeMs > statSync(installed).mtimeMs) {
-    return { stale: true, reason: 'la liste des dépendances a changé' };
+    return { stale: true, reason: 'the dependency list changed' };
   }
   return { stale: false };
 }
 
+/**
+ * Is the build up to date?
+ * After a `git pull`, `dist/` still exists but is older: without this check
+ * the game would run the previous version.
+ */
 function buildIsStale() {
   const artefacts = [
     path.join(ROOT, 'client/dist/index.html'),
     path.join(ROOT, 'server/dist/index.js'),
   ];
   if (artefacts.some((file) => !existsSync(file))) {
-    return { stale: true, reason: 'aucun build présent' };
+    return { stale: true, reason: 'no build yet' };
   }
   const builtAt = Math.min(...artefacts.map((file) => statSync(file).mtimeMs));
   const sourceAt = Math.max(...SOURCE_PATHS.map((rel) => newestMtime(path.join(ROOT, rel))));
   if (sourceAt > builtAt) {
-    return { stale: true, reason: 'sources modifiées depuis le dernier build' };
+    return { stale: true, reason: 'sources changed since the last build' };
   }
   return { stale: false };
 }
@@ -866,7 +873,7 @@ function shutdown(signal) {
     return;
   }
   shuttingDown = true;
-  console.log(`\nArrêt (${signal})…`);
+  console.log(`\nStopping (${signal})…`);
   for (const child of children) {
     killChild(child);
   }
@@ -876,7 +883,7 @@ function shutdown(signal) {
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 
-/** Attend que le serveur local réponde (au plus `timeoutMs`). */
+/** Waits for the local server to answer (at most `timeoutMs`). */
 async function waitForLocalServer(localPort, timeoutMs = 15_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -886,7 +893,7 @@ async function waitForLocalServer(localPort, timeoutMs = 15_000) {
         return true;
       }
     } catch {
-      // Le serveur n'écoute pas encore.
+      // Not listening yet.
     }
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
@@ -894,13 +901,13 @@ async function waitForLocalServer(localPort, timeoutMs = 15_000) {
 }
 
 async function main() {
-  // Diagnostic : tester un lien déjà ouvert.
+  // Diagnosis: test a link that is already open.
   const urlToVerify = readOption('--verify', null);
   if (urlToVerify) {
-    console.log(`Vérification de ${urlToVerify} …`);
+    console.log(`Checking ${urlToVerify} …`);
     const verdict = await verifyPublicLink(urlToVerify);
     if (verdict.ok) {
-      console.log(`Ce lien répond correctement (nom résolu par : ${String(verdict.via)}).`);
+      console.log(`This link answers correctly (name resolved by: ${String(verdict.via)}).`);
     } else {
       explainLinkFailure(verdict, urlToVerify);
       process.exitCode = 1;
@@ -908,39 +915,39 @@ async function main() {
     return;
   }
 
-  // Diagnostic : ouvrir un tunnel et le tester, sans démarrer le serveur.
+  // Diagnosis: open a tunnel and test it, without starting the server.
   if (hasFlag('--check')) {
-    console.log('Test du tunnel (aucun serveur ne sera démarré)…');
+    console.log('Testing the tunnel (no server will be started)…');
     const tunnel = await startTunnel(port);
     if (tunnel.ok) {
-      console.log(`\nTunnel opérationnel : ${tunnel.url}`);
-      console.log(`Nom résolu par : ${String(tunnel.via)} (${String(tunnel.ip)}).`);
-      if (tunnel.via !== 'système') {
+      console.log(`\nTunnel working: ${tunnel.url}`);
+      console.log(`Name resolved by: ${String(tunnel.via)} (${String(tunnel.ip)}).`);
+      if (tunnel.via !== SYSTEM) {
         console.log(
-          "Ton résolveur local ne connaît pas ce nom : le lien marchera pour ton ami,\n" +
-            'pas dans ton propre navigateur.',
+          'Your local resolver does not know this name: the link will work for your\n' +
+            'friends, not in your own browser.',
         );
       }
     } else {
       explainTunnelFailure(tunnel);
       process.exitCode = 1;
     }
-    shutdown('fin du test');
+    shutdown('end of test');
     return;
   }
 
   const deps = dependenciesAreStale();
   if (deps.stale) {
-    console.log(`Installation des dépendances — ${String(deps.reason)} (une minute environ)…`);
+    console.log(`Installing dependencies — ${String(deps.reason)} (about a minute)…`);
     await run('npm install');
   }
 
   const freshness = buildIsStale();
   if (hasFlag('--build') || freshness.stale) {
-    const why = hasFlag('--build') ? 'reconstruction demandée' : freshness.reason;
-    console.log(`Construction du jeu — ${String(why)} (quelques secondes)…`);
-    // VITE_SERVER_URL vide : le client parle au serveur qui le sert, donc au
-    // tunnel, quelle que soit son adresse.
+    const why = hasFlag('--build') ? 'rebuild requested' : freshness.reason;
+    console.log(`Building the game — ${String(why)} (a few seconds)…`);
+    // Empty VITE_SERVER_URL: the client talks to the server that serves it,
+    // hence to the tunnel, whatever its address.
     await run('npm run build', { env: { ...process.env, VITE_SERVER_URL: '' } });
   }
 
@@ -948,21 +955,21 @@ async function main() {
   let resolvedVia = null;
   let resolvedIp = null;
   if (!hasFlag('--local')) {
-    console.log('Ouverture du tunnel public…');
+    console.log('Opening the public tunnel…');
     const tunnel = await startTunnel(port);
     if (tunnel.ok) {
       tunnelUrl = tunnel.url;
       resolvedVia = tunnel.via;
       resolvedIp = tunnel.ip;
       if (tunnel.waited > 0) {
-        console.log(`Adresse publiée après ${String(tunnel.waited)} secondes.`);
+        console.log(`Address published after ${String(tunnel.waited)} seconds.`);
       }
     } else {
       explainTunnelFailure(tunnel);
       if (tunnel.child) {
         killChild(tunnel.child);
       }
-      console.warn('\nLe jeu démarre quand même en local.\n');
+      console.warn('\nThe game starts locally anyway.\n');
     }
   }
 
@@ -981,7 +988,7 @@ async function main() {
       ...process.env,
       PORT: String(port),
       NODE_ENV: 'production',
-      // Seules ces origines sont acceptées : le tunnel et la machine locale.
+      // Only these origins are accepted: the tunnel and the local machine.
       CLIENT_URL: origins,
     },
   });
@@ -995,49 +1002,49 @@ async function main() {
 
   const localReady = await waitForLocalServer(port);
   if (!localReady) {
-    console.warn(`\nLe serveur local ne répond pas sur le port ${String(port)}.`);
+    console.warn(`\nThe local server does not answer on port ${String(port)}.`);
   }
 
   if (!tunnelUrl) {
-    banner([`Jeu disponible sur http://localhost:${String(port)}`]);
+    banner([`Game available on http://localhost:${String(port)}`]);
     return;
   }
 
-  // Dernière vérification, cette fois avec le jeu derrière le tunnel.
-  process.stdout.write('Vérification du lien public… ');
+  // Last check, this time with the game behind the tunnel.
+  process.stdout.write('Checking the public link… ');
   const verdict = await verifyPublicLink(tunnelUrl);
-  console.log(verdict.ok ? 'le jeu répond bien à travers le tunnel.' : 'échec.');
+  console.log(verdict.ok ? 'the game answers through the tunnel.' : 'failed.');
 
   if (verdict.ok) {
     banner([
-      'Partage ce lien avec ton ami :',
+      'Share this link with up to three friends:',
       '',
       tunnelUrl,
       '',
-      'Toi : Créer une partie → tu obtiens un code à 5 caractères.',
-      'Lui : Rejoindre une partie → il saisit ce code.',
+      'You: Start a game → you get a 5-character code.',
+      'Everyone else: Join a game → type that code.',
       '',
-      'Ctrl+C ferme le tunnel : le lien cesse alors de fonctionner.',
+      'Ctrl+C closes the tunnel: the link then stops working.',
     ]);
-    if (verdict.via !== 'système') {
+    if (verdict.via !== SYSTEM) {
       explainLocalDnsBlocked(String(resolvedVia ?? verdict.via), tunnelUrl, String(resolvedIp ?? verdict.ip), port);
     }
   } else {
     explainLinkFailure(verdict, tunnelUrl);
     banner([
-      'Lien public (non vérifié) :',
+      'Public link (not verified):',
       '',
       tunnelUrl,
       '',
-      `En local, le jeu répond sur http://localhost:${String(port)}`,
+      `Locally, the game answers on http://localhost:${String(port)}`,
     ]);
   }
 
-  console.log(`Lien à partager : ${tunnelUrl}\n`);
+  console.log(`Link to share: ${tunnelUrl}\n`);
 }
 
 main().catch((error) => {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;
-  shutdown('erreur');
+  shutdown('error');
 });

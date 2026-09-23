@@ -1,157 +1,203 @@
 /* ==========================================================================
-   Table de jeu : tuiles, supports, paravents, zone publique, actions
+   The table: stars, racks, name plates, open sky, actions
    ========================================================================== */
 
-/* --- Tuiles ---------------------------------------------------------------- */
+/* --- Stars: celestial medallions ------------------------------------------ */
 
 .tile {
   position: relative;
   width: var(--tile-w);
-  height: var(--tile-h);
+  height: var(--tile-w);
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
-  padding: 3px;
+  gap: calc(var(--tile-w) * 0.02);
+  padding: 0;
   border: none;
-  border-radius: calc(var(--tile-w) * 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 45%),
-    var(--tile-face, var(--c-violet));
+  border-radius: 50%;
   color: #fff;
-  box-shadow: var(--sh-tile);
+  /* A glowing body: bright heart up-left, deep edge. */
+  background:
+    radial-gradient(circle at 33% 27%, var(--tile-light, #fff) 0%, transparent 44%),
+    radial-gradient(circle at 50% 50%, var(--tile-face, var(--c-violet)) 0%, var(--tile-edge, var(--c-violet-dark)) 80%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 236, 190, 0.6),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.22),
+    0 0 16px -4px var(--tile-face, transparent),
+    var(--sh-tile);
   text-align: center;
   transition:
     transform var(--mo-fast) var(--ease-out),
-    box-shadow var(--mo-fast) var(--ease-out);
+    box-shadow var(--mo-fast) var(--ease-out),
+    opacity var(--mo-fast) var(--ease-out);
 }
 
-.tile::after {
-  /* Fine arete claire : rendu "objet physique". */
+/* Graduated ring, as on an astrolabe. */
+.tile::before {
   content: '';
   position: absolute;
-  inset: 2px;
-  border-radius: inherit;
-  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  inset: 3px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 255, 255, 0.7) 0 1.4deg, transparent 1.4deg 15deg);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px));
+  opacity: 0.55;
   pointer-events: none;
 }
 
 .tile--xs {
-  --tile-w: clamp(26px, 4.4vw, 34px);
+  --tile-w: clamp(28px, 3.9vw, 34px);
 }
 .tile--sm {
-  --tile-w: clamp(38px, 6.6vw, 52px);
+  --tile-w: clamp(40px, 5.2vw, 50px);
 }
 .tile--lg {
-  --tile-w: clamp(64px, 13vw, 92px);
+  --tile-w: clamp(76px, 15vw, 96px);
+}
+
+.tile__sigil {
+  width: calc(var(--tile-w) * 0.27);
+  height: calc(var(--tile-w) * 0.27);
+  color: rgba(255, 255, 255, 0.88);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  margin-top: calc(var(--tile-w) * -0.02);
 }
 
 .tile__number {
+  position: relative;
   font-family: var(--font-title);
-  font-weight: 600;
-  font-size: calc(var(--tile-w) * 0.52);
-  line-height: 0.95;
-  text-shadow: 0 2px 3px rgba(var(--shadow-rgb), 0.45);
+  font-weight: 700;
+  font-size: calc(var(--tile-w) * 0.34);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.tile--xs .tile__number {
+  font-size: calc(var(--tile-w) * 0.4);
 }
 
 .tile__points {
   display: flex;
-  gap: calc(var(--tile-w) * 0.05);
+  gap: calc(var(--tile-w) * 0.035);
+  min-height: calc(var(--tile-w) * 0.1);
 }
 
+/* A spark: a small four-pointed star. */
 .tile__dot {
-  width: calc(var(--tile-w) * 0.1);
-  height: calc(var(--tile-w) * 0.1);
+  width: calc(var(--tile-w) * 0.12);
+  height: calc(var(--tile-w) * 0.12);
+  min-width: 5px;
+  min-height: 5px;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+}
+
+.tile--xs .tile__dot {
   min-width: 4px;
   min-height: 4px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 1px rgba(var(--shadow-rgb), 0.4);
-}
-
-.tile .star-glyph {
-  margin-top: 1px;
-  opacity: 0.92;
-}
-
-.tile--xs .tile__number {
-  font-size: calc(var(--tile-w) * 0.58);
 }
 
 .tile--clickable {
   cursor: pointer;
 }
 
-.tile--clickable:hover {
-  transform: translateY(-4px) scale(1.04);
-  box-shadow: var(--sh-tile-raised);
+.tile--clickable:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 236, 190, 0.8),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.18),
+    0 0 22px -2px var(--tile-face, transparent),
+    var(--sh-tile-raised);
   z-index: 3;
 }
 
-.tile--clickable:active {
-  transform: translateY(1px) scale(0.98);
+.tile--clickable:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .tile--selected {
-  outline: 4px solid var(--c-gold);
-  outline-offset: 2px;
-  transform: translateY(-4px);
+  outline: 3px solid var(--c-gold-bright);
+  outline-offset: 3px;
+  transform: translateY(-3px);
   z-index: 4;
 }
 
+/* A gauged star that got a NO: dimmed, with a dashed halo. */
 .tile--tilted {
-  transform: rotate(-13deg);
+  opacity: 0.62;
+  filter: saturate(0.45);
 }
 
-.tile--tilted.tile--clickable:hover {
-  transform: rotate(-13deg) translateY(-4px);
+.tile--tilted::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--c-ink-soft);
+  pointer-events: none;
 }
 
 .tile--enter {
-  animation: gf-flip-in var(--mo-slow) var(--ease-bounce) both;
+  animation: gf-flip-in var(--mo-slow) var(--ease-out) both;
 }
 
-/* --- Dos de tuile (mes tuiles secretes) ------------------------------------ */
+/* --- My hidden stars: eclipsed discs ---------------------------------------- */
 
 .tile-back {
+  color: var(--tile-light, #fff);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.12)),
-    var(--tile-face, var(--c-violet));
+    radial-gradient(circle at 50% 50%, var(--eclipse-face) 0 56%, var(--tile-edge, #222) 84%, var(--tile-face, #444) 100%);
+  box-shadow:
+    inset 0 0 0 1.5px var(--tile-face, transparent),
+    0 0 18px -5px var(--tile-face, transparent),
+    var(--sh-tile);
 }
 
-.tile-back__pattern {
-  position: absolute;
-  inset: 4px;
-  border-radius: inherit;
-  background-image:
-    repeating-linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.16) 0 4px,
-      transparent 4px 8px
-    );
-  opacity: 0.7;
+.tile-back::before {
+  background: repeating-conic-gradient(var(--tile-face, #fff) 0 1.4deg, transparent 1.4deg 15deg);
+  opacity: 0.45;
+}
+
+.tile-back .tile__sigil {
+  color: var(--tile-light, #fff);
+  opacity: 0.95;
 }
 
 .tile-back__mark {
   position: relative;
   font-family: var(--font-title);
-  font-size: calc(var(--tile-w) * 0.5);
-  font-weight: 600;
-  text-shadow: 0 2px 3px rgba(var(--shadow-rgb), 0.5);
+  font-size: calc(var(--tile-w) * 0.32);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tile-light, #fff);
+  opacity: 0.9;
 }
 
 .tile-back__position {
   position: absolute;
-  bottom: 3px;
-  right: 5px;
-  font-size: calc(var(--tile-w) * 0.2);
-  font-weight: 800;
-  opacity: 0.85;
+  right: -3px;
+  bottom: -3px;
+  display: grid;
+  place-items: center;
+  width: calc(var(--tile-w) * 0.36);
+  height: calc(var(--tile-w) * 0.36);
+  min-width: 16px;
+  min-height: 16px;
+  border-radius: 50%;
+  background: var(--c-paper);
+  border: 1px solid var(--c-rule);
+  color: var(--c-ink);
+  font-family: var(--font-title);
+  font-size: max(10px, calc(var(--tile-w) * 0.19));
+  font-weight: 700;
+  line-height: 1;
 }
 
-/* --- Empilements ----------------------------------------------------------- */
+/* --- Stacks ------------------------------------------------------------------ */
 
 .tile-stack {
   position: relative;
@@ -161,28 +207,35 @@
 }
 
 /*
- * Les tuiles classees s'empilent en colonne : la largeur du support reste
- * bornee (l'espace rare, surtout sur telephone) et chaque numero demeure
- * lisible, ce qui est l'information meme que le joueur vient de gagner.
+ * Placed stars stack in a column: the rack stays narrow (space is scarce,
+ * especially on a phone) and each number stays readable, since the number is
+ * exactly what the player just learned.
  */
 .tile-stack__item {
   display: inline-flex;
-  transform: translateX(calc(var(--stack-index, 0) * 1px))
-    rotate(calc(var(--stack-index, 0) * 1.5deg - 1.5deg));
   z-index: calc(var(--stack-index, 0) + 1);
 }
 
 .tile-stack__item + .tile-stack__item {
-  /* Recouvrement constant : le numero de chaque tuile reste visible. */
   margin-top: var(--stack-overlap, -8px);
 }
 
-/* --- Support (rack) --------------------------------------------------------- */
+/* --- Everyone else --------------------------------------------------------- */
+
+.rivals {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  align-items: start;
+}
+
+/* --- Racks ------------------------------------------------------------------- */
 
 .player-zone {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  align-items: stretch;
+  min-width: 0;
 }
 
 .rack {
@@ -195,39 +248,55 @@
 .rack__board {
   position: relative;
   width: 100%;
-  /* Le bas du support doit rester assez large pour accueillir les tuiles
-     comparees posees devant le paravent. */
-  padding: var(--sp-3) var(--sp-2) var(--sp-3);
+  padding: var(--sp-3) var(--sp-2);
   border-radius: var(--r-lg);
-  background: var(--rack-face);
+  /* Engraved arcs, like the declination lines of a star chart. */
+  background:
+    repeating-radial-gradient(
+      ellipse at 50% 160%,
+      transparent 0 26px,
+      rgba(var(--rack-line-rgb), 0.08) 26px 27px
+    ),
+    var(--rack-face);
+  border: 1px solid rgba(var(--rack-line-rgb), 0.32);
   box-shadow:
-    inset 0 2px 0 var(--rack-gloss),
-    inset 0 -6px 0 rgba(var(--rack-line-rgb), 0.35),
-    0 8px 18px rgba(var(--shadow-rgb), 0.18);
-  border: 2px solid rgba(var(--rack-line-rgb), 0.35);
+    inset 0 1px 0 var(--rack-gloss),
+    inset 0 0 0 4px rgba(var(--rack-line-rgb), 0.05),
+    0 10px 24px rgba(var(--shadow-rgb), 0.12);
+  transition:
+    border-color var(--mo-base) var(--ease-out),
+    box-shadow var(--mo-base) var(--ease-out);
+}
+
+.player-zone.is-active .rack__board {
+  border-color: var(--c-gold);
+  box-shadow:
+    inset 0 1px 0 var(--rack-gloss),
+    0 0 0 3px rgba(216, 169, 63, 0.22),
+    0 12px 28px rgba(var(--shadow-rgb), 0.16);
 }
 
 .rack__track {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 4px 2px 2px;
   scrollbar-width: thin;
 }
 
 .rack__cell {
   display: flex;
   align-items: flex-start;
-  gap: 2px;
+  gap: 3px;
 }
 
 .rack__column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
 }
 
 .classify-slot {
@@ -237,69 +306,77 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 4px;
-  border-radius: var(--r-sm);
-  border: 2px dashed rgba(var(--rack-line-rgb), 0.55);
+  padding-top: 5px;
+  border-radius: var(--r-pill);
+  border: 1px dashed rgba(var(--rack-line-rgb), 0.5);
   background: var(--rack-slot);
+}
+
+.rack--compact .classify-slot {
+  min-height: clamp(40px, 5.2vw, 50px);
 }
 
 .classify-slot--filled {
   border-style: solid;
-  border-color: rgba(var(--rack-line-rgb), 0.7);
+  border-color: rgba(var(--rack-line-rgb), 0.55);
   background: var(--rack-slot-filled);
   width: auto;
   min-width: var(--slot-w);
-  padding: 4px 3px;
-  align-items: flex-start;
+  padding: 4px 2px;
+  border-radius: calc(var(--r-pill));
 }
 
+/* A small brass diamond marks each gap. */
 .classify-slot__notch {
   position: absolute;
-  top: -6px;
+  top: -4px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 6px;
-  border-radius: 0 0 6px 6px;
-  background: rgba(var(--rack-line-rgb), 0.45);
+  width: 7px;
+  height: 7px;
+  background: var(--c-gold);
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 1px;
+  opacity: 0.8;
 }
 
 .rack__arrow {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  width: 100%;
   margin-top: var(--sp-2);
+  padding: 0 var(--sp-1);
   font-size: var(--fs-xs);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(87, 58, 26, 0.85);
+  letter-spacing: 0.14em;
+  color: var(--c-ink-soft);
 }
 
 .rack__arrow-line {
   flex: 1;
-  height: 3px;
-  background: linear-gradient(90deg, rgba(var(--rack-line-rgb), 0.3), rgba(var(--rack-line-rgb), 0.85));
-  border-radius: 2px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(var(--rack-line-rgb), 0.15), rgba(var(--rack-line-rgb), 0.7));
   position: relative;
 }
 
 .rack__arrow-line::after {
   content: '';
   position: absolute;
-  right: -2px;
+  right: -1px;
   top: 50%;
-  transform: translateY(-50%);
-  border-left: 8px solid rgba(var(--rack-line-rgb), 0.85);
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
+  width: 6px;
+  height: 6px;
+  border-top: 1px solid rgba(var(--rack-line-rgb), 0.8);
+  border-right: 1px solid rgba(var(--rack-line-rgb), 0.8);
+  transform: translateY(-50%) rotate(45deg);
 }
 
-/* --- Zone COMPARER --------------------------------------------------------- */
+/* --- GAUGE area --------------------------------------------------------------- */
 
 .compare-area {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 3px;
   justify-content: center;
   max-width: calc(var(--tile-w) * 1.9);
 }
@@ -312,66 +389,128 @@
 
 .compare-area__answer {
   font-family: var(--font-title);
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
-  padding: 0 4px;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 1px 5px;
   border-radius: var(--r-pill);
-  margin-top: -3px;
+  margin-top: -4px;
+  z-index: 2;
 }
 
 .compare-area__answer.is-yes {
-  background: var(--t-green);
+  background: var(--c-success);
   color: #fff;
 }
 
 .compare-area__answer.is-no {
-  background: var(--c-danger);
-  color: #fff;
+  background: var(--c-paper);
+  border: 1px solid var(--c-line);
+  color: var(--c-ink-soft);
 }
 
-/* --- Paravent -------------------------------------------------------------- */
+/* --- Name plates: a strip of night sky ------------------------------------------ */
 
 .paravent {
   position: relative;
-  height: 34px;
-  border-radius: var(--r-md);
-  overflow: hidden;
-  box-shadow: 0 6px 14px rgba(var(--shadow-rgb), 0.22);
-}
-
-.paravent--mine {
-  margin-top: -6px;
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
-  transform: perspective(300px) rotateX(8deg);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  align-self: center;
+  width: min(100%, 360px);
+  min-height: 32px;
+  padding: 3px var(--sp-3) 3px 5px;
+  color: var(--plate-ink);
+  background:
+    radial-gradient(circle at 18% 40%, rgba(255, 255, 255, 0.7) 0 0.8px, transparent 1.3px),
+    radial-gradient(circle at 62% 70%, rgba(255, 255, 255, 0.5) 0 0.7px, transparent 1.2px),
+    radial-gradient(circle at 84% 25%, rgba(255, 255, 255, 0.6) 0 0.8px, transparent 1.3px),
+    var(--plate-face);
+  background-size: 53px 29px, 71px 31px, 47px 27px, 100% 100%;
+  border: 1px solid rgba(232, 189, 90, 0.45);
+  box-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.18);
+  transition: box-shadow var(--mo-base) var(--ease-out);
 }
 
 .paravent--opponent {
-  margin-bottom: -6px;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  transform: perspective(300px) rotateX(-8deg);
+  border-bottom: none;
+  border-radius: var(--r-md) var(--r-md) 0 0;
 }
 
-.paravent__art {
-  width: 100%;
-  height: 100%;
-  display: block;
+.paravent--mine {
+  border-top: none;
+  border-radius: 0 0 var(--r-md) var(--r-md);
+}
+
+.paravent__avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 189, 90, 0.7);
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .paravent__label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-title);
   font-size: var(--fs-sm);
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(21, 8, 34, 0.6);
 }
 
-/* --- Zone publique --------------------------------------------------------- */
+.paravent__me {
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.paravent__status {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.paravent.is-active {
+  box-shadow: 0 0 0 2px rgba(216, 169, 63, 0.35), 0 4px 14px rgba(var(--shadow-rgb), 0.2);
+}
+
+.paravent.is-active .paravent__status {
+  background: var(--c-gold-bright);
+  color: var(--c-on-vivid);
+}
+
+.paravent.is-answering .paravent__status {
+  background: var(--t-pink-light);
+  color: var(--c-on-vivid);
+  animation: gf-glow 1.6s var(--ease-out) infinite;
+}
+
+.paravent.is-offline,
+.paravent.is-out {
+  filter: saturate(0.4);
+}
+
+.paravent.is-offline .paravent__label {
+  opacity: 0.7;
+}
+
+/* --- Open sky ----------------------------------------------------------------- */
 
 .pool {
   display: flex;
@@ -380,7 +519,8 @@
   padding: var(--sp-3);
   border-radius: var(--r-lg);
   background: var(--c-gloss-panel);
-  border: 2px dashed rgba(106, 43, 174, 0.3);
+  border: 1px solid var(--c-rule);
+  box-shadow: var(--sh-panel);
 }
 
 .pool__head {
@@ -393,21 +533,22 @@
 
 .pool__reserve {
   display: flex;
-  gap: 4px;
+  gap: 5px;
 }
 
 .pool__reserve-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 26px;
+  width: 26px;
   height: 26px;
-  border-radius: var(--r-pill);
-  background: var(--tile-face);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, var(--tile-face), var(--tile-edge) 90%);
+  box-shadow: inset 0 0 0 1px rgba(255, 236, 190, 0.5);
   color: #fff;
   font-family: var(--font-title);
   font-size: var(--fs-xs);
-  box-shadow: inset 0 -2px 0 var(--tile-edge);
+  font-weight: 700;
 }
 
 .pool__tiles {
@@ -416,10 +557,10 @@
   gap: var(--sp-2);
   max-height: 34vh;
   overflow-y: auto;
-  padding: 2px;
+  padding: 6px 4px;
 }
 
-/* --- Panneau d'action ------------------------------------------------------ */
+/* --- Action panel -------------------------------------------------------------- */
 
 .action-panel {
   display: flex;
@@ -429,15 +570,18 @@
   border-radius: var(--r-lg);
   background: var(--c-paper);
   box-shadow: var(--sh-panel);
-  border: 2px solid rgba(var(--shadow-rgb), 0.08);
+  border: 1px solid var(--c-rule);
 }
 
 .action-panel--waiting {
   align-items: center;
+  justify-content: center;
   text-align: center;
+  min-height: 96px;
   background: var(--c-gloss-panel);
   box-shadow: none;
   border-style: dashed;
+  color: var(--c-ink-soft);
 }
 
 .action-panel__step {
@@ -458,7 +602,7 @@
 
 .action-panel__colors {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--sp-2);
 }
 
@@ -466,46 +610,55 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   padding: var(--sp-2) 2px;
-  border: none;
+  min-height: 86px;
+  border: 1px solid rgba(255, 236, 190, 0.4);
   border-radius: var(--r-md);
-  background: var(--tile-face);
+  background:
+    radial-gradient(circle at 50% 18%, var(--tile-light) 0%, transparent 38%),
+    radial-gradient(circle at 50% 30%, var(--tile-face), var(--tile-edge) 95%);
   color: #fff;
-  font-family: var(--font-title);
-  font-size: var(--fs-sm);
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--tile-edge);
-  transition: transform var(--mo-fast) var(--ease-out);
-  min-height: 56px;
+  box-shadow: 0 0 14px -6px var(--tile-face), var(--sh-tile);
+  transition:
+    transform var(--mo-fast) var(--ease-out),
+    box-shadow var(--mo-fast) var(--ease-out);
 }
 
 .color-button:hover:not(:disabled) {
   transform: translateY(-3px);
+  box-shadow: 0 0 22px -4px var(--tile-face), var(--sh-tile-raised);
 }
 
 .color-button:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--tile-edge);
+  transform: translateY(1px);
 }
 
 .color-button:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
+  filter: saturate(0.3);
   cursor: not-allowed;
 }
 
+.color-button__sigil {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
 .color-button__label {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-family: var(--font-title);
   font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .color-button__count {
-  font-size: var(--fs-lg);
-  font-weight: 600;
+  font-size: 0.7rem;
+  opacity: 0.9;
 }
 
-/* --- Bandeau et indicateurs ------------------------------------------------ */
+/* --- Header and banners ----------------------------------------------------------- */
 
 .game-header {
   position: sticky;
@@ -518,8 +671,8 @@
   flex-wrap: wrap;
   padding: var(--sp-2) var(--sp-4);
   background: var(--c-bar);
-  backdrop-filter: blur(8px);
-  border-bottom: 3px solid rgba(106, 43, 174, 0.18);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--c-rule);
 }
 
 .game-header__brand {
@@ -531,10 +684,12 @@
 
 .game-header__code {
   font-family: var(--font-title);
-  letter-spacing: 0.22em;
-  background: var(--c-violet);
-  color: #fff;
-  padding: 0.15em 0.6em;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  background: var(--plate-face);
+  color: var(--plate-ink);
+  border: 1px solid rgba(232, 189, 90, 0.5);
+  padding: 0.2em 0.5em 0.2em 0.75em;
   border-radius: var(--r-pill);
   font-size: var(--fs-sm);
 }
@@ -543,14 +698,14 @@
   font-size: var(--fs-xs);
   padding: 0.15em 0.6em;
   border-radius: var(--r-pill);
-  background: rgba(47, 176, 97, 0.16);
-  color: var(--t-green-dark);
-  font-weight: 800;
+  background: rgba(47, 143, 111, 0.14);
+  color: var(--c-success);
+  font-weight: 600;
 }
 
 .game-header__net.is-offline {
-  background: rgba(232, 69, 60, 0.16);
-  color: #a8271f;
+  background: rgba(184, 68, 58, 0.14);
+  color: var(--c-danger);
 }
 
 .game-header__tools {
@@ -569,18 +724,19 @@
   border-radius: var(--r-lg);
   background: var(--c-paper);
   box-shadow: var(--sh-panel);
-  border-left: 8px solid var(--c-violet);
+  border: 1px solid var(--c-line-soft);
+  border-left: 4px solid var(--c-violet);
 }
 
 .turn-indicator--mine {
-  border-left-color: var(--t-green);
-  background: linear-gradient(90deg, rgba(47, 176, 97, 0.14), var(--c-paper) 40%);
+  border-left-color: var(--c-gold);
+  background: linear-gradient(90deg, rgba(216, 169, 63, 0.16), var(--c-paper) 45%);
 }
 
 .turn-indicator--answer {
-  border-left-color: var(--c-gold);
-  background: linear-gradient(90deg, rgba(255, 201, 60, 0.22), var(--c-paper) 40%);
-  animation: gf-pulse 1.6s var(--ease-out) infinite;
+  border-left-color: var(--c-magenta);
+  background: linear-gradient(90deg, rgba(207, 95, 181, 0.16), var(--c-paper) 45%);
+  animation: gf-pulse 1.8s var(--ease-out) infinite;
 }
 
 .turn-indicator--over {
@@ -590,8 +746,9 @@
 .turn-indicator__turn {
   font-family: var(--font-title);
   font-size: var(--fs-xs);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   color: var(--c-ink-soft);
   white-space: nowrap;
 }
@@ -599,13 +756,18 @@
 .turn-indicator__text {
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .turn-indicator__text strong {
   font-family: var(--font-title);
   font-size: var(--fs-lg);
   color: var(--c-violet);
+  letter-spacing: 0.03em;
+}
+
+.turn-indicator--mine .turn-indicator__text strong {
+  color: var(--c-gold);
 }
 
 .turn-indicator__text span {
@@ -613,7 +775,7 @@
   color: var(--c-ink-soft);
 }
 
-/* --- Mise en page de la table ---------------------------------------------- */
+/* --- Table layout ------------------------------------------------------------------ */
 
 .table {
   display: flex;
@@ -623,7 +785,7 @@
 
 .table__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: var(--sp-4);
   padding: var(--sp-4);
   align-items: start;
@@ -648,7 +810,7 @@
   flex-direction: column;
   gap: var(--sp-3);
   position: sticky;
-  top: 86px;
+  top: 80px;
 }
 
 .sheet-panel {
@@ -656,17 +818,18 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(620px, 52vw);
+  width: min(640px, 54vw);
   z-index: var(--z-panel);
   padding: var(--sp-3);
   overflow-y: auto;
   background: var(--c-veil);
-  backdrop-filter: blur(6px);
-  box-shadow: -14px 0 40px rgba(var(--shadow-rgb), 0.22);
+  backdrop-filter: blur(8px);
+  border-left: 1px solid var(--c-rule);
+  box-shadow: -18px 0 44px rgba(var(--shadow-rgb), 0.2);
   animation: gf-slide-up var(--mo-base) var(--ease-out) both;
 }
 
-/* --- Joueurs --------------------------------------------------------------- */
+/* --- Players ------------------------------------------------------------------------ */
 
 .player-status {
   display: flex;
@@ -674,25 +837,30 @@
   gap: var(--sp-2);
   padding: var(--sp-2);
   border-radius: var(--r-md);
-  background: var(--rack-slot-filled);
-  border: 2px solid transparent;
+  background: var(--c-wash);
+  border: 1px solid transparent;
 }
 
 .player-status.is-active {
   border-color: var(--c-gold);
-  background: rgba(255, 201, 60, 0.16);
+  background: rgba(216, 169, 63, 0.14);
+}
+
+.player-status.is-left {
+  opacity: 0.6;
 }
 
 .player-status__avatar {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--c-violet);
-  color: #fff;
+  background: var(--plate-face);
+  color: var(--plate-ink);
+  border: 1px solid rgba(232, 189, 90, 0.6);
   font-family: var(--font-title);
-  font-size: var(--fs-lg);
+  font-weight: 700;
   flex: 0 0 auto;
 }
 
@@ -703,12 +871,14 @@
 }
 
 .player-status__name {
-  font-weight: 800;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .player-status__me {
   color: var(--c-ink-soft);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .player-status__tags {
@@ -718,18 +888,23 @@
   flex-wrap: wrap;
 }
 
+.player-status__net {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-soft);
+}
+
 .player-status__dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--t-green);
+  background: var(--c-success);
 }
 
 .player-status__dot.is-offline {
   background: var(--c-danger);
 }
 
-/* --- Historique ------------------------------------------------------------ */
+/* --- History ------------------------------------------------------------------------ */
 
 .game-log {
   list-style: none;
@@ -737,53 +912,53 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   font-size: var(--fs-sm);
 }
 
 .game-log--compact {
-  max-height: 34vh;
+  max-height: 36vh;
   overflow-y: auto;
 }
 
 .game-log__item {
   display: flex;
+  align-items: flex-start;
   gap: var(--sp-2);
   padding: 6px 8px;
   border-radius: var(--r-sm);
-  background: rgba(255, 255, 255, 0.7);
-  line-height: 1.35;
+  background: var(--c-wash);
+  color: var(--c-ink);
+  line-height: 1.4;
 }
 
 .game-log__item[data-kind='guess'] {
-  background: rgba(255, 201, 60, 0.25);
-  font-weight: 700;
+  background: rgba(216, 169, 63, 0.2);
+  font-weight: 600;
 }
 
 .game-log__item[data-kind='turn'] {
-  background: rgba(106, 43, 174, 0.1);
+  background: transparent;
+  color: var(--c-ink-soft);
+  border-top: 1px solid var(--c-line-soft);
+  border-radius: 0;
 }
 
 .game-log__icon {
   flex: 0 0 auto;
+  color: var(--c-violet);
+  padding-top: 2px;
 }
 
 .opponent-offline {
   margin: var(--sp-3) var(--sp-4) 0;
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--r-md);
-  background: rgba(247, 144, 32, 0.18);
-  border: 2px dashed var(--c-warning);
-  color: #8a4a06;
-  font-weight: 700;
+  background: rgba(183, 122, 28, 0.12);
+  border: 1px dashed var(--c-warning);
+  color: var(--c-ink);
+  font-weight: 500;
   text-align: center;
-}
-
-@media (max-width: 860px) {
-  .opponent-offline {
-    margin: var(--sp-2) var(--sp-3) 0;
-    font-size: var(--fs-sm);
-  }
 }
 
 .offline-banner {
@@ -791,18 +966,18 @@
   text-align: center;
   background: var(--c-danger);
   color: #fff;
-  font-weight: 800;
+  font-weight: 600;
 }
 
-/* --- Responsive ------------------------------------------------------------ */
+/* --- Responsive -------------------------------------------------------------------- */
 
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .table__center {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .table__layout {
     grid-template-columns: minmax(0, 1fr);
     padding: var(--sp-3);
@@ -818,6 +993,11 @@
     padding: var(--sp-2) var(--sp-3);
   }
 
+  .opponent-offline {
+    margin: var(--sp-2) var(--sp-3) 0;
+    font-size: var(--fs-sm);
+  }
+
   .rack__track {
     justify-content: flex-start;
   }
@@ -829,16 +1009,28 @@
   .game-header {
     padding: var(--sp-2) var(--sp-3);
   }
+
+  .rivals {
+    gap: var(--sp-3);
+  }
 }
 
 @media (max-width: 520px) {
   :root {
-    --tile-w: 42px;
+    --tile-w: 44px;
     --slot-w: 20px;
   }
 
+  .tile--sm {
+    --tile-w: 40px;
+  }
+
+  .tile--xs {
+    --tile-w: 28px;
+  }
+
   .rack__board {
-    padding: var(--sp-2) 4px var(--sp-2);
+    padding: var(--sp-2) 4px;
   }
 
   .game-header {
@@ -848,14 +1040,14 @@
 
   .game-header .btn {
     min-height: 40px;
-    padding: 0.45em 0.9em;
+    padding: 0.45em 0.8em;
     font-size: var(--fs-sm);
   }
 
-  .icon-btn {
+  .icon-btn,
+  .lang-select {
     width: 40px;
     height: 40px;
-    font-size: var(--fs-md);
   }
 
   .game-header__tools {
@@ -867,37 +1059,45 @@
   }
 
   .color-button {
-    min-height: 50px;
+    min-height: 76px;
+  }
+
+  .color-button__label {
+    font-size: 0.62rem;
+    letter-spacing: 0.02em;
   }
 }
 
 @media (max-width: 380px) {
   :root {
-    --tile-w: 38px;
+    --tile-w: 40px;
     --slot-w: 18px;
+  }
+
+  .tile--sm {
+    --tile-w: 36px;
   }
 }
 
 /* ==========================================================================
-   Roulette d'ouverture : qui commence ?
-   La roue ne tire rien au sort, elle montre le tirage deja fait par le
-   serveur. `--spin` porte la rotation finale ; le disque, les etiquettes et
-   le texte de chaque etiquette partagent exactement la meme transition, si
-   bien que les noms restent lisibles pendant toute la rotation.
+   Opening wheel: who goes first?
+   The wheel draws nothing: it shows the draw the server already made.
+   `--spin` holds the final rotation; the disc, the labels and each label's
+   text share exactly the same transition, so names stay readable all along.
    ========================================================================== */
 
 .roulette-backdrop {
   position: fixed;
   inset: 0;
-  /* Au-dessus des modales : l'annonce du tirage au sort ouvre la partie, rien
-     ne doit passer devant (ni l'intercepter au clic). */
+  /* Above dialogs: the draw opens the game, nothing may cover it (or catch
+     its clicks). */
   z-index: calc(var(--z-modal) + 1);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--sp-4);
-  background: radial-gradient(circle at 50% 40%, rgba(106, 43, 174, 0.72), rgba(var(--shadow-rgb), 0.88));
-  backdrop-filter: blur(4px);
+  background: radial-gradient(circle at 50% 40%, rgba(29, 32, 80, 0.8), rgba(4, 6, 16, 0.92));
+  backdrop-filter: blur(5px);
   animation: gf-pop-in var(--mo-base) var(--ease-out) both;
 }
 
@@ -910,8 +1110,8 @@
   padding: var(--sp-5) var(--sp-4);
   text-align: center;
   background: var(--c-paper);
-  border: 3px solid var(--c-ink);
-  border-radius: var(--r-lg);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r-xl);
   box-shadow: var(--sh-modal);
 }
 
@@ -919,13 +1119,13 @@
   margin: 0;
   font-family: var(--font-title);
   font-size: var(--fs-xl);
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--c-ink);
 }
 
 .roulette__wheel {
   position: relative;
-  width: clamp(180px, 58vw, 260px);
+  width: clamp(190px, 60vw, 260px);
   aspect-ratio: 1;
 }
 
@@ -939,8 +1139,22 @@
 
 .roulette__disc {
   border-radius: 50%;
-  border: 3px solid var(--c-ink);
-  box-shadow: inset 0 0 0 6px var(--c-gloss), var(--sh-tile-raised);
+  border: 2px solid var(--c-gold);
+  box-shadow:
+    inset 0 0 0 5px rgba(255, 236, 190, 0.18),
+    inset 0 0 40px rgba(0, 0, 0, 0.35),
+    var(--sh-tile-raised);
+}
+
+/* Graduations around the wheel. */
+.roulette__disc::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 255, 255, 0.55) 0 1deg, transparent 1deg 10deg);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
 }
 
 .roulette__label {
@@ -951,34 +1165,35 @@
 
 .roulette__label-text {
   position: absolute;
-  /* Assez haut pour rester dans son secteur, assez bas pour qu'un long pseudo
-     ne deborde pas du disque. */
-  top: 13%;
+  /* High enough to stay in its sector, low enough for a long name not to
+     spill over the rim. */
+  top: 15%;
   left: 50%;
   max-width: 6em;
   overflow: hidden;
   font-family: var(--font-title);
+  font-weight: 700;
   font-size: clamp(0.62rem, 2.4vw, 0.85rem);
   color: #fff;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-shadow: 0 2px 0 rgba(var(--shadow-rgb), 0.65);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
   transform: translateX(-50%) rotate(calc(-1 * (var(--angle, 0deg) + var(--spin, 0deg))));
   transition: transform var(--spin-ms, 2600ms) cubic-bezier(0.15, 0.9, 0.1, 1);
 }
 
 .roulette__pointer {
   position: absolute;
-  top: -16px;
+  top: -14px;
   left: 50%;
   z-index: 3;
   width: 0;
   height: 0;
-  border-right: 12px solid transparent;
-  border-left: 12px solid transparent;
-  border-top: 22px solid var(--c-gold);
+  border-right: 11px solid transparent;
+  border-left: 11px solid transparent;
+  border-top: 20px solid var(--c-gold-bright);
   transform: translateX(-50%);
-  filter: drop-shadow(0 2px 0 var(--c-ink));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
 }
 
 .roulette__hub {
@@ -988,11 +1203,11 @@
   z-index: 2;
   display: grid;
   place-items: center;
-  width: 30%;
+  width: 28%;
   aspect-ratio: 1;
-  font-size: var(--fs-lg);
-  background: var(--c-cream);
-  border: 3px solid var(--c-ink);
+  color: var(--c-gold-bright);
+  background: var(--plate-face);
+  border: 2px solid var(--c-gold);
   border-radius: 50%;
   transform: translate(-50%, -50%);
 }
@@ -1017,7 +1232,7 @@
     transform: scale(1);
   }
   45% {
-    transform: scale(1.07);
+    transform: scale(1.06);
   }
   100% {
     transform: scale(1);

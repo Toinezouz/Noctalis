@@ -29,8 +29,8 @@ afterAll(async () => {
 });
 
 /**
- * Historique des etats recus par socket : evite toute course entre l'accuse de
- * reception d'une action et l'etat diffuse juste apres.
+ * States received per socket: avoids any race between an action's
+ * acknowledgement and the state broadcast right after it.
  */
 const received = new Map<Socket, StatePayload[]>();
 
@@ -58,7 +58,7 @@ function emit<T>(socket: Socket, event: string, payload: unknown): Promise<Ack<T
   });
 }
 
-/** Attend un etat satisfaisant un predicat (deja recu ou a venir). */
+/** Waits for a state matching a predicate (already received or upcoming). */
 function waitFor(socket: Socket, predicate: (s: StatePayload) => boolean): Promise<StatePayload> {
   const already = received.get(socket)?.find(predicate);
   if (already) {
@@ -67,7 +67,7 @@ function waitFor(socket: Socket, predicate: (s: StatePayload) => boolean): Promi
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error('timeout en attendant un etat'));
+      reject(new Error('timed out waiting for a state'));
     }, 5000);
     const handler = (payload: StatePayload): void => {
       if (predicate(payload)) {
@@ -85,12 +85,12 @@ function waitFor(socket: Socket, predicate: (s: StatePayload) => boolean): Promi
   });
 }
 
-/** Attend un evenement de jeu satisfaisant un predicat. */
+/** Waits for a game event matching a predicate. */
 function nextEvent(socket: Socket, predicate: (e: GameEvent) => boolean): Promise<GameEvent> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error('timeout en attendant un evenement'));
+      reject(new Error('timed out waiting for an event'));
     }, 5000);
     const handler = (event: GameEvent): void => {
       if (predicate(event)) {
@@ -106,7 +106,7 @@ function nextEvent(socket: Socket, predicate: (e: GameEvent) => boolean): Promis
   });
 }
 
-/** Vide l'historique : utile avant une action dont on veut observer l'effet. */
+/** Clears the history: handy before an action whose effect is observed. */
 function resetHistory(...sockets: Socket[]): void {
   for (const socket of sockets) {
     received.set(socket, []);
@@ -122,9 +122,8 @@ interface Session {
   aliceState: StatePayload;
   bobState: StatePayload;
   /**
-   * Le premier joueur est tire au sort par le serveur : les scenarios qui
-   * dependent de l'ordre des tours passent par `first` / `second` plutot que
-   * par Alice et Bob.
+   * The server draws the first player at random: scenarios that depend on
+   * the turn order use `first` / `second` rather than Alice and Bob.
    */
   first: Socket;
   second: Socket;
@@ -132,11 +131,11 @@ interface Session {
   secondCreds: PlayerCredentials;
   firstState: StatePayload;
   secondState: StatePayload;
-  /** Evenement d'ouverture recu par le premier joueur. */
+  /** Opening event received by the first player. */
   startedEvent: GameEvent;
 }
 
-/** Cree une room, y fait entrer Bob et lance la partie. */
+/** Creates a room, lets Bob in and starts the game. */
 async function startSession(): Promise<Session> {
   const alice = await connect();
   const bob = await connect();
@@ -183,8 +182,8 @@ function closeAll(session: Session): void {
   session.bob.close();
 }
 
-describe('multijoueur temps reel', () => {
-  it('cree une room, accueille un second joueur et lance la partie', async () => {
+describe('real-time multiplayer', () => {
+  it('creates a room, welcomes a second player and starts the game', async () => {
     const session = await startSession();
     const { aliceState, bobState } = session;
 
@@ -193,35 +192,35 @@ describe('multijoueur temps reel', () => {
     expect(aliceState.publicState!.phase).toBe('TURN_REVEAL');
     expect(aliceState.publicState!.publicTiles).toHaveLength(5);
     expect(bobState.publicState!.publicTiles).toHaveLength(5);
-    // Le premier joueur est tire au sort : c'est l'un des deux, et les deux
-    // clients voient le meme tirage que celui annonce a l'ouverture.
+    // The first player is drawn at random: one of the two, and both clients
+    // see the same draw as the one announced at the opening.
     const drawn = aliceState.publicState!.startingPlayerId;
     expect([session.aliceCreds.playerId, session.bobCreds.playerId]).toContain(drawn);
     expect(aliceState.publicState!.activePlayerId).toBe(drawn);
     expect(bobState.publicState!.startingPlayerId).toBe(drawn);
     expect(session.startedEvent).toEqual({ type: 'game-started', startingPlayerId: drawn });
-    // Et l'historique le raconte, sans rediger la phrase (chacun sa langue).
+    // And the history tells it, without writing the sentence (each their own language).
     expect(aliceState.publicState!.log.map((l) => l.code)).toContain('starting-player');
     closeAll(session);
   });
 
-  it('ne transmet jamais a un joueur ses propres numeros secrets', async () => {
+  it('never sends a player their own secret numbers', async () => {
     const session = await startSession();
     const alicePrivate = session.aliceState.privateState!;
     const bobPrivate = session.bobState.privateState!;
 
-    // Mes tuiles : uniquement couleur + position.
+    // My stars: constellation and position only.
     for (const tile of alicePrivate.myTiles) {
       expect(Object.keys(tile).sort()).toEqual(['color', 'position']);
     }
-    // Les tuiles adverses sont completes.
-    expect(alicePrivate.opponentTiles).toHaveLength(5);
-    expect(alicePrivate.opponentTiles.every((t) => typeof t.number === 'number')).toBe(true);
+    // The other player's stars are complete.
+    expect(alicePrivate.rivals[0]!.tiles).toHaveLength(5);
+    expect(alicePrivate.rivals[0]!.tiles.every((t) => typeof t.number === 'number')).toBe(true);
 
-    // Symetrie : les tuiles vues par Alice sont bien les secrets de Bob,
-    // et Bob ne les recoit jamais.
-    const bobSecrets = alicePrivate.opponentTiles.map((t) => t.number);
-    const aliceSecrets = bobPrivate.opponentTiles.map((t) => t.number);
+    // Symmetry: the stars Alice sees are Bob's secrets, and Bob never
+    // receives them.
+    const bobSecrets = alicePrivate.rivals[0]!.tiles.map((t) => t.number);
+    const aliceSecrets = bobPrivate.rivals[0]!.tiles.map((t) => t.number);
     expect(new Set([...bobSecrets, ...aliceSecrets]).size).toBe(10);
 
     const bobPayload = JSON.stringify(session.bobState);
@@ -234,7 +233,7 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('synchronise un tour complet : reveal + CLASSER + changement de tour', async () => {
+  it('syncs a full turn: reveal + PLACE + next turn', async () => {
     const session = await startSession();
     const { first: alice, second: bob } = session;
 
@@ -265,8 +264,8 @@ describe('multijoueur temps reel', () => {
 
     const result = done.publicState!.classifications[0]!;
     expect(result.ownerId).toBe(session.firstCreds.playerId);
-    // La verite du serveur : la position calculee a partir des vrais numeros.
-    const aliceSecrets = session.secondState.privateState!.opponentTiles.map((t) => t.number);
+    // The server's truth: the gap computed from the real numbers.
+    const aliceSecrets = session.secondState.privateState!.rivals[0]!.tiles.map((t) => t.number);
     const expectedSlot = aliceSecrets.filter((n) => n < result.tileNumber).length;
     expect(result.slot).toBe(expectedSlot);
 
@@ -275,7 +274,7 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('la tuile utilisee pour un indice disparait de la zone commune des deux cotes', async () => {
+  it('a star used for a hint leaves the shared sky on both sides', async () => {
     const session = await startSession();
     const { first: alice, second: bob } = session;
 
@@ -298,10 +297,10 @@ describe('multijoueur temps reel', () => {
     const available = settled.publicState!.publicTiles.filter((t) => !t.used);
     expect(available).toHaveLength(5);
     expect(available.map((t) => t.tile.number)).not.toContain(tileNumber);
-    // L'historique conserve la tuile : la fiche de deduction en a besoin.
+    // The memory keeps the star: the star chart needs it.
     expect(settled.publicState!.publicTiles.map((t) => t.tile.number)).toContain(tileNumber);
 
-    // Bob ne peut pas la reutiliser a son tour.
+    // Bob cannot reuse it on his turn.
     await emit<null>(bob, 'game:reveal', { color });
     expect(await emit<null>(bob, 'game:request-classify', { tileNumber })).toMatchObject({
       ok: false,
@@ -310,7 +309,7 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('applique la verite du serveur pour COMPARER', async () => {
+  it('applies the server\'s truth for GAUGE', async () => {
     const session = await startSession();
     const { first: alice, second: bob } = session;
 
@@ -330,14 +329,14 @@ describe('multijoueur temps reel', () => {
 
     resetHistory(alice, bob);
     const aliceSeesCompare = waitFor(alice, (s) => (s.publicState?.comparisons.length ?? 0) === 1);
-    // Bob tente de mentir : le serveur ignore la valeur envoyee.
+    // Bob tries to lie: the server ignores the value sent.
     await emit<null>(bob, 'game:submit-compare', { answer: !truth });
     const done = await aliceSeesCompare;
     expect(done.publicState!.comparisons[0]!.match).toBe(truth);
     closeAll(session);
   });
 
-  it('refuse les actions hors tour et hors phase', async () => {
+  it('refuses out-of-turn and out-of-phase actions', async () => {
     const session = await startSession();
     const { first: alice, second: bob } = session;
 
@@ -357,10 +356,10 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('gere la reconnexion apres un refresh, sans fuite de secret', async () => {
+  it('handles reconnection after a reload, without leaking a secret', async () => {
     const session = await startSession();
-    // On reconnecte le joueur qui a la main : la partie doit rester jouable.
-    const aliceSecretsSeenByBob = session.secondState.privateState!.opponentTiles.map(
+    // Reconnect the player in the lead: the game must stay playable.
+    const aliceSecretsSeenByBob = session.secondState.privateState!.rivals[0]!.tiles.map(
       (t) => t.number,
     );
 
@@ -384,26 +383,26 @@ describe('multijoueur temps reel', () => {
       expect(numbers.has(secret)).toBe(false);
     }
 
-    // Le jeu reste jouable apres reconnexion.
+    // The game is still playable after reconnecting.
     expect((await emit<null>(revived, 'game:reveal', { color: 'green' })).ok).toBe(true);
     revived.close();
     session.second.close();
   });
 
-  it('refuse une reconnexion avec un mauvais jeton', async () => {
+  it('refuses a reconnection with a wrong token', async () => {
     const session = await startSession();
     const intruder = await connect();
     const res = await emit<PlayerCredentials>(intruder, 'player:reconnect', {
       code: session.code,
       playerId: session.aliceCreds.playerId,
-      token: 'jeton-invalide',
+      token: 'invalid-token',
     });
     expect(res.ok).toBe(false);
     intruder.close();
     closeAll(session);
   });
 
-  it('signale la deconnexion de l adversaire', async () => {
+  it('reports the other player\'s disconnection', async () => {
     const session = await startSession();
     const seen = waitFor(session.bob, (s) => s.room.players.some((p) => !p.connected));
     session.alice.close();
@@ -412,7 +411,7 @@ describe('multijoueur temps reel', () => {
     session.bob.close();
   });
 
-  it('refuse un code inexistant, une room pleine et un pseudo invalide', async () => {
+  it('refuses an unknown code, a started game and an invalid name', async () => {
     const session = await startSession();
     const third = await connect();
 
@@ -430,12 +429,12 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('joue une observation jusqu a la victoire et propose une revanche', async () => {
+  it('plays a game to victory and offers a rematch', async () => {
     const session = await startSession();
     const { alice, bob } = session;
-    // Bob voit les vrais numeros d'Alice : on les utilise pour une tentative
-    // gagnante (c'est exactement l'information dont dispose un joueur humain).
-    const aliceSecrets = session.bobState.privateState!.opponentTiles.map((t) => t.number);
+    // Bob sees Alice's real numbers: they make a winning call (exactly the
+    // information a human player would have).
+    const aliceSecrets = session.bobState.privateState!.rivals[0]!.tiles.map((t) => t.number);
 
     const over = waitFor(bob, (s) => s.publicState?.phase === 'GAME_OVER');
     expect((await emit<null>(alice, 'game:guess', { numbers: aliceSecrets })).ok).toBe(true);
@@ -446,7 +445,7 @@ describe('multijoueur temps reel', () => {
     expect(finished.publicState!.finalReveal![session.aliceCreds.playerId]!.map((t) => t.number)).
       toEqual(aliceSecrets);
 
-    // Revanche : il faut que les deux joueurs cliquent sur REJOUER.
+    // Rematch: both players have to ask for it.
     resetHistory(alice, bob);
     const askedRematch = waitFor(bob, (s) => s.room.rematchReady.length === 1);
     await emit<null>(alice, 'game:rematch', {});
@@ -462,11 +461,11 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('elimine un joueur apres une tentative ratee et laisse la partie continuer', async () => {
+  it('puts a player out after a wrong call and lets the game go on', async () => {
     const session = await startSession();
     const { alice, bob } = session;
-    const aliceSecrets = session.bobState.privateState!.opponentTiles.map((t) => t.number);
-    // Proposition valide dans sa forme mais fausse : on decale d'une couleur.
+    const aliceSecrets = session.bobState.privateState!.rivals[0]!.tiles.map((t) => t.number);
+    // A call with a valid shape but wrong numbers.
     const wrong = [1, 2, 3, 4, 5]
       .map((base) => {
         for (let n = base; n <= 60; n += 5) {
@@ -486,17 +485,17 @@ describe('multijoueur temps reel', () => {
     expect(state.publicState!.phase).not.toBe('GAME_OVER');
     expect(state.publicState!.activePlayerId).toBe(session.bobCreds.playerId);
 
-    // Alice ne peut plus jouer ni retenter.
+    // Alice can neither play nor call again.
     expect(await emit<null>(alice, 'game:guess', { numbers: aliceSecrets })).toMatchObject({
       ok: false,
       error: { code: 'GUESS_ALREADY_USED' },
     });
-    // ...mais Bob continue sa partie normalement.
+    // ...but Bob carries on normally.
     expect((await emit<null>(bob, 'game:reveal', { color: 'green' })).ok).toBe(true);
     closeAll(session);
   });
 
-  it('limite le debit des evenements', async () => {
+  it('rate-limits events', async () => {
     const socket = await connect();
     const results: boolean[] = [];
     for (let i = 0; i < 40; i += 1) {
@@ -507,12 +506,166 @@ describe('multijoueur temps reel', () => {
     socket.close();
   });
 
-  it('quitte proprement une partie (abandon)', async () => {
+  it('leaves a game cleanly (forfeit)', async () => {
     const session = await startSession();
     const over = waitFor(session.bob, (s) => s.publicState?.phase === 'GAME_OVER');
     await emit<null>(session.alice, 'room:leave', {});
     const state = await over;
     expect(state.publicState!.winnerId).toBe(session.bobCreds.playerId);
     closeAll(session);
+  });
+});
+
+/** Opens a room for `names.length` players (the first one hosts) without starting it. */
+async function openTable(
+  names: string[],
+): Promise<{ sockets: Socket[]; creds: PlayerCredentials[]; code: string }> {
+  const sockets: Socket[] = [];
+  const creds: PlayerCredentials[] = [];
+  for (const [index, name] of names.entries()) {
+    const socket = await connect();
+    const res =
+      index === 0
+        ? await emit<PlayerCredentials>(socket, 'room:create', { name })
+        : await emit<PlayerCredentials>(socket, 'room:join', { name, code: creds[0]!.roomCode });
+    expect(res.ok).toBe(true);
+    sockets.push(socket);
+    creds.push((res as { ok: true; data: PlayerCredentials }).data);
+  }
+  return { sockets, creds, code: creds[0]!.roomCode };
+}
+
+/** Starts the game and returns everybody's first game state. */
+async function startTable(sockets: Socket[]): Promise<StatePayload[]> {
+  const states = sockets.map((s) => waitFor(s, (p) => p.publicState !== null));
+  expect((await emit<null>(sockets[0]!, 'game:start', {})).ok).toBe(true);
+  return Promise.all(states);
+}
+
+describe('tables of three and four', () => {
+  it('seats four players, refuses a fifth, and deals to everyone', async () => {
+    const { sockets, code } = await openTable(['Alice', 'Bob', 'Chloe', 'Dany']);
+    const fifth = await connect();
+    expect(await emit(fifth, 'room:join', { name: 'Eve', code })).toMatchObject({
+      ok: false,
+      error: { code: 'ROOM_FULL' },
+    });
+
+    const states = await startTable(sockets);
+    for (const state of states) {
+      expect(state.publicState!.players).toHaveLength(4);
+      expect(state.publicState!.order).toHaveLength(4);
+      expect(state.privateState!.rivals).toHaveLength(3);
+      expect(state.privateState!.rivals.every((r) => r.tiles.length === 5)).toBe(true);
+    }
+    // Twenty secret stars, all different, and nobody receives their own.
+    const secrets = new Map<string, number[]>();
+    for (const state of states) {
+      for (const rival of state.privateState!.rivals) {
+        secrets.set(rival.playerId, rival.tiles.map((t) => t.number));
+      }
+    }
+    expect(new Set([...secrets.values()].flat()).size).toBe(20);
+    for (const state of states) {
+      const mine = secrets.get(state.privateState!.playerId)!;
+      const found = new Set(
+        [...JSON.stringify(state).matchAll(/"(?:number|tileNumber)":(\d+)/g)].map((m) =>
+          Number(m[1]),
+        ),
+      );
+      expect(mine.some((n) => found.has(n))).toBe(false);
+    }
+    fifth.close();
+    sockets.forEach((s) => s.close());
+  });
+
+  it('refuses a newcomer once the game has started', async () => {
+    const { sockets, code } = await openTable(['Alice', 'Bob', 'Chloe']);
+    await startTable(sockets);
+    const late = await connect();
+    expect(await emit(late, 'room:join', { name: 'Dany', code })).toMatchObject({
+      ok: false,
+      error: { code: 'ROOM_STARTED' },
+    });
+    late.close();
+    sockets.forEach((s) => s.close());
+  });
+
+  it('asks the next player in the turn order, and moves on when they go offline', async () => {
+    const { sockets, creds } = await openTable(['Alice', 'Bob', 'Chloe']);
+    const [first] = await startTable(sockets);
+    const order = first!.publicState!.order;
+    const socketOf = (id: string): Socket => sockets[creds.findIndex((c) => c.playerId === id)]!;
+    const lead = socketOf(order[0]!);
+    const next = socketOf(order[1]!);
+    const after = socketOf(order[2]!);
+
+    const colors = first!.publicState!.reserveByColor;
+    const color = (Object.keys(colors) as TileColor[]).find((c) => colors[c] > 0)!;
+    expect((await emit<null>(lead, 'game:reveal', { color })).ok).toBe(true);
+    const revealed = await waitFor(lead, (s) => s.publicState?.phase === 'TURN_HINT');
+    const tileNumber = revealed.publicState!.publicTiles.at(-1)!.tile.number;
+
+    const nextAsked = waitFor(next, (s) => s.privateState?.pendingResponse != null);
+    expect((await emit<null>(lead, 'game:request-compare', { tileNumber, position: 0 })).ok).toBe(
+      true,
+    );
+    expect((await nextAsked).publicState!.pendingHint!.responderId).toBe(order[1]);
+
+    // The next player closes their tab: the third one is asked instead.
+    resetHistory(after);
+    const handedOver = nextEvent(after, (e) => e.type === 'hint-requested');
+    const afterAsked = waitFor(after, (s) => s.privateState?.pendingResponse != null);
+    next.close();
+    await handedOver;
+    await afterAsked;
+    const answered = waitFor(lead, (s) => (s.publicState?.comparisons.length ?? 0) === 1);
+    expect((await emit<null>(after, 'game:submit-compare', { answer: true })).ok).toBe(true);
+    await answered;
+    sockets.forEach((s) => s.close());
+  });
+
+  it('goes on without a player who leaves, and hands the host role over', async () => {
+    const { sockets, creds } = await openTable(['Alice', 'Bob', 'Chloe']);
+    await startTable(sockets);
+    const [alice, bob, chloe] = sockets;
+
+    resetHistory(bob!, chloe!);
+    const seen = waitFor(bob!, (s) => s.publicState?.players.some((p) => p.left) ?? false);
+    expect((await emit<null>(alice!, 'room:leave', {})).ok).toBe(true);
+    const state = await seen;
+    expect(state.publicState!.phase).not.toBe('GAME_OVER');
+    expect(state.room.players.map((p) => p.name)).toEqual(['Bob', 'Chloe']);
+    expect(state.room.players.find((p) => p.id === creds[1]!.playerId)!.isHost).toBe(true);
+    expect(state.publicState!.activePlayerId).not.toBe(creds[0]!.playerId);
+
+    // One more departure and the last person at the table wins.
+    const over = waitFor(chloe!, (s) => s.publicState?.phase === 'GAME_OVER');
+    expect((await emit<null>(bob!, 'room:leave', {})).ok).toBe(true);
+    expect((await over).publicState!.winnerId).toBe(creds[2]!.playerId);
+    sockets.forEach((s) => s.close());
+  });
+
+  it('waits for everybody before a rematch', async () => {
+    const { sockets } = await openTable(['Alice', 'Bob', 'Chloe']);
+    const states = await startTable(sockets);
+    // Nobody sees their own stars: Bob's winning call is read on Alice's screen.
+    const bobId = states[1]!.privateState!.playerId;
+    const bobStars = states[0]!.privateState!.rivals.find((r) => r.playerId === bobId)!.tiles;
+    const over = waitFor(sockets[0]!, (s) => s.publicState?.phase === 'GAME_OVER');
+    expect(
+      (await emit<null>(sockets[1]!, 'game:guess', { numbers: bobStars.map((t) => t.number) })).ok,
+    ).toBe(true);
+    await over;
+
+    resetHistory(...sockets);
+    await emit<null>(sockets[0]!, 'game:rematch', {});
+    await emit<null>(sockets[1]!, 'game:rematch', {});
+    const two = await waitFor(sockets[2]!, (s) => s.room.rematchReady.length === 2);
+    expect(two.publicState!.phase).toBe('GAME_OVER');
+    const fresh = waitFor(sockets[0]!, (s) => s.publicState?.phase === 'TURN_REVEAL');
+    await emit<null>(sockets[2]!, 'game:rematch', {});
+    expect((await fresh).publicState!.players).toHaveLength(3);
+    sockets.forEach((s) => s.close());
   });
 });

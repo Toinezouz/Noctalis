@@ -19,15 +19,15 @@ afterEach(() => {
   delete document.documentElement.dataset['theme'];
 });
 
-describe('Choix du theme (composant)', () => {
-  it('propose les trois choix et marque celui qui est actif', () => {
+describe('Theme choice (component)', () => {
+  it('offers the three choices and marks the active one', () => {
     show('dark');
     expect(screen.getByTestId('theme-auto')).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('theme-light')).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('theme-dark')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('remonte le choix du joueur', async () => {
+  it('reports the player\'s choice', async () => {
     const onChange = vi.fn();
     show('auto', onChange);
     await userEvent.click(screen.getByTestId('theme-dark'));
@@ -36,7 +36,7 @@ describe('Choix du theme (composant)', () => {
     expect(onChange).toHaveBeenLastCalledWith('light');
   });
 
-  it('reste utilisable au clavier et porte des libelles traduits', () => {
+  it('works with the keyboard and carries translated labels', () => {
     show('auto');
     expect(screen.getByRole('group', { name: 'Thème' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Automatique/ })).toBeInTheDocument();
@@ -44,19 +44,19 @@ describe('Choix du theme (composant)', () => {
     expect(screen.getByRole('button', { name: /Sombre/ })).toBeInTheDocument();
   });
 
-  it('en version compacte, un seul bouton fait defiler les trois choix', async () => {
+  it('in its compact form, one button cycles through the three choices', async () => {
     const onChange = vi.fn();
     show('auto', onChange, true);
     const button = screen.getByTestId('theme-cycle');
-    // Le bouton annonce l'etat courant : indispensable sans libelle visible.
+    // The button announces the current state: essential without a visible label.
     expect(button).toHaveAccessibleName('Thème : Automatique. Cliquer pour changer.');
     await userEvent.click(button);
     expect(onChange).toHaveBeenCalledWith('light');
-    // Les trois pastilles n'encombrent pas le bandeau de jeu.
+    // The three pills do not clutter the game header.
     expect(screen.queryByTestId('theme-dark')).toBeNull();
   });
 
-  it('applique le theme au document et a la barre du navigateur', () => {
+  it('applies the theme to the document and the browser bar', () => {
     const meta = document.createElement('meta');
     meta.setAttribute('name', 'theme-color');
     document.head.appendChild(meta);

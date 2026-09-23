@@ -2,7 +2,7 @@ import type { PrivatePlayerState, PublicGameState } from './game.js';
 
 export type RoomStatus = 'waiting' | 'playing' | 'finished';
 
-/** Joueur tel qu'affiche dans le lobby. */
+/** A player as shown in the lobby. */
 export interface RoomPlayerInfo {
   id: string;
   name: string;
@@ -10,28 +10,28 @@ export interface RoomPlayerInfo {
   isHost: boolean;
 }
 
-/** Etat public d'une room (lobby). */
+/** Public state of a room (lobby). */
 export interface RoomState {
   code: string;
   status: RoomStatus;
   players: RoomPlayerInfo[];
-  /** `true` des que 2 joueurs sont presents. */
+  /** `true` as soon as enough players are present and no game is running. */
   canStart: boolean;
-  /** Ids des joueurs ayant demande une revanche (ecran de fin). */
+  /** Ids of the players who asked for a rematch (end screen). */
   rematchReady: string[];
   createdAt: number;
 }
 
-/** Identifiants rendus au client apres creation / connexion a une room. */
+/** Credentials handed to a client after creating or joining a room. */
 export interface PlayerCredentials {
   roomCode: string;
   playerId: string;
-  /** Jeton prive permettant la reconnexion. Ne contient aucun secret de jeu. */
+  /** Private token used to reconnect. Holds no game secret. */
   token: string;
   name: string;
 }
 
-/** Enveloppe complete d'etat envoyee a un client donne. */
+/** Full state envelope sent to one given client. */
 export interface GameStateSnapshot {
   room: RoomState;
   publicState: PublicGameState | null;

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fiche de deduction : carton imprime, encre, feutre effacable
+   Star chart: an engraved grid, a felt pen, your own notes
    ========================================================================== */
 
 .sheet {
@@ -8,15 +8,11 @@
   gap: var(--sp-3);
   padding: var(--sp-4);
   background:
-    linear-gradient(var(--c-gloss-wash), var(--c-gloss-wash)),
-    repeating-linear-gradient(
-      0deg,
-      rgba(var(--shadow-rgb), 0.035) 0 1px,
-      transparent 1px 4px
-    ),
+    repeating-linear-gradient(0deg, rgba(var(--rack-line-rgb), 0.05) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(var(--rack-line-rgb), 0.05) 0 1px, transparent 1px 22px),
     var(--c-paper);
   border-radius: var(--r-lg);
-  border: 2px solid var(--c-line-soft);
+  border: 1px solid var(--c-rule);
   box-shadow: var(--sh-panel);
 }
 
@@ -39,26 +35,26 @@
 
 .sheet__title {
   font-family: var(--font-title);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-xl);
   color: var(--c-violet);
   margin: 0;
 }
 
 .sheet__subtitle {
   margin: 0;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
 }
 
-/* --- Les 5 hypotheses ------------------------------------------------------ */
+/* --- The five guesses --------------------------------------------------------- */
 
 .sheet-guess {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
+  gap: var(--sp-2);
   padding: var(--sp-3);
   border-radius: var(--r-md);
-  background: rgba(106, 43, 174, 0.07);
-  border: 2px dashed rgba(106, 43, 174, 0.28);
+  background: var(--c-wash);
+  border: 1px dashed var(--c-rule);
 }
 
 .sheet-guess__cells {
@@ -72,13 +68,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: var(--sp-2) 2px;
-  border-radius: var(--r-md);
-  background: var(--tile-face, var(--c-field));
-  border: 2px solid var(--c-line);
-  box-shadow: 0 2px 0 rgba(var(--shadow-rgb), 0.18);
+  aspect-ratio: 1;
+  max-width: 76px;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--c-field);
+  border: 1px dashed var(--c-line);
   transition: background var(--mo-base) var(--ease-out);
+}
+
+.sheet-guess__cell[data-color] {
+  border: none;
+  background:
+    radial-gradient(circle at 33% 27%, var(--tile-light) 0%, transparent 44%),
+    radial-gradient(circle at 50% 50%, var(--tile-face) 0%, var(--tile-edge) 80%);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 236, 190, 0.6), 0 0 14px -5px var(--tile-face);
 }
 
 .sheet-guess__input {
@@ -87,15 +94,15 @@
   background: transparent;
   text-align: center;
   font-family: var(--font-title);
-  font-size: clamp(1.1rem, 4.4vw, 1.8rem);
-  font-weight: 600;
+  font-size: clamp(1.05rem, 4.2vw, 1.6rem);
+  font-weight: 700;
   color: var(--c-ink);
   padding: 0;
 }
 
 .sheet-guess__cell[data-color] .sheet-guess__input {
   color: #fff;
-  text-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.45);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .sheet-guess__input:focus {
@@ -103,8 +110,8 @@
 }
 
 .sheet-guess__cell:focus-within {
-  outline: 3px solid var(--c-violet);
-  outline-offset: 2px;
+  outline: 2px solid var(--c-gold-bright);
+  outline-offset: 3px;
 }
 
 .sheet-guess__points {
@@ -119,30 +126,30 @@
   gap: var(--sp-2);
   font-size: var(--fs-xs);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--c-ink-soft);
 }
 
 .sheet-guess__arrow-line {
   flex: 1;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, rgba(106, 43, 174, 0.25), var(--c-violet));
+  height: 1px;
+  background: linear-gradient(90deg, var(--c-line-soft), var(--c-violet));
   position: relative;
 }
 
 .sheet-guess__arrow-line::after {
   content: '';
   position: absolute;
-  right: -2px;
+  right: -1px;
   top: 50%;
-  transform: translateY(-50%);
-  border-left: 8px solid var(--c-violet);
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
+  width: 6px;
+  height: 6px;
+  border-top: 1px solid var(--c-violet);
+  border-right: 1px solid var(--c-violet);
+  transform: translateY(-50%) rotate(45deg);
 }
 
-/* --- La grille 1-60 -------------------------------------------------------- */
+/* --- The 1-60 grid ------------------------------------------------------------- */
 
 .sheet__grid-wrap {
   overflow-x: auto;
@@ -151,13 +158,16 @@
 
 .sheet__columns {
   display: grid;
-  grid-template-columns: 18px repeat(12, minmax(var(--cell-size, 40px), 1fr));
+  grid-template-columns: 22px repeat(12, minmax(var(--cell-size, 40px), 1fr));
   gap: 4px;
   font-size: var(--fs-xs);
   color: var(--c-ink-soft);
   text-align: center;
-  padding-left: 22px;
   margin-bottom: 2px;
+}
+
+.sheet__columns::before {
+  content: '';
 }
 
 .sheet__grid {
@@ -169,7 +179,7 @@
 
 .sheet__row {
   display: grid;
-  grid-template-columns: 18px repeat(12, minmax(var(--cell-size, 40px), 1fr));
+  grid-template-columns: 22px repeat(12, minmax(var(--cell-size, 40px), 1fr));
   gap: 4px;
   align-items: center;
 }
@@ -181,35 +191,28 @@
 }
 
 .sheet__row-chip {
-  width: 12px;
-  height: 26px;
-  border-radius: var(--r-sm);
-  background: var(--tile-face);
-  box-shadow: inset 0 -2px 0 var(--tile-edge);
+  display: grid;
+  place-items: center;
+  color: var(--tile-face);
 }
 
 .sheet__row-label[data-color='green'] {
   --tile-face: var(--t-green);
-  --tile-edge: var(--t-green-dark);
 }
 .sheet__row-label[data-color='pink'] {
   --tile-face: var(--t-pink);
-  --tile-edge: var(--t-pink-dark);
 }
 .sheet__row-label[data-color='blue'] {
   --tile-face: var(--t-blue);
-  --tile-edge: var(--t-blue-dark);
 }
 .sheet__row-label[data-color='red'] {
   --tile-face: var(--t-red);
-  --tile-edge: var(--t-red-dark);
 }
 .sheet__row-label[data-color='orange'] {
   --tile-face: var(--t-orange);
-  --tile-edge: var(--t-orange-dark);
 }
 
-/* --- Une case -------------------------------------------------------------- */
+/* --- One cell ------------------------------------------------------------------- */
 
 .sheet-cell {
   position: relative;
@@ -222,12 +225,12 @@
   justify-content: center;
   gap: 2px;
   padding: 2px;
-  border: 2px solid var(--c-line);
+  border: 1px solid rgba(255, 236, 190, 0.35);
   border-radius: var(--r-sm);
-  background: var(--tile-face);
+  background: linear-gradient(160deg, var(--tile-face), var(--tile-edge));
   color: #fff;
   cursor: pointer;
-  box-shadow: inset 0 -3px 0 rgba(var(--shadow-rgb), 0.16);
+  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.16);
   transition:
     transform var(--mo-fast) var(--ease-out),
     filter var(--mo-fast) var(--ease-out);
@@ -235,7 +238,7 @@
 
 .sheet-cell:hover {
   transform: translateY(-2px) scale(1.04);
-  filter: saturate(1.15);
+  filter: brightness(1.1);
   z-index: 2;
 }
 
@@ -245,10 +248,10 @@
 
 .sheet-cell__number {
   font-family: var(--font-title);
-  font-size: clamp(0.9rem, 2.6vw, 1.15rem);
-  font-weight: 600;
+  font-size: clamp(0.85rem, 2.4vw, 1.05rem);
+  font-weight: 700;
   line-height: 1;
-  text-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .sheet-cell__points {
@@ -258,29 +261,41 @@
 
 .sheet-cell__dot,
 .sheet-guess__points .sheet-cell__dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  width: 6px;
+  height: 6px;
   background: #fff;
-  box-shadow: 0 1px 1px rgba(var(--shadow-rgb), 0.35);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
 }
 
+/* Already revealed in the open sky: a small brass star. */
 .sheet-cell__revealed {
   position: absolute;
   top: 3px;
   right: 3px;
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
+  background: var(--c-gold-bright);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.6));
+}
+
+/* Seen on someone else's row: a thin white ring. */
+.sheet-cell__held {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--c-gold);
-  box-shadow: 0 0 0 2px rgba(var(--shadow-rgb), 0.25);
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
 .sheet-cell.is-crossed {
-  filter: saturate(0.72) brightness(0.95);
+  filter: saturate(0.35) brightness(0.9);
 }
 
-/* Croix au feutre : trait epais, legerement irregulier et translucide. */
+/* A felt-pen cross: thick, slightly uneven, a little see-through. */
 .sheet-cell__cross {
   position: absolute;
   inset: -2px;
@@ -292,26 +307,34 @@
 
 .sheet-cell__stroke {
   fill: none;
-  stroke: rgba(30, 10, 48, 0.82);
-  stroke-width: 4.6;
+  stroke: rgba(20, 16, 40, 0.85);
+  stroke-width: 4.4;
   stroke-linecap: round;
   stroke-dasharray: 0.2 3.4;
   stroke-dashoffset: 0;
-  filter: drop-shadow(0 0 1px rgba(30, 10, 48, 0.35));
+  filter: drop-shadow(0 0 1px rgba(20, 16, 40, 0.35));
 }
 
 .sheet-cell__stroke--second {
-  stroke: rgba(30, 10, 48, 0.7);
-  stroke-width: 4.1;
+  stroke: rgba(20, 16, 40, 0.72);
+  stroke-width: 4;
 }
 
 .sheet__legend-dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
+  background: var(--c-gold-bright);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  vertical-align: middle;
+}
+
+.sheet__legend-ring {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: var(--c-gold);
-  box-shadow: 0 0 0 2px rgba(var(--shadow-rgb), 0.2);
+  border: 1.5px solid var(--c-ink);
   vertical-align: middle;
 }
 
@@ -322,8 +345,18 @@
 }
 
 .sheet__legend {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   margin: 0;
+}
+
+.sheet__keys {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
 }
 
 .sheet__actions {
@@ -333,7 +366,7 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .sheet__grid-wrap {
     --cell-size: 42px;
   }

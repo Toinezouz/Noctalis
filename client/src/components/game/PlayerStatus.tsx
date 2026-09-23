@@ -7,12 +7,12 @@ export interface PlayerStatusProps {
   isActive: boolean;
 }
 
-/** Pastille d'identite : nom, connexion, annonce faite, elimination. */
+/** Identity pill: name, connection, call made, out of the race. */
 export function PlayerStatus({ player, isMe, isActive }: PlayerStatusProps): JSX.Element {
   const { t } = useI18n();
 
   return (
-    <div className={`player-status ${isActive ? 'is-active' : ''}`.trim()}>
+    <div className={`player-status ${isActive ? 'is-active' : ''} ${player.left ? 'is-left' : ''}`.trim()}>
       <span className="player-status__avatar" aria-hidden="true">
         {player.name.slice(0, 1).toUpperCase()}
       </span>
@@ -22,14 +22,20 @@ export function PlayerStatus({ player, isMe, isActive }: PlayerStatusProps): JSX
           {isMe ? <span className="player-status__me"> {t('common.you')}</span> : null}
         </span>
         <span className="player-status__tags">
-          <span
-            className={`player-status__dot ${player.connected ? 'is-online' : 'is-offline'}`}
-            aria-hidden="true"
-          />
-          <span className="muted" style={{ fontSize: 'var(--fs-xs)' }}>
-            {player.connected ? t('common.online') : t('common.offline')}
-          </span>
-          {player.eliminated ? (
+          {player.left ? (
+            <span className="badge badge--muted">{t('status.left')}</span>
+          ) : (
+            <>
+              <span
+                className={`player-status__dot ${player.connected ? 'is-online' : 'is-offline'}`}
+                aria-hidden="true"
+              />
+              <span className="player-status__net">
+                {player.connected ? t('common.online') : t('common.offline')}
+              </span>
+            </>
+          )}
+          {player.eliminated && !player.left ? (
             <span className="badge badge--danger">{t('status.eliminated')}</span>
           ) : null}
           {player.guessUsed && !player.eliminated ? (

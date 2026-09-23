@@ -1,7 +1,6 @@
 /**
- * Audio 100 % synthetise (Web Audio API) : aucun fichier a telecharger, aucun
- * asset externe. Le jeu fonctionne parfaitement si l'audio est indisponible
- * ou desactive.
+ * Fully synthesised sound (Web Audio API): no file to download, no external
+ * asset. The game works perfectly well when sound is unavailable or off.
  */
 
 export type SoundName =
@@ -18,7 +17,7 @@ export type SoundName =
 
 interface Note {
   frequency: number;
-  /** Debut relatif en secondes. */
+  /** Relative start, in seconds. */
   at: number;
   duration: number;
   type?: OscillatorType;
@@ -26,8 +25,8 @@ interface Note {
 }
 
 /**
- * Cliquetis de la roulette : des tics qui s'espacent a mesure que la roue
- * ralentit, cales sur la duree de la rotation (~2,4 s).
+ * Clicks of the wheel: ticks that space out as the wheel slows down, timed
+ * to the spin (~2.4 s).
  */
 function rouletteTicks(): Note[] {
   const notes: Note[] = [];
@@ -114,7 +113,7 @@ export function isSoundEnabled(): boolean {
   return enabled;
 }
 
-/** Joue un son court. Silencieux et sans erreur si l'audio est indisponible. */
+/** Plays a short sound. Silent, and error-free, when audio is unavailable. */
 export function playSound(name: SoundName): void {
   if (!enabled) {
     return;

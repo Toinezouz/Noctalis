@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readOpponentTiles, startGame } from './helpers.js';
 
-/** Capture toutes les trames WebSocket recues par une page. */
+/** Captures every WebSocket frame a page receives. */
 function captureFrames(page: Page): string[] {
   const frames: string[] = [];
   page.on('websocket', (ws) => {
@@ -14,7 +14,7 @@ function captureFrames(page: Page): string[] {
   return frames;
 }
 
-/** Numeros portes par des champs de type "numero de tuile" dans un texte JSON. */
+/** Numbers carried by "star number" fields in a JSON text. */
 function tileNumbersIn(text: string): Set<number> {
   const found = new Set<number>();
   for (const match of text.matchAll(/"(?:number|tileNumber)":(\d+)/g)) {
@@ -23,14 +23,14 @@ function tileNumbersIn(text: string): Set<number> {
   return found;
 }
 
-// Chaque test repart d'un navigateur propre : aucune session ne fuit d'un
-// test a l'autre (sessions, fiches de deduction, sockets).
+// Every test starts from a clean browser: no session leaks from one test to
+// the next (sessions, star charts, sockets).
 test.afterEach(async ({ browser }) => {
   await Promise.all(browser.contexts().map((context) => context.close()));
 });
 
-test.describe('Protection des informations secretes', () => {
-  test('un joueur ne recoit jamais ses propres numeros (DOM, stockage, reseau)', async ({
+test.describe('Protecting secret information', () => {
+  test('a player never receives their own numbers (DOM, storage, network)', async ({
     browser,
   }) => {
     const contextA = await browser.newContext();
@@ -40,7 +40,7 @@ test.describe('Protection des informations secretes', () => {
     const aliceFrames = captureFrames(alicePage);
     const bobFrames = captureFrames(bobPage);
 
-    // Partie reelle entre les deux pages instrumentees.
+    // A real game between the two instrumented pages.
     await alicePage.goto('/');
     await alicePage.getByTestId('menu-create').click();
     await alicePage.getByTestId('name-input').fill('Alice');
@@ -68,11 +68,11 @@ test.describe('Protection des informations secretes', () => {
     ];
 
     for (const [name, page, ownSecrets, frames] of checks) {
-      // 1. Rien dans le DOM.
+      // 1. Nothing in the DOM.
       const html = await page.content();
       const inDom = tileNumbersIn(html);
       for (const secret of ownSecrets) {
-        expect(inDom.has(secret), `${name} : ${String(secret)} present dans le DOM`).toBe(false);
+        expect(inDom.has(secret), `${name}: ${String(secret)} found in the DOM`).toBe(false);
       }
       const tileAttributes = await page
         .locator('[data-tile]')
@@ -80,11 +80,11 @@ test.describe('Protection des informations secretes', () => {
       for (const secret of ownSecrets) {
         expect(
           tileAttributes.includes(secret),
-          `${name} : ${String(secret)} affiche sur une tuile`,
+          `${name}: ${String(secret)} shown on a star`,
         ).toBe(false);
       }
 
-      // 2. Rien dans le stockage local.
+      // 2. Nothing in local storage.
       const storage = await page.evaluate(() =>
         JSON.stringify({
           local: { ...window.localStorage },
@@ -95,41 +95,41 @@ test.describe('Protection des informations secretes', () => {
         expect(
           new RegExp(`\\b${String(secret)}\\b`).test(storage) &&
             storage.includes(`"${String(secret)}"`),
-          `${name} : ${String(secret)} dans le stockage`,
+          `${name}: ${String(secret)} in storage`,
         ).toBe(false);
       }
 
-      // 3. Rien dans les trames WebSocket recues.
+      // 3. Nothing in the WebSocket frames received.
       expect(frames.length).toBeGreaterThan(0);
       const network = frames.join('\n');
       const inNetwork = tileNumbersIn(network);
       for (const secret of ownSecrets) {
         expect(
           inNetwork.has(secret),
-          `${name} : ${String(secret)} transite sur le reseau`,
+          `${name}: ${String(secret)} travels over the network`,
         ).toBe(false);
       }
 
-      // 4. En revanche, les numeros de l'adversaire sont bien recus.
+      // 4. The other player's numbers, on the other hand, do arrive.
       const opponentSecrets = name === 'Alice' ? bobSecrets : aliceSecrets;
       for (const secret of opponentSecrets) {
         expect(
           inNetwork.has(secret),
-          `${name} : ${String(secret)} devrait etre visible`,
+          `${name}: ${String(secret)} should be visible`,
         ).toBe(true);
       }
     }
   });
 
-  test('mes tuiles n affichent ni numero ni points', async ({ browser }) => {
+  test('my stars show neither number nor brightness', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Alice', 'Bob']);
     const backs = alice.locator('.player-zone--mine .tile-back');
     await expect(backs).toHaveCount(5);
-    // Aucun point affiche sur le dos des tuiles (les points restreindraient
-    // le numero a 12 candidats sur 60).
+    // No spark on my eclipsed stars (brightness would narrow the number down
+    // to 12 candidates out of 60).
     await expect(alice.locator('.player-zone--mine .tile-back .tile__dot')).toHaveCount(0);
     for (let i = 0; i < 5; i += 1) {
-      await expect(backs.nth(i)).toHaveAccessibleName(/numéro inconnu/);
+      await expect(backs.nth(i)).toHaveAccessibleName(/number unknown/);
     }
   });
 });

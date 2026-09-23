@@ -1,10 +1,10 @@
 import type { TileColor } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
-import { StarGlyph } from './StarGlyph.js';
+import { ConstellationSigil } from './ConstellationSigil.js';
 
 export interface TileBackProps {
   color: TileColor;
-  /** Position sur le support (0 a 4) : affichee comme reperage. */
+  /** Position on the rack (0 to 4), shown as a landmark. */
   position: number;
   size?: 'sm' | 'md' | 'lg';
   highlighted?: boolean;
@@ -14,8 +14,9 @@ export interface TileBackProps {
 }
 
 /**
- * Dos d'une etoile secrete, vu par son proprietaire : la constellation et la position
- * sont visibles, le numero ne l'est jamais (il n'existe pas cote client).
+ * One of my own stars, as I see it: an eclipsed medallion. Its constellation
+ * and position show; its number never does (the client simply does not have
+ * it).
  */
 export function TileBack({
   color,
@@ -46,11 +47,10 @@ export function TileBack({
 
   const content = (
     <>
-      <span className="tile-back__pattern" aria-hidden="true" />
+      <ConstellationSigil color={color} className="tile__sigil" size={size === 'lg' ? 22 : 15} />
       <span className="tile-back__mark" aria-hidden="true">
         ?
       </span>
-      <StarGlyph seed={position * 7 + 3} color={color} size={18} />
       <span className="tile-back__position" aria-hidden="true">
         {position + 1}
       </span>

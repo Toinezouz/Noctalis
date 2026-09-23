@@ -1,26 +1,26 @@
 import { useI18n, type MessageKey } from '../../i18n/index.js';
+import { Icon, type IconName } from './Icon.js';
 import { IconButton } from './IconButton.js';
 import { THEME_PREFERENCES, nextThemePreference, type ThemePreference } from '../../lib/theme.js';
 
-/** Libelle et pictogramme de chaque choix. */
-const ENTRIES: Record<ThemePreference, { icon: string; label: MessageKey }> = {
-  auto: { icon: '\u{1F317}', label: 'theme.auto' },
-  light: { icon: '\u2600\uFE0F', label: 'theme.light' },
-  dark: { icon: '\u{1F319}', label: 'theme.dark' },
+/** Label and icon of each choice. */
+const ENTRIES: Record<ThemePreference, { icon: IconName; label: MessageKey }> = {
+  auto: { icon: 'auto', label: 'theme.auto' },
+  light: { icon: 'sun', label: 'theme.light' },
+  dark: { icon: 'moon', label: 'theme.dark' },
 };
 
 export interface ThemeSwitchProps {
   value: ThemePreference;
   onChange: (value: ThemePreference) => void;
   /**
-   * Version compacte : un seul bouton qui fait defiler les trois choix. Le
-   * bandeau de jeu est deja charge ; trois pastilles de plus y seraient de
-   * trop. L'accueil, lui, affiche les trois choix cote a cote.
+   * Compact version: a single button cycling through the three choices. The
+   * game header is busy enough already; the home screen shows all three.
    */
   compact?: boolean;
 }
 
-/** Choix du theme : automatique (systeme), clair ou sombre. */
+/** Theme choice: automatic (follows the device), light or dark. */
 export function ThemeSwitch({ value, onChange, compact = false }: ThemeSwitchProps): JSX.Element {
   const { t } = useI18n();
   const current = ENTRIES[value];
@@ -35,7 +35,7 @@ export function ThemeSwitch({ value, onChange, compact = false }: ThemeSwitchPro
           onChange(nextThemePreference(value));
         }}
       >
-        {current.icon}
+        <Icon name={current.icon} />
       </IconButton>
     );
   }
@@ -57,7 +57,7 @@ export function ThemeSwitch({ value, onChange, compact = false }: ThemeSwitchPro
               onChange(preference);
             }}
           >
-            <span aria-hidden="true">{entry.icon}</span>
+            <Icon name={entry.icon} size={18} />
             <span>{t(entry.label)}</span>
           </button>
         );

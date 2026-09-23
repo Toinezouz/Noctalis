@@ -1,88 +1,125 @@
 /* ==========================================================================
-   NOCTALIS - Design system : jetons de conception
-   Esprit : releve astronomique, nuit profonde, gravure, papier d'atlas.
+   NOCTALIS — design tokens
+   Two moods for one sky:
+   - light: an old celestial atlas — parchment, indigo ink, brass;
+   - dark: the night itself — deep blue, starlight, the same brass.
+   Components never write a colour of their own: they use these tokens, and
+   the dark theme only has to redefine them.
    ========================================================================== */
 
 :root {
-  /* --- Couleurs de marque ------------------------------------------------ */
-  --c-cream: #f3efe6;
-  --c-cream-deep: #e7e0d2;
-  --c-cream-shadow: #d3cab7;
-  --c-paper: #fbf8f2;
-  --c-ink: #1a1f3c;
-  --c-ink-soft: #55597a;
-  --c-violet: #3f57c9;
-  --c-violet-dark: #2c3d96;
-  --c-magenta: #c2456f;
-  --c-gold: #e0a82e;
+  /* --- Surfaces and ink -------------------------------------------------- */
+  /* Page background (parchment). */
+  --c-cream: #f2ecdf;
+  /* Slightly deeper parchment: wells, secondary surfaces. */
+  --c-cream-deep: #e8dfcb;
+  /* Hairline shadow under raised surfaces. */
+  --c-cream-shadow: #d6cab0;
+  /* Panels and cards. */
+  --c-paper: #faf6ec;
+  /* Main ink: deep indigo. */
+  --c-ink: #1b1d3f;
+  --c-ink-soft: #5c5d7d;
+  /* Accent ink (titles, links, selections). */
+  --c-violet: #3d3fa0;
+  --c-violet-dark: #2a2b78;
+  /* Second accent: a dusky rose, used sparingly. */
+  --c-magenta: #9c3f6e;
+  /* Brass: the instrument's metal. */
+  --c-gold: #a57a23;
+  --c-gold-bright: #d8a93f;
 
-  /* --- Couleurs des 5 familles de tuiles --------------------------------- */
-  --t-green: #2fb061;
-  --t-green-dark: #1f8548;
-  --t-pink: #f05a9c;
-  --t-pink-dark: #c73c7b;
-  --t-blue: #2aa7e0;
-  --t-blue-dark: #1b7fae;
-  --t-red: #e8453c;
-  --t-red-dark: #b82f28;
-  --t-orange: #f79020;
-  --t-orange-dark: #c96c0c;
+  /* Hovered surface / input background. */
+  --c-surface-hi: #fffdf7;
+  --c-field: #fffdf7;
+  /* Text set on a vivid fill (brass, a star): always dark. */
+  --c-on-vivid: #1b1d3f;
+  /* Hairlines and quiet washes. */
+  --c-line: rgba(27, 29, 63, 0.18);
+  --c-line-soft: rgba(27, 29, 63, 0.09);
+  --c-wash: rgba(27, 29, 63, 0.07);
+  /* Brass hairline around instruments and panels. */
+  --c-rule: rgba(184, 138, 45, 0.45);
+  /* Soft sheen on surfaces. */
+  --c-gloss: rgba(255, 255, 255, 0.55);
+  --c-gloss-panel: rgba(255, 253, 247, 0.72);
+  --c-gloss-wash: rgba(255, 255, 255, 0.4);
+  /* Starfield dots of the page background. */
+  --c-dot: rgba(27, 29, 63, 0.16);
+  --c-dot-soft: rgba(27, 29, 63, 0.08);
+  /* Game header, stuck to the top (slightly see-through). */
+  --c-bar: rgba(242, 236, 223, 0.92);
+  /* Lines of the astrolabe drawn on the home screen. */
+  --c-rays: rgba(61, 63, 160, 0.22);
+  /* Veil behind the star chart side panel. */
+  --c-veil: rgba(242, 236, 223, 0.97);
+  /* Notifications. */
+  --c-toast-bg: #1b1d3f;
+  --c-toast-fg: #f6f2e6;
 
-  /* --- Surfaces et traits ------------------------------------------------
-     Ces jetons existent pour que le theme sombre n'ait qu'a les redefinir :
-     aucun composant ne doit jamais ecrire une teinte en dur. */
-  /* Surface survolee / fond de champ de saisie. */
-  --c-surface-hi: #fff;
-  --c-field: #fff;
-  /* Texte pose sur un aplat vif (or, orange, tuile) : toujours sombre. */
-  --c-on-vivid: #1a1f3c;
-  /* Traits et aplats discrets, poses sur une surface. */
-  --c-line: rgba(26, 31, 60, 0.16);
-  --c-line-soft: rgba(26, 31, 60, 0.08);
-  --c-wash: rgba(26, 31, 60, 0.12);
-  /* Reflets blancs (papier lustre). Discrets en sombre, sinon ca delave. */
-  --c-gloss: rgba(255, 255, 255, 0.6);
-  --c-gloss-panel: rgba(255, 255, 255, 0.72);
-  --c-gloss-wash: rgba(255, 255, 255, 0.5);
-  /* Grain du fond de page. */
-  --c-dot: rgba(26, 31, 60, 0.05);
-  /* Bandeau de jeu, colle en haut de l'ecran (legerement translucide). */
-  --c-bar: rgba(243, 239, 230, 0.94);
-  /* Rayons decoratifs de l'accueil : discrets sur fond sombre. */
-  --c-rays: rgba(63, 87, 201, 0.16);
-  /* Voile du panneau lateral de la fiche (au-dessus de la table). */
-  --c-veil: rgba(243, 239, 230, 0.96);
-  /* Bulle de notification. */
-  --c-toast-bg: #1a1f3c;
-  --c-toast-fg: #fff;
-  /* Support en bois des joueurs. */
-  --rack-face: linear-gradient(180deg, #dfd8c6, #c9c0aa);
-  --rack-line-rgb: 120, 116, 96;
-  --rack-gloss: rgba(255, 255, 255, 0.65);
+  /* Racks: a strip of engraved parchment. */
+  --rack-face: linear-gradient(180deg, #efe6d2, #e4d8bd);
+  --rack-line-rgb: 118, 96, 52;
+  --rack-gloss: rgba(255, 255, 255, 0.6);
   --rack-slot: rgba(255, 255, 255, 0.35);
-  --rack-slot-filled: rgba(255, 255, 255, 0.6);
-  /* Base des ombres portees : l'encre en clair, le noir en sombre. */
-  --shadow-rgb: 26, 31, 60;
+  --rack-slot-filled: rgba(255, 255, 255, 0.62);
+  /* Name plates: always a strip of night sky. */
+  --plate-face: linear-gradient(90deg, #1d2050, #2c2f78 55%, #1d2050);
+  --plate-ink: #f3efe2;
+  /* Eclipsed discs (my hidden stars): always night. */
+  --eclipse-face: #121633;
 
-  /* --- Etats ------------------------------------------------------------- */
-  --c-success: #2fb061;
-  --c-danger: #e8453c;
-  --c-warning: #f79020;
-  --c-info: #2aa7e0;
+  /* Shadows are built on the ink in light mode, on black in dark mode. */
+  --shadow-rgb: 27, 29, 63;
 
-  /* --- Typographie ------------------------------------------------------- */
-  --font-title: 'Fredoka Variable', 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
-  --font-body: 'Nunito Variable', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* --- States ------------------------------------------------------------ */
+  --c-success: #2f8f6f;
+  --c-danger: #b8443a;
+  --c-warning: #b77a1c;
+  --c-info: #3d3fa0;
 
-  --fs-xs: 0.72rem;
-  --fs-sm: 0.85rem;
+  /* --- The five constellations -------------------------------------------
+     Jewel tones that glow on the dark discs, in both themes. `-deep` is the
+     edge of a disc, `-light` its luminous heart. The technical identifiers
+     (green, pink...) are only names: players see Lyra, Aurora, Cygnus, Ember
+     and Phoenix, each with its own sigil. */
+  --t-green: #27b39b;
+  --t-green-deep: #0c5d5a;
+  --t-green-light: #9ef0d8;
+  --t-pink: #cf5fb5;
+  --t-pink-deep: #6a1f63;
+  --t-pink-light: #f7b8e6;
+  --t-blue: #4d8ef0;
+  --t-blue-deep: #1b3b8f;
+  --t-blue-light: #b6d4ff;
+  --t-red: #e2583f;
+  --t-red-deep: #7c1f1c;
+  --t-red-light: #ffc0a8;
+  --t-orange: #e0a02c;
+  --t-orange-deep: #7a4c07;
+  --t-orange-light: #ffe2a0;
+  /* Kept for components that still name them (sheet, buttons). */
+  --t-green-dark: var(--t-green-deep);
+  --t-pink-dark: var(--t-pink-deep);
+  --t-blue-dark: var(--t-blue-deep);
+  --t-red-dark: var(--t-red-deep);
+  --t-orange-dark: var(--t-orange-deep);
+
+  /* --- Type -------------------------------------------------------------- */
+  /* Cinzel: capitals inspired by engraved inscriptions — titles and star
+     numbers. Jost: a clear geometric sans for everything else. */
+  --font-title: 'Cinzel Variable', 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body: 'Jost Variable', 'Jost', 'Futura', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-xs: 0.74rem;
+  --fs-sm: 0.88rem;
   --fs-md: 1rem;
   --fs-lg: 1.2rem;
-  --fs-xl: 1.6rem;
-  --fs-2xl: 2.2rem;
-  --fs-3xl: clamp(2.4rem, 8vw, 4.4rem);
+  --fs-xl: 1.55rem;
+  --fs-2xl: 2.1rem;
+  --fs-3xl: clamp(2.4rem, 8vw, 4.2rem);
 
-  /* --- Espacements ------------------------------------------------------- */
+  /* --- Spacing ----------------------------------------------------------- */
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
   --sp-3: 0.75rem;
@@ -91,86 +128,95 @@
   --sp-6: 2rem;
   --sp-7: 3rem;
 
-  /* --- Rayons ------------------------------------------------------------ */
+  /* --- Radii ------------------------------------------------------------- */
   --r-sm: 6px;
   --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 24px;
+  --r-lg: 14px;
+  --r-xl: 22px;
   --r-pill: 999px;
 
-  /* --- Ombres (rendu carton / objet pose sur la table) ------------------- */
-  --sh-tile: 0 2px 0 rgba(var(--shadow-rgb), 0.35), 0 6px 12px rgba(var(--shadow-rgb), 0.18);
-  --sh-tile-raised: 0 6px 0 rgba(var(--shadow-rgb), 0.3), 0 14px 22px rgba(var(--shadow-rgb), 0.22);
-  --sh-panel: 0 4px 0 var(--c-cream-shadow), 0 12px 28px rgba(var(--shadow-rgb), 0.16);
-  --sh-modal: 0 24px 60px rgba(var(--shadow-rgb), 0.38);
-  --sh-inset: inset 0 2px 6px rgba(var(--shadow-rgb), 0.18);
+  /* --- Shadows ----------------------------------------------------------- */
+  --sh-tile: 0 2px 5px rgba(var(--shadow-rgb), 0.28), 0 6px 14px rgba(var(--shadow-rgb), 0.16);
+  --sh-tile-raised: 0 6px 14px rgba(var(--shadow-rgb), 0.3), 0 14px 26px rgba(var(--shadow-rgb), 0.2);
+  --sh-panel: 0 1px 0 var(--c-cream-shadow), 0 10px 30px rgba(var(--shadow-rgb), 0.1);
+  --sh-modal: 0 28px 70px rgba(var(--shadow-rgb), 0.36);
+  --sh-inset: inset 0 1px 4px rgba(var(--shadow-rgb), 0.14);
 
-  /* --- Mouvement --------------------------------------------------------- */
-  --mo-fast: 120ms;
-  --mo-base: 220ms;
-  --mo-slow: 420ms;
+  /* --- Motion ------------------------------------------------------------ */
+  --mo-fast: 140ms;
+  --mo-base: 240ms;
+  --mo-slow: 460ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.4, 0.64, 1);
 
-  /* --- Profondeur -------------------------------------------------------- */
+  /* --- Depth ------------------------------------------------------------- */
   --z-table: 1;
   --z-sticky: 50;
   --z-panel: 100;
   --z-modal: 200;
   --z-toast: 300;
 
-  /* --- Dimensions de jeu ------------------------------------------------- */
-  --tile-w: clamp(46px, 8.5vw, 72px);
-  --tile-h: calc(var(--tile-w) * 1.32);
-  --slot-w: clamp(26px, 4.6vw, 40px);
+  /* --- Game sizes -------------------------------------------------------- */
+  /* Stars are round: height equals width. */
+  --tile-w: clamp(46px, 6.4vw, 64px);
+  --tile-h: var(--tile-w);
+  --slot-w: clamp(22px, 3.4vw, 32px);
 }
 
-
 /* ==========================================================================
-   Theme sombre
-   `data-theme` est pose sur <html> par le client (et par un petit script
-   dans index.html, avant le premier rendu, pour eviter un flash clair).
-   Seules les surfaces et l'encre changent : les 5 couleurs de tuiles restent
-   identiques, sans quoi la fiche de deduction ne correspondrait plus au
-   plateau.
+   Dark theme
+   `data-theme` is set on <html> by the client (and by a tiny script in
+   index.html, before the first paint, to avoid a light flash). Only surfaces
+   and ink change: the constellations keep their colours, so the star chart
+   always matches the table.
    ========================================================================== */
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --c-cream: #0b1022;
-  --c-cream-deep: #121831;
-  --c-cream-shadow: #05070f;
-  --c-paper: #141b33;
-  --c-ink: #eef1ff;
-  --c-ink-soft: #a6afd4;
-  --c-violet: #8aa2ff;
-  --c-violet-dark: #5f77df;
-  --c-magenta: #ff7ba6;
-  --c-gold: #ffc94a;
+  --c-cream: #070b1a;
+  --c-cream-deep: #0d1330;
+  --c-cream-shadow: #03050c;
+  --c-paper: #10163a;
+  --c-ink: #ecebf8;
+  --c-ink-soft: #a3a6cc;
+  --c-violet: #a4a8ff;
+  --c-violet-dark: #6c70e0;
+  --c-magenta: #f08cc4;
+  --c-gold: #e8bd5a;
+  --c-gold-bright: #f6d27a;
 
-  --c-surface-hi: #1e2748;
-  --c-field: #0a0f1f;
-  --c-line: rgba(255, 255, 255, 0.18);
-  --c-line-soft: rgba(255, 255, 255, 0.09);
-  --c-wash: rgba(255, 255, 255, 0.1);
-  --c-gloss: rgba(255, 255, 255, 0.07);
-  --c-gloss-panel: rgba(255, 255, 255, 0.05);
-  --c-gloss-wash: rgba(255, 255, 255, 0.04);
-  --c-dot: rgba(255, 255, 255, 0.05);
-  --c-bar: rgba(11, 16, 34, 0.94);
-  --c-rays: rgba(138, 162, 255, 0.12);
-  --c-veil: rgba(11, 16, 34, 0.97);
-  --c-toast-bg: #1e2748;
-  --c-toast-fg: #eef1ff;
+  --c-surface-hi: #1a2150;
+  --c-field: #0a0f28;
+  --c-line: rgba(236, 235, 248, 0.2);
+  --c-line-soft: rgba(236, 235, 248, 0.1);
+  --c-wash: rgba(236, 235, 248, 0.07);
+  --c-rule: rgba(232, 189, 90, 0.38);
+  --c-gloss: rgba(255, 255, 255, 0.06);
+  --c-gloss-panel: rgba(16, 22, 58, 0.72);
+  --c-gloss-wash: rgba(255, 255, 255, 0.03);
+  --c-dot: rgba(236, 235, 248, 0.5);
+  --c-dot-soft: rgba(236, 235, 248, 0.22);
+  --c-bar: rgba(7, 11, 26, 0.9);
+  --c-rays: rgba(164, 168, 255, 0.2);
+  --c-veil: rgba(7, 11, 26, 0.96);
+  --c-toast-bg: #1a2150;
+  --c-toast-fg: #ecebf8;
 
-  --rack-face: linear-gradient(180deg, #27304f, #171d33);
-  --rack-line-rgb: 150, 166, 214;
-  --rack-gloss: rgba(255, 255, 255, 0.12);
-  --rack-slot: rgba(255, 255, 255, 0.08);
-  --rack-slot-filled: rgba(255, 255, 255, 0.16);
+  --rack-face: linear-gradient(180deg, rgba(26, 33, 80, 0.92), rgba(14, 19, 50, 0.92));
+  --rack-line-rgb: 164, 168, 255;
+  --rack-gloss: rgba(255, 255, 255, 0.08);
+  --rack-slot: rgba(255, 255, 255, 0.04);
+  --rack-slot-filled: rgba(255, 255, 255, 0.09);
+  --plate-face: linear-gradient(90deg, #151a46, #262b73 55%, #151a46);
+  --eclipse-face: #0a0e24;
 
-  /* Sur fond sombre, une ombre coloree ne se voit pas : on passe au noir. */
+  --c-success: #52c7a3;
+  --c-danger: #f07a6e;
+  --c-warning: #efb54f;
+  --c-info: #a4a8ff;
+
+  /* A coloured shadow does not show on a dark background: black it is. */
   --shadow-rgb: 0, 0, 0;
 }
 
@@ -178,24 +224,29 @@
   color-scheme: light;
 }
 
-/* Couleur -> variables, pour ne jamais recopier une teinte dans un composant. */
+/* Constellation -> variables, so no component ever copies a colour. */
 [data-color='green'] {
   --tile-face: var(--t-green);
-  --tile-edge: var(--t-green-dark);
+  --tile-edge: var(--t-green-deep);
+  --tile-light: var(--t-green-light);
 }
 [data-color='pink'] {
   --tile-face: var(--t-pink);
-  --tile-edge: var(--t-pink-dark);
+  --tile-edge: var(--t-pink-deep);
+  --tile-light: var(--t-pink-light);
 }
 [data-color='blue'] {
   --tile-face: var(--t-blue);
-  --tile-edge: var(--t-blue-dark);
+  --tile-edge: var(--t-blue-deep);
+  --tile-light: var(--t-blue-light);
 }
 [data-color='red'] {
   --tile-face: var(--t-red);
-  --tile-edge: var(--t-red-dark);
+  --tile-edge: var(--t-red-deep);
+  --tile-light: var(--t-red-light);
 }
 [data-color='orange'] {
   --tile-face: var(--t-orange);
-  --tile-edge: var(--t-orange-dark);
+  --tile-edge: var(--t-orange-deep);
+  --tile-light: var(--t-orange-light);
 }

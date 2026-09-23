@@ -3,12 +3,16 @@ import type { PublicGameState, PrivatePlayerState } from '../types/game.js';
 import type { PlayerCredentials, RoomState } from '../types/room.js';
 import type { TileColor } from '../types/tiles.js';
 
-/** Contraintes partagees client/serveur sur les pseudos et les codes de room. */
+/** Limits shared by client and server: names, room codes, table size. */
 export const NAME_MIN_LENGTH = 2;
 export const NAME_MAX_LENGTH = 16;
 export const ROOM_CODE_LENGTH = 5;
-/** Alphabet sans caracteres ambigus (pas de 0/O, 1/I...). */
+/** Alphabet without look-alike characters (no 0/O, 1/I...). */
 export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+/** A game needs at least two players... */
+export const MIN_PLAYERS = 2;
+/** ...and seats four at most. */
+export const MAX_PLAYERS = 4;
 
 export interface AckOk<T> {
   ok: true;
@@ -20,14 +24,14 @@ export interface AckErr {
 }
 export type Ack<T> = AckOk<T> | AckErr;
 
-/** Enveloppe d'etat envoyee individuellement a chaque socket. */
+/** State envelope, built separately for each socket. */
 export interface StatePayload {
   room: RoomState;
   publicState: PublicGameState | null;
   privateState: PrivatePlayerState | null;
 }
 
-/** Evenements Client -> Serveur. */
+/** Client -> server events. */
 export interface ClientToServerEvents {
   'room:create': (payload: { name: string }, ack: (res: Ack<PlayerCredentials>) => void) => void;
   'room:join': (
@@ -55,7 +59,7 @@ export interface ClientToServerEvents {
   'game:rematch': (payload: Record<string, never>, ack: (res: Ack<null>) => void) => void;
 }
 
-/** Evenements Serveur -> Client. */
+/** Server -> client events. */
 export interface ServerToClientEvents {
   'room:state': (payload: StatePayload) => void;
   'game:state': (payload: StatePayload) => void;

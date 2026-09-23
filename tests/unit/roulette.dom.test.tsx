@@ -9,7 +9,7 @@ const PLAYERS = [
   { id: 'p_bob', name: 'Bob' },
 ];
 
-/** Avance les minuteries en laissant React appliquer ses rendus. */
+/** Moves timers forward while letting React render. */
 async function advance(ms: number): Promise<void> {
   await act(() => {
     vi.advanceTimersByTime(ms);
@@ -39,37 +39,37 @@ afterEach(() => {
   cleanup();
 });
 
-describe('Roulette d ouverture (composant)', () => {
-  it('pose la question pendant la rotation, puis annonce le joueur tire', async () => {
+describe('Opening wheel (component)', () => {
+  it('asks the question while spinning, then announces who starts', async () => {
     show('p_bob', 'p_alice');
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Qui commence ?');
-    expect(screen.getByTestId('roulette-note')).toHaveTextContent('La roue tourne');
+    expect(screen.getByTestId('roulette-note')).toHaveTextContent('Le ciel tourne');
 
     await advance(SPIN_MS + 200);
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Bob commence !');
     expect(screen.getByTestId('roulette-note')).toHaveTextContent('Bob ouvre la partie');
   });
 
-  it('dit au joueur tire que c est a lui', async () => {
+  it('tells the drawn player it is their turn to open', async () => {
     show('p_alice', 'p_alice');
     await advance(SPIN_MS + 200);
-    expect(screen.getByTestId('roulette-note')).toHaveTextContent('Le sort te désigne');
+    expect(screen.getByTestId('roulette-note')).toHaveTextContent('Les étoiles ont parlé');
   });
 
-  it('arrete la roue sur le secteur du joueur tire', async () => {
+  it('stops the wheel on the drawn player\'s sector', async () => {
     show('p_bob', 'p_alice');
     const wheel = document.querySelector('.roulette__wheel')!;
-    // Au depart : aucune rotation, le navigateur doit peindre 0 degre.
+    // At first: no rotation, the browser must paint 0 degrees.
     expect(wheel.getAttribute('style')).toContain('--spin: 0deg');
 
     await advance(SPIN_MS + 200);
     const spin = Number(/--spin: (-?\d+)deg/.exec(wheel.getAttribute('style') ?? '')?.[1]);
     expect(Number.isFinite(spin)).toBe(true);
-    // Bob est le second secteur : c'est lui qui doit se trouver sous l'aiguille.
+    // Bob is the second sector: he must end up under the pointer.
     expect(sectorAtPointer(spin, PLAYERS.length)).toBe(1);
   });
 
-  it('se ferme toute seule apres l annonce', async () => {
+  it('closes by itself after the announcement', async () => {
     const onDone = vi.fn();
     show('p_bob', 'p_alice', onDone);
 
@@ -79,7 +79,7 @@ describe('Roulette d ouverture (composant)', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
-  it('laisse passer l animation d un clic', async () => {
+  it('lets one click skip the animation', async () => {
     const onDone = vi.fn();
     show('p_bob', 'p_alice', onDone);
     const button = screen.getByTestId('roulette-continue');
@@ -91,11 +91,28 @@ describe('Roulette d ouverture (composant)', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
-  it('affiche les deux joueurs sur la roue', () => {
+  it('shows every player on the wheel', () => {
     show('p_bob', 'p_alice');
     const labels = [...document.querySelectorAll('.roulette__label-text')].map(
       (node) => node.textContent,
     );
     expect(labels).toEqual(['Alice', 'Bob']);
+  });
+
+  it('seats four players on the wheel, and stops on the fourth', async () => {
+    cleanup();
+    const four = [...PLAYERS, { id: 'p_chloe', name: 'Chloé' }, { id: 'p_dany', name: 'Dany' }];
+    render(
+      <I18nProvider initialLanguage="en">
+        <StartRoulette players={four} startingPlayerId="p_dany" myId="p_alice" onDone={() => {}} />
+      </I18nProvider>,
+    );
+    const labels = [...document.querySelectorAll('.roulette__label-text')].map((n) => n.textContent);
+    expect(labels).toEqual(['Alice', 'Bob', 'Chloé', 'Dany']);
+    await advance(SPIN_MS + 200);
+    const wheel = document.querySelector('.roulette__wheel')!;
+    const spin = Number(/--spin: (-?\d+)deg/.exec(wheel.getAttribute('style') ?? '')?.[1]);
+    expect(sectorAtPointer(spin, four.length)).toBe(3);
+    expect(screen.getByTestId('roulette-note')).toHaveTextContent('Dany opens the game');
   });
 });

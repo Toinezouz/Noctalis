@@ -8,18 +8,18 @@ export interface CompareDialogProps {
   open: boolean;
   tileNumber: number;
   position: number;
-  /** Les vrais numeros du demandeur, visibles par le repondeur. */
+  /** The asker's real numbers, visible to the responder. */
   askerSecretNumbers: number[];
   askerName: string;
-  /** Reponse veritable calculee par le serveur. */
+  /** True answer, computed by the server. */
   truth: boolean;
   onSubmit: (answer: boolean) => void;
   busy?: boolean;
 }
 
 /**
- * Reponse a JAUGER. L'interface ne propose que la reponse juste : le
- * repondeur ne peut pas mentir, et le serveur recalcule de toute facon.
+ * Answer to GAUGE. Only the right answer is offered: the responder cannot
+ * lie, and the server works it out again anyway.
  */
 export function CompareDialog({
   open,
@@ -65,7 +65,7 @@ export function CompareDialog({
           <span className="badge">{pointsLabel(publicTile.points)}</span>
         </div>
         <span className="compare-dialog__vs" aria-hidden="true">
-          =?
+          ⟷
         </span>
         <div className="compare-dialog__side">
           <span className="muted">

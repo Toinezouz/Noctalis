@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { TileColor } from '@noctalis/shared';
+import { pickResponder, type TileColor } from '@noctalis/shared';
 import type { ThemePreference } from '../../lib/theme.js';
 import { useGame } from '../../app/GameContext.js';
 import { useI18n } from '../../i18n/index.js';
@@ -31,7 +31,7 @@ export interface GameTableProps {
   onLeave: () => void;
 }
 
-/** La table de jeu complete : adversaire en haut, releve commun, mon support. */
+/** The full table: everybody else at the top, the shared sky, my rack below. */
 export function GameTable({
   soundEnabled,
   onToggleSound,
@@ -40,18 +40,8 @@ export function GameTable({
   onOpenHelp,
   onLeave,
 }: GameTableProps): JSX.Element | null {
-  const {
-    publicState,
-    privateState,
-    credentials,
-    room,
-    me,
-    opponent,
-    isMyTurn,
-    status,
-    lastEvent,
-    actions,
-  } = useGame();
+  const { publicState, privateState, credentials, room, me, rivals, isMyTurn, status, lastEvent, actions } =
+    useGame();
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const sheet = useDeductionSheet(credentials?.roomCode ?? null, credentials?.playerId ?? null);
@@ -63,7 +53,7 @@ export function GameTable({
 
   const phase = publicState?.phase ?? 'SETUP';
 
-  // La selection ne survit pas au changement de phase ou de tour.
+  // The selection does not survive a change of phase or turn.
   useEffect(() => {
     if (phase !== 'TURN_HINT' || !isMyTurn) {
       setSelectedTile(null);
@@ -89,18 +79,26 @@ export function GameTable({
   }
 
   const myId = credentials.playerId;
-  const opponentName = opponent?.name ?? 'Ton adversaire';
-  const activeName =
-    publicState.players.find((p) => p.id === publicState.activePlayerId)?.name ?? opponentName;
+  const nameOf = (id: string | null | undefined): string =>
+    publicState.players.find((p) => p.id === id)?.name ?? '';
+  const activeName = nameOf(publicState.activePlayerId);
+  const hint = publicState.pendingHint;
+  const responderName = nameOf(hint?.responderId);
   const pending = privateState.pendingResponse;
-  const opponentSecretNumbers = privateState.opponentTiles.map((t) => t.number);
+  const askerTiles = pending
+    ? (privateState.rivals.find((r) => r.playerId === pending.hint.askerId)?.tiles ?? [])
+    : [];
+  const askerName = nameOf(pending?.hint.askerId);
+  // Who would answer if I asked now: the same rule the server applies.
+  const myResponderName = pickResponder(publicState.order, publicState.players, myId)?.name ?? '';
   const finalMyFaces = publicState.finalReveal?.[myId] ?? null;
   const gameOver = phase === 'GAME_OVER';
-
   const canAnnounce = !me.guessUsed && !me.eliminated && !gameOver;
+  const offlineRivals = rivals.filter((p) => !p.connected && !p.left);
+  const heldNumbers = privateState.rivals.flatMap((r) => r.tiles.map((tile) => tile.number));
 
   return (
-    <div className="table">
+    <div className="table" data-players={publicState.players.length}>
       <GameHeader
         roomCode={credentials.roomCode}
         soundEnabled={soundEnabled}
@@ -124,10 +122,11 @@ export function GameTable({
         online={status === 'online'}
       />
 
-      {opponent && !opponent.connected && !gameOver ? (
+      {offlineRivals.length > 0 && !gameOver ? (
         <p className="opponent-offline" role="status" data-testid="opponent-offline">
-          <span aria-hidden="true">🔌</span>{' '}
-          {t('banner.opponentOffline', { name: opponent.name })}
+          {t(offlineRivals.length === 1 ? 'banner.playerOffline' : 'banner.playersOffline', {
+            name: offlineRivals.map((p) => p.name).join(', '),
+          })}
         </p>
       ) : null}
 
@@ -136,28 +135,32 @@ export function GameTable({
         isMyTurn={isMyTurn}
         mustAnswer={pending !== null}
         activeName={activeName}
-        opponentName={opponentName}
+        responderName={responderName}
         turn={publicState.turn}
         eliminated={me.eliminated}
       />
 
       <main className="table__layout">
         <div className="table__board">
-          <section aria-label={t('rack.opponentZone', { name: opponentName })}>
-            {opponent ? (
+          <section
+            className={`rivals rivals--${String(rivals.length)}`}
+            aria-label={t('rack.othersZone')}
+          >
+            {rivals.map((rival) => (
               <OpponentRack
-                name={opponent.name}
-                colors={opponent.tileColors}
-                faces={privateState.opponentTiles}
-                classifications={publicState.classifications.filter(
-                  (c) => c.ownerId === opponent.id,
-                )}
-                comparisons={publicState.comparisons.filter((c) => c.ownerId === opponent.id)}
-                connected={opponent.connected}
+                key={rival.id}
+                playerId={rival.id}
+                name={rival.name}
+                colors={rival.tileColors}
+                faces={privateState.rivals.find((r) => r.playerId === rival.id)?.tiles ?? null}
+                classifications={publicState.classifications.filter((c) => c.ownerId === rival.id)}
+                comparisons={publicState.comparisons.filter((c) => c.ownerId === rival.id)}
+                connected={rival.connected}
+                active={publicState.activePlayerId === rival.id}
+                answering={hint?.responderId === rival.id}
+                out={rival.eliminated}
               />
-            ) : (
-              <p className="muted center">{t('rack.waitingOpponent')}</p>
-            )}
+            ))}
           </section>
 
           <section className="table__center" aria-label={t('status.publicZone')}>
@@ -181,7 +184,7 @@ export function GameTable({
               }}
               selectedTile={selectedTile}
               activeName={activeName}
-              opponentName={opponentName}
+              responderName={responderName}
               busy={busy}
             />
           </section>
@@ -194,6 +197,9 @@ export function GameTable({
               classifications={publicState.classifications.filter((c) => c.ownerId === myId)}
               comparisons={publicState.comparisons.filter((c) => c.ownerId === myId)}
               connected={me.connected}
+              active={isMyTurn}
+              answering={pending !== null}
+              out={me.eliminated}
             />
           </section>
         </div>
@@ -201,20 +207,30 @@ export function GameTable({
         <aside className="table__side" aria-label={t('side.gameInfo')}>
           <Panel title={t('side.players')}>
             <div className="stack">
-              {publicState.players.map((player) => (
-                <PlayerStatus
-                  key={player.id}
-                  player={player}
-                  isMe={player.id === myId}
-                  isActive={publicState.activePlayerId === player.id}
-                />
-              ))}
+              {publicState.order
+                .map((id) => publicState.players.find((p) => p.id === id))
+                .map((player) =>
+                  player ? (
+                    <PlayerStatus
+                      key={player.id}
+                      player={player}
+                      isMe={player.id === myId}
+                      isActive={publicState.activePlayerId === player.id}
+                    />
+                  ) : null,
+                )}
             </div>
           </Panel>
 
           {!sheetOpen && !isMobile ? (
-            <Button variant="secondary" block onClick={() => { setSheetOpen(true); }}>
-              📋 {t('side.openSheet')}
+            <Button
+              variant="secondary"
+              block
+              onClick={() => {
+                setSheetOpen(true);
+              }}
+            >
+              {t('side.openSheet')}
             </Button>
           ) : null}
 
@@ -231,7 +247,8 @@ export function GameTable({
         <div className={isMobile ? '' : 'sheet-panel'}>
           <DeductionSheet
             sheet={sheet}
-            revealedNumbers={publicState.publicTiles.map((t) => t.tile.number)}
+            revealedNumbers={publicState.publicTiles.map((tile) => tile.tile.number)}
+            heldNumbers={gameOver ? [] : heldNumbers}
             fullscreen={isMobile}
             onClose={() => {
               setSheetOpen(false);
@@ -251,7 +268,7 @@ export function GameTable({
         open={selectedTile !== null && isMyTurn && phase === 'TURN_HINT'}
         tileNumber={selectedTile}
         myTiles={privateState.myTiles}
-        opponentName={opponentName}
+        responderName={myResponderName}
         busy={busy}
         onClose={() => {
           setSelectedTile(null);
@@ -268,8 +285,8 @@ export function GameTable({
         <ClassifyDialog
           open
           tileNumber={pending.hint.tileNumber}
-          askerSecretNumbers={opponentSecretNumbers}
-          askerName={opponentName}
+          askerSecretNumbers={askerTiles.map((tile) => tile.number)}
+          askerName={askerName}
           busy={busy}
           onSubmit={(slot) => {
             void run(() => actions.submitClassify(slot));
@@ -282,8 +299,8 @@ export function GameTable({
           open
           tileNumber={pending.hint.tileNumber}
           position={pending.hint.position}
-          askerSecretNumbers={opponentSecretNumbers}
-          askerName={opponentName}
+          askerSecretNumbers={askerTiles.map((tile) => tile.number)}
+          askerName={askerName}
           truth={pending.truth ?? false}
           busy={busy}
           onSubmit={(answer) => {
@@ -315,7 +332,7 @@ export function GameTable({
           state={publicState}
           myId={myId}
           rematchReady={room?.rematchReady ?? []}
-          opponentPresent={opponent !== null}
+          seated={room?.players.map((p) => p.id) ?? []}
           onRematch={() => {
             void run(() => actions.rematch());
           }}

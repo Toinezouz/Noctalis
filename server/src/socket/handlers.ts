@@ -10,6 +10,8 @@ import {
   type StatePayload,
   SECRET_TILE_COUNT,
   CLASSIFY_SLOT_COUNT,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
   defaultRng,
   findSecretLeak,
   forfeit,
@@ -39,23 +41,21 @@ export interface SocketData {
 export type GameServer = Server<ClientToServerEvents, ServerToClientEvents, never, SocketData>;
 export type GameSocket = Socket<ClientToServerEvents, ServerToClientEvents, never, SocketData>;
 
-/** Chaque refus de salon porte son propre code : le client le traduit. */
+/**
+ * Every room refusal carries its own code; players see a translation of it.
+ * The messages are for developers reading logs and raw acknowledgements.
+ */
 const JOIN_ERRORS: Record<JoinError, { code: GameErrorCode; message: string }> = {
-  ROOM_NOT_FOUND: {
-    code: 'ROOM_NOT_FOUND',
-    message: "Cette partie n'existe pas (ou a expire).",
-  },
-  ROOM_FULL: { code: 'ROOM_FULL', message: 'Cette partie est deja complete.' },
-  ROOM_FINISHED: { code: 'ROOM_FINISHED', message: 'Cette partie est terminee.' },
-  NAME_TAKEN: { code: 'NAME_TAKEN', message: 'Ce pseudo est deja pris dans cette partie.' },
-  BAD_TOKEN: { code: 'BAD_TOKEN', message: 'Session invalide : rejoins la partie avec le code.' },
-  TOO_MANY_ROOMS: {
-    code: 'SERVER_BUSY',
-    message: 'Le serveur est sature, reessaie dans un instant.',
-  },
+  ROOM_NOT_FOUND: { code: 'ROOM_NOT_FOUND', message: 'No such room (or it expired).' },
+  ROOM_FULL: { code: 'ROOM_FULL', message: 'This room is full.' },
+  ROOM_STARTED: { code: 'ROOM_STARTED', message: 'This game has already started.' },
+  ROOM_FINISHED: { code: 'ROOM_FINISHED', message: 'This game is over.' },
+  NAME_TAKEN: { code: 'NAME_TAKEN', message: 'This name is already taken in the room.' },
+  BAD_TOKEN: { code: 'BAD_TOKEN', message: 'Invalid session: join again with the code.' },
+  TOO_MANY_ROOMS: { code: 'SERVER_BUSY', message: 'Too many rooms, try again shortly.' },
 };
 
-/** Construit la reponse d'erreur correspondant a un refus de salon. */
+/** Builds the error answer matching a room refusal. */
 function joinError(reason: JoinError): Ack<never> {
   const entry = JOIN_ERRORS[reason];
   return err(entry.code, entry.message);
@@ -69,7 +69,7 @@ function ok<T>(data: T): Ack<T> {
   return { ok: true, data };
 }
 
-/** Repond a un ack meme si le client n'en a pas fourni (robustesse). */
+/** Answers an ack, even if the client did not provide one (robustness). */
 function reply<T>(ack: unknown, value: Ack<T>): void {
   if (typeof ack === 'function') {
     (ack as (res: Ack<T>) => void)(value);
@@ -79,13 +79,13 @@ function reply<T>(ack: unknown, value: Ack<T>): void {
 export interface HandlerContext {
   io: GameServer;
   rooms: RoomManager;
-  /** Verification anti-fuite avant chaque emission (developpement / tests). */
+  /** Leak check before every emission (development / tests). */
   strictLeakCheck: boolean;
-  /** Journalise les actions refusees (utile en developpement et en test). */
+  /** Logs refused actions (useful in development and tests). */
   logRefusals?: boolean;
 }
 
-/** Construit la charge utile d'etat destinee a un joueur precis. */
+/** Builds the state payload meant for one given player. */
 function buildStatePayload(room: Room, playerId: string | null): StatePayload {
   const publicState = room.game ? toPublicGameState(room.game) : null;
   const privateState =
@@ -93,7 +93,7 @@ function buildStatePayload(room: Room, playerId: string | null): StatePayload {
   return { room: room.toRoomState(), publicState, privateState };
 }
 
-/** Envoie a chaque joueur sa propre vue : jamais l'etat serveur complet. */
+/** Sends each player their own view: never the full server state. */
 export function broadcastState(ctx: HandlerContext, room: Room): void {
   for (const player of room.players) {
     if (!player.socketId) {
@@ -103,14 +103,14 @@ export function broadcastState(ctx: HandlerContext, room: Room): void {
     if (ctx.strictLeakCheck && room.game) {
       const leak = findSecretLeak(room.game, player.id, payload);
       if (leak) {
-        // Filet de securite : on prefere casser la partie plutot que de
-        // divulguer un numero secret a son proprietaire.
+        // Safety net: better to break the game than to reveal a secret
+        // number to its owner.
         console.error(
-          `[SECURITE] Fuite detectee vers ${player.id} : numero ${String(leak.number)} en ${leak.path}`,
+          `[SECURITY] Leak detected towards ${player.id}: number ${String(leak.number)} at ${leak.path}`,
         );
         ctx.io.to(player.socketId).emit('server:error', {
           code: 'GAME_OVER',
-          message: 'Erreur interne de securite : partie interrompue.',
+          message: 'Internal security error: game interrupted.',
         });
         continue;
       }
@@ -133,7 +133,7 @@ function currentRoom(ctx: HandlerContext, socket: GameSocket): Room | null {
   return ctx.rooms.get(code) ?? null;
 }
 
-/** Recupere room + joueur authentifies pour ce socket. */
+/** Returns the authenticated room and player behind this socket. */
 function requireSession(
   ctx: HandlerContext,
   socket: GameSocket,
@@ -141,11 +141,11 @@ function requireSession(
   const room = currentRoom(ctx, socket);
   const playerId = socket.data.playerId;
   if (!room || !playerId || !room.getPlayer(playerId)) {
-    return { code: 'PLAYER_NOT_FOUND', message: "Tu n'es plus dans une partie." };
+    return { code: 'PLAYER_NOT_FOUND', message: 'Not in a room any more.' };
   }
   const player = room.getPlayer(playerId)!;
   if (player.socketId !== socket.id) {
-    return { code: 'PLAYER_NOT_FOUND', message: 'Session invalide.' };
+    return { code: 'PLAYER_NOT_FOUND', message: 'Invalid session.' };
   }
   return { room, playerId };
 }
@@ -171,7 +171,7 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
     if (allow(event)) {
       return true;
     }
-    reply<T>(ack, err('WRONG_PHASE', 'Trop d actions coup sur coup, respire une seconde.'));
+    reply<T>(ack, err('WRONG_PHASE', 'Too many actions in a row, slow down.'));
     return false;
   };
 
@@ -240,7 +240,7 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
       return;
     }
     if (typeof payload?.playerId !== 'string' || typeof payload?.token !== 'string') {
-      reply(ack, err('BAD_TOKEN', 'Session invalide.'));
+      reply(ack, err('BAD_TOKEN', 'Invalid session.'));
       return;
     }
     const res = ctx.rooms.reconnect(code.value, payload.playerId, payload.token, socket.id);
@@ -270,9 +270,13 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
     const player = room.getPlayer(playerId)!;
 
     if (room.game && room.game.phase !== 'GAME_OVER') {
+      // With three or four players the game goes on without them; with two,
+      // the other player wins.
       const result = forfeit(room.game, playerId);
       if (result.ok) {
-        room.status = 'finished';
+        if (result.events.some((e) => e.type === 'game-over')) {
+          room.status = 'finished';
+        }
         emitEvents(ctx, room, result.events);
       }
     }
@@ -285,7 +289,7 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
     broadcastState(ctx, room);
   });
 
-  // --- Partie -------------------------------------------------------------
+  // --- Game ---------------------------------------------------------------
 
   socket.on('game:start', (_payload, ack) => {
     if (!guard<null>('game:start', ack)) {
@@ -297,23 +301,23 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
       return;
     }
     const { room, playerId } = session;
-    if (room.players.length !== 2) {
-      reply(ack, err('NOT_ENOUGH_PLAYERS', "Il faut etre deux pour commencer."));
+    if (room.players.length < MIN_PLAYERS || room.players.length > MAX_PLAYERS) {
+      reply(ack, err('NOT_ENOUGH_PLAYERS', 'A game needs 2 to 4 players.'));
       return;
     }
     if (room.game && room.game.phase !== 'GAME_OVER') {
-      reply(ack, err('WRONG_PHASE', 'La partie est deja en cours.'));
+      reply(ack, err('WRONG_PHASE', 'The game is already running.'));
       return;
     }
     if (!room.getPlayer(playerId)?.isHost) {
-      reply(ack, err('NOT_YOUR_TURN', "Seul l'hote peut lancer la partie."));
+      reply(ack, err('NOT_YOUR_TURN', 'Only the host can start the game.'));
       return;
     }
     const events = room.startGame();
     reply(ack, ok(null));
-    // L'annonce du tirage au sort part avant l'etat : le client sait ainsi
-    // qu'une annonce est en cours des le premier rendu de la table, et rien
-    // (tutoriel compris) ne s'affiche par-dessus.
+    // The draw is announced before the state: the client then knows a
+    // roulette is coming from the very first render of the table, and
+    // nothing (tutorial included) shows on top of it.
     emitEvents(ctx, room, events);
     broadcastState(ctx, room);
   });
@@ -329,11 +333,11 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
     }
     const { room, playerId } = session;
     if (!room.game || room.game.phase !== 'GAME_OVER') {
-      reply(ack, err('WRONG_PHASE', "La partie n'est pas terminee."));
+      reply(ack, err('WRONG_PHASE', 'The game is not over.'));
       return;
     }
-    if (room.players.length !== 2) {
-      reply(ack, err('NOT_ENOUGH_PLAYERS', 'Ton adversaire a quitte la partie.'));
+    if (room.players.length < MIN_PLAYERS) {
+      reply(ack, err('NOT_ENOUGH_PLAYERS', 'Not enough players left for a rematch.'));
       return;
     }
     room.rematchReady.add(playerId);
@@ -344,7 +348,7 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
     broadcastState(ctx, room);
   });
 
-  /** Fabrique un handler d'action de jeu : session + partie en cours requises. */
+  /** Builds a game action handler: a session and a running game are required. */
   const gameAction = (
     event: string,
     run: (room: Room, playerId: string, payload: never) => Ack<null>,
@@ -360,13 +364,13 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
       }
       const { room, playerId } = session;
       if (!room.game) {
-        reply(ack, err('WRONG_PHASE', "La partie n'a pas encore commence."));
+        reply(ack, err('WRONG_PHASE', 'The game has not started yet.'));
         return;
       }
       const result = run(room, playerId, payload as never);
       if (!result.ok && ctx.logRefusals) {
         console.error(
-          `[action] ${event} refusee pour ${playerId} : ${result.error.code} - ${result.error.message}`,
+          `[action] ${event} refused for ${playerId}: ${result.error.code} - ${result.error.message}`,
         );
       }
       room.touch();
@@ -452,8 +456,8 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
   socket.on(
     'game:submit-compare',
     gameAction('game:submit-compare', (room, playerId) => {
-      // La valeur envoyee par le client est volontairement ignoree : seule la
-      // verite calculee par le serveur fait foi.
+      // Whatever the client sends is deliberately ignored: only the truth
+      // computed by the server counts.
       const result = submitCompare(room.game!, playerId);
       if (!result.ok) {
         return { ok: false, error: result.error };
@@ -489,6 +493,7 @@ export function registerHandlers(ctx: HandlerContext, socket: GameSocket): void 
       ctx.io
         .to(res.room.code)
         .emit('player:left', { playerId: res.player.id, name: res.player.name });
+      emitEvents(ctx, res.room, res.events);
       broadcastState(ctx, res.room);
     }
   });

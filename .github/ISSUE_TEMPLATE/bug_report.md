@@ -1,31 +1,32 @@
 ---
-name: Signaler un bug
-about: Quelque chose ne fonctionne pas comme prévu
+name: Report a bug
+about: Something does not work the way it should
 title: ''
 labels: bug
 assignees: ''
 ---
 
 <!--
-  Merci ! Une faille de SÉCURITÉ ne se signale pas ici :
-  voir SECURITY.md pour les canaux privés.
+  Thank you! Please do NOT report a SECURITY issue here:
+  see SECURITY.md for the private channels.
 -->
 
-## Ce qui se passe
+## What happens
 
-## Ce que j'attendais
+## What you expected
 
-## Comment reproduire
+## How to reproduce
 
 1.
 2.
 3.
 
-## Contexte
+## Context
 
-- Navigateur et version :
-- Système :
-- En ligne ou en local :
-- Code d'observation (si utile) :
+- Browser and version:
+- System:
+- Number of players at the table:
+- Online (noctalis.onrender.com) or local:
+- Language and theme:
 
-## Captures ou messages d'erreur
+## Screenshots or error messages

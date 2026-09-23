@@ -7,8 +7,8 @@ export interface DeductionGuessRowProps {
 }
 
 /**
- * Les 5 cases d'hypotheses, en haut de la fiche, suivies de la fleche
- * indiquant l'ordre croissant. Ces valeurs restent strictement privees.
+ * The five guess boxes at the top of the chart, followed by the arrow of the
+ * ascending order. These values stay strictly private.
  */
 export function DeductionGuessRow({ guesses, onChange }: DeductionGuessRowProps): JSX.Element {
   const { t } = useI18n();

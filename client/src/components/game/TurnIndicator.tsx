@@ -6,21 +6,22 @@ export interface TurnIndicatorProps {
   isMyTurn: boolean;
   mustAnswer: boolean;
   activeName: string;
-  opponentName: string;
+  /** Who has to answer the pending hint, if any. */
+  responderName: string;
   turn: number;
   eliminated: boolean;
 }
 
 /**
- * Banniere d'etat : elle explique en permanence ce que le joueur doit faire,
- * ou ce que l'on attend de l'adversaire. Aucune zone ne reste muette.
+ * Status banner: it always says what I have to do, or who everybody is
+ * waiting for. No moment of the game is left unexplained.
  */
 export function TurnIndicator({
   phase,
   isMyTurn,
   mustAnswer,
   activeName,
-  opponentName,
+  responderName,
   turn,
   eliminated,
 }: TurnIndicatorProps): JSX.Element {
@@ -39,14 +40,14 @@ export function TurnIndicator({
     title = t('turn.mustAnswer');
     detail =
       phase === 'WAITING_FOR_CLASSIFY'
-        ? t('turn.mustClassify', { name: opponentName })
-        : t('turn.mustCompare', { name: opponentName });
+        ? t('turn.mustClassify', { name: activeName })
+        : t('turn.mustCompare', { name: activeName });
   } else if (phase === 'WAITING_FOR_CLASSIFY') {
     title = isMyTurn ? t('turn.hintAsked') : t('turn.of', { name: activeName });
-    detail = t('turn.waitingClassify', { name: opponentName });
+    detail = t('turn.waitingClassify', { name: responderName });
   } else if (phase === 'WAITING_FOR_COMPARE') {
     title = isMyTurn ? t('turn.hintAsked') : t('turn.of', { name: activeName });
-    detail = t('turn.waitingCompare', { name: opponentName });
+    detail = t('turn.waitingCompare', { name: responderName });
   } else if (eliminated) {
     tone = 'theirs';
     title = t('turn.eliminated');

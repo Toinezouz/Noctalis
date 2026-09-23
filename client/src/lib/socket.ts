@@ -4,10 +4,11 @@ import type { Ack, ClientToServerEvents, ServerToClientEvents } from '@noctalis/
 export type GameClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 /**
- * URL du serveur Socket.IO.
- * - En developpement et en previsualisation, on laisse vide : Vite proxifie
- *   `/socket.io` vers le serveur, donc la meme origine suffit.
- * - En production, `VITE_SERVER_URL` pointe vers le service backend.
+ * URL of the Socket.IO server.
+ * - Left empty by default: in development Vite proxies `/socket.io` to the
+ *   server, and in production Express serves the client itself, so the same
+ *   origin is enough.
+ * - `VITE_SERVER_URL` can point to a separate backend if ever needed.
  */
 const SERVER_URL = (import.meta.env['VITE_SERVER_URL'] as string | undefined) ?? '';
 
@@ -26,7 +27,7 @@ export function getSocket(): GameClientSocket {
   return socket;
 }
 
-/** Emission avec accuse de reception promisifie (et delai de garde). */
+/** Emits with a promisified acknowledgement (and a safety timeout). */
 export function emitWithAck<T>(
   event: keyof ClientToServerEvents,
   payload: unknown,
@@ -40,7 +41,7 @@ export function emitWithAck<T>(
         settled = true;
         resolve({
           ok: false,
-          error: { code: 'NETWORK_TIMEOUT', message: 'Le serveur ne repond pas. Reessaie.' },
+          error: { code: 'NETWORK_TIMEOUT', message: 'No answer in time. Please try again.' },
         });
       }
     }, timeoutMs);

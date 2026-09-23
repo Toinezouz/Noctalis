@@ -1,64 +1,64 @@
-# Validation de la copie
+# Validating the copy
 
-Vérification que la copie est **fonctionnellement identique à l'original**,
-exécutée avant toute transformation d'identité.
+A record of the checks run when NOCTALIS was created (version 1.0): first
+that the copy was **functionally identical to the original**, before any
+change of identity, then that the transformed project still passed
+everything. Later versions add their own section at the end.
 
 ## Provenance
 
 | | |
 | --- | --- |
-| Source | `/home/user/Got-Five`, commit `f650a15`, arbre propre |
+| Source | `/home/user/Got-Five`, commit `f650a15`, clean tree |
 | Destination | `/home/user/noctalis` |
-| Méthode | archive `tar` excluant `node_modules`, `dist`, `.git`, `test-results`, `playwright-report` |
-| Fichiers copiés | 119 |
-| Git | dépôt neuf (`git init`), **aucun remote**, historique vierge |
+| Method | `tar` archive excluding `node_modules`, `dist`, `.git`, `test-results`, `playwright-report` |
+| Files copied | 119 |
+| Git | new repository (`git init`), **no remote**, clean history |
 
-L'historique Git de l'original n'a **pas** été copié : le nouveau projet part
-d'un premier commit propre, sans trace du projet précédent.
+The original's Git history was **not** copied: the new project starts from a
+clean first commit, with no trace of the previous project.
 
-## Résultats — copie non modifiée
+## Results — unmodified copy
 
-Commandes réellement exécutées dans `/home/user/noctalis`, sorties observées :
+Commands actually run in `/home/user/noctalis`, outputs observed:
 
-| Étape | Commande | Résultat |
+| Step | Command | Result |
 | --- | --- | --- |
-| Dépendances | `npm install` | 401 paquets, aucune erreur |
-| Types | `npm run typecheck` | ✅ 4 projets TypeScript, 0 erreur |
-| Style | `npx eslint .` | ✅ 0 erreur |
-| Tests unitaires | `npx vitest run` | ✅ **154 tests**, 11 fichiers |
-| Build | `npm run build` | ✅ shared + serveur + client |
-| Bout en bout | `npx playwright test` | ✅ **58 tests** (desktop + mobile), 2,9 min |
+| Dependencies | `npm install` | 401 packages, no error |
+| Types | `npm run typecheck` | ✅ 4 TypeScript projects, 0 errors |
+| Lint | `npx eslint .` | ✅ 0 errors |
+| Unit tests | `npx vitest run` | ✅ **154 tests**, 11 files |
+| Build | `npm run build` | ✅ shared + server + client |
+| End to end | `npx playwright test` | ✅ **58 tests** (desktop + mobile), 2.9 min |
 
-Aucune correction n'a été nécessaire : la copie fonctionne telle quelle.
+No fix was needed: the copy worked as it was.
 
-## État de l'original après la copie
+## State of the original after the copy
 
 ```
 $ git -C /home/user/Got-Five status --short
-(aucune sortie)
+(no output)
 $ git -C /home/user/Got-Five log --oneline -1
 f650a15 Mode sombre : automatique, clair ou sombre, au choix du joueur
 ```
 
-Arbre de travail propre, même commit qu'avant l'opération : **l'original n'a
-pas été touché.**
+Clean working tree, same commit as before the operation: **the original was
+not touched.**
 
-## Recherche de l'ancienne identité — état initial
+## Searching for the former identity — before
 
-Relevé avant transformation, pour mesurer le travail restant :
+Measured before the transformation, to size the work left:
 
 | Nature | Occurrences |
 | --- | --- |
-| Imports `@gotfive/*` | 67 |
-| Chaînes « GOT FIVE » | 66 |
-| Clés `gotfive:*` | 6 |
-| `data-testid` portant la marque | 20 |
+| `@gotfive/*` imports | 67 |
+| "GOT FIVE" strings | 66 |
+| `gotfive:*` keys | 6 |
+| Branded `data-testid`s | 20 |
 
-Le relevé après transformation figure plus bas, complété en fin de migration.
+## Searching for the former identity — after
 
-## Recherche de l'ancienne identité — état final
-
-Rempli après la transformation complète, par la commande vérifiable :
+Filled in after the complete transformation, with a command anyone can run:
 
 ```
 $ grep -ril "got.five\|gotfive" --exclude-dir=node_modules --exclude-dir=dist .
@@ -69,40 +69,63 @@ docs/PROJECT_CONTRACT.md
 scripts/check-contract.mjs
 ```
 
-Cinq fichiers, tous volontaires :
+Five files, all on purpose:
 
-- les **quatre documents d'audit** décrivent la migration — c'est leur sujet ;
-- `scripts/check-contract.mjs` porte le motif de recherche qui garantit,
-  à chaque exécution de la CI, qu'aucun autre fichier ne le contient.
+- the **four audit documents** describe the migration — that is their
+  subject;
+- `scripts/check-contract.mjs` holds the search pattern that makes sure, on
+  every CI run, that no other file contains it.
 
-**Aucun fichier de code applicatif, d'interface, de configuration ou de
-documentation publique ne porte l'ancienne identité.** Le vérificateur de
-contrat échoue si cela change.
+**No application code, interface, configuration or public documentation
+file carries the former identity.** The contract checker fails if that
+changes.
 
-## Résultats — copie transformée en NOCTALIS
+## Results — copy transformed into NOCTALIS 1.0
 
-| Étape | Résultat |
+| Step | Result |
 | --- | --- |
-| `npm run typecheck` | ✅ 0 erreur |
-| `npx eslint .` | ✅ 0 erreur |
-| `npm run check:contract` | ✅ 58 exports, 22 types, 19 événements, 291 clés |
+| `npm run typecheck` | ✅ 0 errors |
+| `npx eslint .` | ✅ 0 errors |
+| `npm run check:contract` | ✅ 58 exports, 22 types, 19 events, 291 keys |
 | `npm test` | ✅ **154 tests** |
-| `npm run test:e2e` | ✅ **58 tests** (desktop + mobile), 2,9 min |
+| `npm run test:e2e` | ✅ **58 tests** (desktop + mobile), 2.9 min |
 | `npm run build` | ✅ |
 
-Le vérificateur de contrat a lui-même été éprouvé : en renommant
-volontairement `toPublicGameState`, il signale bien deux violations, puis
-repasse au vert une fois le nom restauré.
+The contract checker was itself put to the test: renaming
+`toPublicGameState` on purpose made it report two violations, and it turned
+green again once the name was restored.
 
-## Recherche de secrets
+## Searching for secrets
 
 ```
 $ grep -rInE "(api[_-]?key|secret|token|password|passwd|bearer)\s*[:=]\s*['\"][^'\"]{8,}" \
     --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.git .
-(aucune correspondance)
+(no match)
 $ ls .env 2>/dev/null
 (absent)
 ```
 
-Le projet n'utilise aucun secret. `.env` est ignoré par Git ; `.env.example`
-ne contient que des valeurs d'exemple.
+The project uses no secret. `.env` is ignored by Git; `.env.example` only
+holds example values.
+
+## Version 1.1 — 2 to 4 players, new look, English
+
+Version 1.1 brings games for two to four people, a new visual identity for the
+stars, English as a third language (and the default one), gender-inclusive
+wording in French and Spanish, and a repository written in English.
+Everything below was run on 2026-09-23, before the push.
+
+| Step | Result |
+| --- | --- |
+| `npm run typecheck` | ✅ 0 errors |
+| `npm run lint` | ✅ 0 errors |
+| `npm run check:contract` | ✅ 63 exports, 23 types, 19 events, 303 keys × 3 languages |
+| `npm test` | ✅ **193 tests** in 12 files |
+| `npm run build` | ✅ |
+| `npm run test:e2e` | ✅ **64 tests** (32 desktop + 32 mobile), 3.8 min |
+| Render sequence on a clean copy (`npm ci --include=dev && npm run build`, then `npm start` with `NODE_ENV=production`) | ✅ `/health` answers `{"status":"ok",…,"env":"production"}`, 13 E2E tests (game flow, secrecy, table size) pass against it |
+| Secret search (same command as above) | ✅ one hit, the deliberately fake `'invalid-token'` in a unit test; no `.env` |
+| Original GOT FIVE! repository | ✅ untouched: clean working tree, still at `f650a15` |
+
+The screenshots in `docs/images/` were taken from a real four-player game on
+the production build.

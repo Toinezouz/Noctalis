@@ -1,23 +1,23 @@
 ---
-name: Proposer une amélioration
-about: Une idée pour le jeu ou le projet
+name: Suggest an improvement
+about: An idea for the game or the project
 title: ''
 labels: enhancement
 assignees: ''
 ---
 
-## Le besoin
+## The need
 
-<!-- Quel problème cette idée résout-elle ? Pour qui ? -->
+<!-- What problem does this idea solve? For whom? -->
 
-## La proposition
+## The idea
 
-## Alternatives envisagées
+## Alternatives you considered
 
 ## Impact
 
-- [ ] Change les règles du jeu
-- [ ] Change l'interface
-- [ ] Change le protocole réseau
-- [ ] Change le contrat (`docs/PROJECT_CONTRACT.md`)
-- [ ] Aucun des précédents
+- [ ] Changes the rules of the game
+- [ ] Changes the interface
+- [ ] Changes the network protocol
+- [ ] Changes the contract (`docs/PROJECT_CONTRACT.md`)
+- [ ] None of the above

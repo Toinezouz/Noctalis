@@ -3,22 +3,22 @@ import { Tile } from './Tile.js';
 
 export interface TileStackProps {
   tiles: TileData[];
-  /** Etoiles inclinees (reponse NON), reperees par numero. */
+  /** Stars that got a NO, by number. */
   tiltedNumbers?: number[];
   size?: 'xs' | 'sm' | 'md';
   label?: string;
 }
 
 /**
- * Au-dela de ce nombre de etoiles, la pile se resserre pour qu'une encoche tres
- * chargee ne fasse pas grandir le support indefiniment.
+ * Beyond this many stars the stack tightens, so that a crowded gap does not
+ * make the rack grow forever.
  */
 const LOOSE_STACK_LIMIT = 5;
 
 /**
- * Empilement de etoiles : plusieurs etoiles peuvent etre situees dans la meme
- * encoche, ou jaugees a la meme position secrete. Les etoiles se superposent
- * verticalement, chaque numero restant lisible.
+ * A stack of stars: several stars can land in the same gap, or be gauged
+ * against the same position. They overlap vertically and every number stays
+ * readable.
  */
 export function TileStack({
   tiles,

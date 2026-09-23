@@ -3,27 +3,45 @@ import { Paravent } from './Paravent.js';
 import { Rack } from './Rack.js';
 
 export interface OpponentRackProps {
+  playerId: string;
   name: string;
   colors: TileColor[];
-  /** Les etoiles de l'adversaire : je vois leurs numeros. */
+  /** Their stars: I can read their numbers. */
   faces: TileData[] | null;
   classifications: ClassifyResult[];
   comparisons: CompareResult[];
   connected?: boolean;
+  active?: boolean;
+  answering?: boolean;
+  out?: boolean;
 }
 
-/** Le support d'en face : ses etoiles sont visibles, les miennes ne le sont pas. */
+/** Someone else's rack: their stars face up, since only mine are hidden from me. */
 export function OpponentRack({
+  playerId,
   name,
   colors,
   faces,
   classifications,
   comparisons,
   connected = true,
+  active = false,
+  answering = false,
+  out = false,
 }: OpponentRackProps): JSX.Element {
   return (
-    <div className="player-zone player-zone--opponent">
-      <Paravent name={name} side="opponent" connected={connected} />
+    <div
+      className={`player-zone player-zone--opponent ${active ? 'is-active' : ''}`.trim()}
+      data-player-id={playerId}
+    >
+      <Paravent
+        name={name}
+        side="opponent"
+        connected={connected}
+        active={active}
+        answering={answering}
+        out={out}
+      />
       <Rack
         ownerName={name}
         colors={colors}

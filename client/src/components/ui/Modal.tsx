@@ -1,10 +1,12 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useI18n } from '../../i18n/index.js';
+import { Icon } from './Icon.js';
 import { IconButton } from './IconButton.js';
 
 /**
- * Verrou de defilement partage : deux modales peuvent etre ouvertes en meme
- * temps (tutoriel + demande d'indice obligatoire). Sans compteur, la fermeture
- * de la seconde restaurerait `overflow: hidden` et bloquerait la page.
+ * Shared scroll lock: two dialogs can be open at once (tutorial + a question
+ * that must be answered). Without a counter, closing the second one would
+ * restore `overflow: hidden` and freeze the page.
  */
 let scrollLocks = 0;
 let previousBodyOverflow = '';
@@ -29,17 +31,17 @@ export interface ModalProps {
   title: ReactNode;
   children: ReactNode;
   onClose?: () => void;
-  /** Actions affichees en pied de modale. */
+  /** Actions shown at the bottom of the dialog. */
   actions?: ReactNode;
   wide?: boolean;
-  /** Empeche la fermeture (etapes obligatoires : repondre a un indice). */
+  /** Prevents closing (mandatory steps: answering a question). */
   mandatory?: boolean;
   labelledBy?: string;
 }
 
 /**
- * Modale accessible : focus piege, fermeture au clavier (sauf etape
- * obligatoire), restitution du focus a la fermeture.
+ * Accessible dialog: focus trapped inside, closes with the keyboard (except
+ * for mandatory steps), gives focus back when closed.
  */
 export function Modal({
   open,
@@ -50,6 +52,7 @@ export function Modal({
   wide,
   mandatory = false,
 }: ModalProps): JSX.Element | null {
+  const { t } = useI18n();
   const dialogRef = useRef<HTMLDivElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
 
@@ -123,8 +126,8 @@ export function Modal({
         <h2 className="modal__title">{title}</h2>
         {!mandatory && onClose ? (
           <span className="modal__close">
-            <IconButton label="Fermer" onClick={onClose}>
-              ✕
+            <IconButton label={t('common.close')} onClick={onClose}>
+              <Icon name="close" />
             </IconButton>
           </span>
         ) : null}

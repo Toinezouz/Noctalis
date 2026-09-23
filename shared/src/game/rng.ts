@@ -1,14 +1,14 @@
 /**
- * Generateur pseudo-aleatoire injectable. Le serveur utilise `defaultRng`
- * (base sur `Math.random`), les tests utilisent `createSeededRng` pour obtenir
- * des parties parfaitement reproductibles.
+ * Injectable pseudo-random generator. The server uses `defaultRng` (built on
+ * `Math.random`); the tests use `createSeededRng` to get perfectly
+ * reproducible games.
  */
 export type Rng = () => number;
 
-/** RNG par defaut : `Math.random`. */
+/** Default RNG: `Math.random`. */
 export const defaultRng: Rng = () => Math.random();
 
-/** RNG deterministe (mulberry32). Meme graine => meme partie. */
+/** Deterministic RNG (mulberry32). Same seed => same game. */
 export function createSeededRng(seed: number): Rng {
   let a = seed >>> 0;
   return () => {
@@ -20,15 +20,15 @@ export function createSeededRng(seed: number): Rng {
   };
 }
 
-/** Entier dans [0, max). */
+/** Integer in [0, max). */
 export function randomInt(rng: Rng, max: number): number {
   return Math.floor(rng() * max);
 }
 
-/** Element aleatoire d'un tableau non vide. */
+/** Random item of a non-empty array. */
 export function pickRandom<T>(rng: Rng, items: readonly T[]): T {
   if (items.length === 0) {
-    throw new RangeError('pickRandom: tableau vide');
+    throw new RangeError('pickRandom: empty array');
   }
   return items[randomInt(rng, items.length)]!;
 }

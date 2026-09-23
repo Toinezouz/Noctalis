@@ -1,92 +1,109 @@
-# Contribuer à NOCTALIS
+# Contributing to NOCTALIS
 
-Merci de vous intéresser au projet. Toute contribution est bienvenue :
-correction, traduction, accessibilité, idée de règle, relecture.
+Thanks for stopping by! Every kind of help is welcome: a bug fix, a
+translation, an accessibility improvement, a rule idea, a second pair of eyes
+on a pull request.
 
-## Démarrer
+## Getting started
 
-Pré-requis : **Node.js ≥ 20**.
+You need **Node.js 20 or later**.
 
 ```bash
 git clone https://github.com/Toinezouz/Noctalis.git
-cd noctalis
+cd Noctalis
 npm install
 npm run dev
 ```
 
-- Client : http://localhost:5173
-- Serveur : http://localhost:3001 (état : `GET /health`)
+- Client: http://localhost:5173
+- Server: http://localhost:3001 (health check: `GET /health`)
 
-Pour jouer, ouvrez **deux navigateurs** (ou une fenêtre privée) : chaque
-onglet est un observateur distinct.
+To play, open **two to four browser windows** (private windows work well):
+each one is a different person at the table.
 
-## Commandes
+## Commands
 
-| Commande | Rôle |
+| Command | What it does |
 | --- | --- |
-| `npm run dev` | serveur + client en développement |
-| `npm run build` | construit `shared`, `server`, puis `client` |
-| `npm start` | démarre le serveur compilé |
-| `npm test` | tests unitaires et d'intégration (Vitest) |
-| `npm run test:e2e` | tests bout en bout (Playwright) |
-| `npm run typecheck` | TypeScript strict, 4 projets |
+| `npm run dev` | server + client in development mode |
+| `npm run build` | builds `shared`, `server`, then `client` |
+| `npm start` | starts the built server (it also serves the client) |
+| `npm run share` | plays with friends far away through a temporary Cloudflare link |
+| `npm test` | unit and integration tests (Vitest) |
+| `npm run test:e2e` | end-to-end tests (Playwright) |
+| `npm run typecheck` | strict TypeScript, 4 projects |
 | `npm run lint` | ESLint |
-| `npm run check:contract` | vérifie que le code respecte `docs/PROJECT_CONTRACT.md` |
+| `npm run check:contract` | checks the code against `docs/PROJECT_CONTRACT.md` |
 
-## Avant d'ouvrir une pull request
+## Before opening a pull request
 
-Ces quatre commandes doivent passer :
+These must pass:
 
 ```bash
 npm run typecheck
 npm run lint
+npm run check:contract
 npm test
 npm run build
 ```
 
-Et, si vous touchez à l'interface :
+And if you touched the interface:
 
 ```bash
 npm run test:e2e
 ```
 
-## Conventions
+## House rules
 
-**Le contrat prime.** `docs/PROJECT_CONTRACT.md` fige les noms de types, les
-signatures, les événements Socket.IO et les `data-testid`. Un même concept n'a
-qu'un seul nom dans tout le projet. Pour changer une signature : modifiez le
-contrat, modifiez tous les consommateurs, puis lancez `npm run check:contract`.
+**The contract comes first.** `docs/PROJECT_CONTRACT.md` freezes type names,
+signatures, Socket.IO events and `data-testid`s. One concept has one name
+across the whole project. To change a signature: update the contract, update
+every consumer, then run `npm run check:contract`.
 
-**Le serveur est la seule source de vérité.** Le client ne décide jamais du
-résultat d'une action. Aucune information qu'un joueur n'a pas le droit de
-connaître ne doit lui parvenir, par aucun canal. Si votre changement touche à
-la sérialisation, ajoutez un test qui le prouve.
+**The server is the only source of truth.** The client never decides the
+outcome of an action, and nobody ever receives information they are not
+allowed to know — through any channel. If your change touches what is sent
+to players, add a test that proves nothing leaks.
 
-**Une seule source de données.** Les propriétés des 60 étoiles vivent dans
-`shared/src/data/tiles.ts`. Aucun composant ne recopie une correspondance
-numéro → constellation → éclat.
+**One source of data.** Everything about the 60 stars lives in
+`shared/src/data/tiles.ts`. No component copies a number → constellation →
+brightness mapping.
 
-**Style.** TypeScript strict, pas de `any`, pas de `TODO` laissé derrière soi.
-Les commentaires expliquent *pourquoi*, pas *quoi*. Le français est la langue
-du code et des commentaires ; l'interface est traduite en français et en
-espagnol, les deux catalogues devant toujours porter exactement les mêmes clés.
+**Code style.** Strict TypeScript, no `any`, no `TODO` left behind. Comments
+explain *why*, not *what*. Code, comments, docs and commit messages are in
+English.
 
-**Messages de commit.** Préfixe conventionnel : `feat:`, `fix:`, `refactor:`,
-`docs:`, `test:`, `ci:`, `chore:`. Sujet à l'impératif, en français.
+**Commit messages.** Conventional prefix (`feat:`, `fix:`, `refactor:`,
+`docs:`, `test:`, `ci:`, `chore:`), imperative subject, in English.
 
-## Traduire
+## Writing texts for players
 
-Une langue = un fichier dans `client/src/i18n/`. Copiez `fr.ts`, traduisez les
-valeurs, gardez les clés et les variables `{entre_accolades}` à l'identique —
-un test unitaire vérifie la parité et la compilation échoue si une clé manque.
+Everything players read lives in `client/src/i18n/`: `en.ts` is the
+reference, `fr.ts` and `es.ts` follow it key by key. A few principles, checked
+in part by the unit tests:
 
-## Signaler un bug
+- **Talk about the game, never about the machinery.** No "server", "data",
+  "session" or "token" in the interface. Those words belong in the README.
+- **Write for everyone at the table.** In French and Spanish, prefer words that
+  do not assume anybody's gender ("astronome", "adversaire", "persona",
+  "quien juega"...) over forms with median dots or other markers.
+- **Keep it warm and short.** Rules should read like a friend explaining the
+  game, not like a manual.
 
-Utilisez le gabarit d'issue. Précisez ce que vous attendiez, ce qui s'est
-produit, et comment reproduire. Une faille de sécurité ne se signale **pas**
-en issue publique : voir [SECURITY.md](SECURITY.md).
+## Adding a language
+
+Copy `en.ts` to `xx.ts`, translate the values, keep the keys and the
+`{variables}` exactly as they are, and add the language to `LANGUAGES` in
+`client/src/i18n/index.tsx`. The compiler fails if a key is missing, and a
+unit test checks that variables match.
+
+## Reporting a bug
+
+Please use the issue template: what you expected, what happened, how to
+reproduce it. A security issue must **not** be reported in a public issue:
+see [SECURITY.md](SECURITY.md).
 
 ## Licence
 
-En contribuant, vous acceptez que votre contribution soit publiée sous
-**AGPL-3.0-or-later**, comme le reste du projet.
+By contributing, you agree that your contribution is released under
+**AGPL-3.0-or-later**, like the rest of the project.

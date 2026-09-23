@@ -5,18 +5,21 @@ import { Rack } from './Rack.js';
 export interface PlayerRackProps {
   name: string;
   colors: TileColor[];
-  /** Renseigne uniquement a la fin de la partie (revelation). */
+  /** Only filled in at the end of the game (final reveal). */
   revealedFaces?: TileData[] | null;
   classifications: ClassifyResult[];
   comparisons: CompareResult[];
   selectedPosition?: number | null;
   onSelectPosition?: (position: number) => void;
   connected?: boolean;
+  active?: boolean;
+  answering?: boolean;
+  out?: boolean;
 }
 
 /**
- * Mon support : mes 5 etoiles restent face cachee (leur numero n'existe pas
- * cote client), entourees des 6 encoches et des etoiles jaugees.
+ * My rack: my five stars stay eclipsed (their numbers do not exist on this
+ * side), surrounded by the six gaps and by the stars that were gauged.
  */
 export function PlayerRack({
   name,
@@ -27,9 +30,12 @@ export function PlayerRack({
   selectedPosition,
   onSelectPosition,
   connected = true,
+  active = false,
+  answering = false,
+  out = false,
 }: PlayerRackProps): JSX.Element {
   return (
-    <div className="player-zone player-zone--mine">
+    <div className={`player-zone player-zone--mine ${active ? 'is-active' : ''}`.trim()}>
       <Rack
         ownerName={name}
         colors={colors}
@@ -39,7 +45,14 @@ export function PlayerRack({
         selectedPosition={selectedPosition ?? null}
         onSelectPosition={onSelectPosition}
       />
-      <Paravent name={name} side="mine" connected={connected} />
+      <Paravent
+        name={name}
+        side="mine"
+        connected={connected}
+        active={active}
+        answering={answering}
+        out={out}
+      />
     </div>
   );
 }

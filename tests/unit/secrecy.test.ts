@@ -16,12 +16,12 @@ import {
 } from '@noctalis/shared';
 import { gameStartedByAlice } from './gameFixture.js';
 
-/** Partie reproductible dans laquelle Alice ouvre le jeu. */
+/** Reproducible game in which Alice opens. */
 function game(seed: number): { state: GameState; rng: () => number } {
   return gameStartedByAlice(seed);
 }
 
-/** Numeros lus dans les champs qui portent reellement des numeros de tuile. */
+/** Numbers read from the fields that really carry star numbers. */
 function tileNumbersIn(payload: unknown): Set<number> {
   const out = new Set<number>();
   const walk = (value: unknown, key: string): void => {
@@ -45,15 +45,15 @@ function tileNumbersIn(payload: unknown): Set<number> {
   return out;
 }
 
-describe('protection des informations secretes', () => {
-  it("la vue privee d'Alice ne contient aucun de ses propres numeros", () => {
+describe('protecting secret information', () => {
+  it('Alice\'s private view holds none of her own numbers', () => {
     for (let seed = 0; seed < 40; seed += 1) {
       const { state } = game(seed);
       const alice = getPlayer(state, 'alice')!;
       const payload = toPlayerPrivateState(state, 'alice');
       const found = tileNumbersIn(payload);
       for (const secret of alice.secret) {
-        expect(found.has(secret), `fuite du numero ${String(secret)} (graine ${String(seed)})`).toBe(
+        expect(found.has(secret), `leak of number ${String(secret)} (seed ${String(seed)})`).toBe(
           false,
         );
       }
@@ -61,25 +61,25 @@ describe('protection des informations secretes', () => {
     }
   });
 
-  it("la vue privee d'Alice contient bien les 5 numeros de Bob", () => {
+  it('Alice\'s private view does hold Bob\'s 5 numbers', () => {
     const { state } = game(5);
     const bob = getPlayer(state, 'bob')!;
     const priv = toPlayerPrivateState(state, 'alice')!;
-    expect(priv.opponentTiles.map((t) => t.number)).toEqual(bob.secret);
-    expect(priv.opponentTiles.every((t) => t.points >= 1 && t.points <= 3)).toBe(true);
+    expect(priv.rivals[0]!.tiles.map((t) => t.number)).toEqual(bob.secret);
+    expect(priv.rivals[0]!.tiles.every((t) => t.points >= 1 && t.points <= 3)).toBe(true);
   });
 
-  it('la symetrie est vraie pour Bob', () => {
+  it('the same holds for Bob', () => {
     const { state } = game(6);
     const alice = getPlayer(state, 'alice')!;
     const bob = getPlayer(state, 'bob')!;
     const priv = toPlayerPrivateState(state, 'bob')!;
-    expect(priv.opponentTiles.map((t) => t.number)).toEqual(alice.secret);
+    expect(priv.rivals[0]!.tiles.map((t) => t.number)).toEqual(alice.secret);
     expect(findSecretLeak(state, 'bob', priv)).toBeNull();
     expect(tileNumbersIn(priv).has(bob.secret[0]!)).toBe(false);
   });
 
-  it('mes tuiles ne revelent que couleur et position (jamais les points)', () => {
+  it('my stars only show constellation and position (never brightness)', () => {
     const { state } = game(7);
     const priv = toPlayerPrivateState(state, 'alice')!;
     expect(priv.myTiles).toHaveLength(5);
@@ -89,7 +89,7 @@ describe('protection des informations secretes', () => {
     });
   });
 
-  it("l'etat public ne contient aucun numero secret tant que la partie n'est pas finie", () => {
+  it('the public state holds no secret number until the game is over', () => {
     const { state, rng } = game(8);
     revealTile(state, 'alice', 'green', rng);
     requestClassify(state, 'alice', state.publicTiles[5]!.tile.number);
@@ -98,7 +98,7 @@ describe('protection des informations secretes', () => {
     const found = tileNumbersIn(pub);
     for (const player of state.players) {
       for (const secret of player.secret) {
-        expect(found.has(secret), `numero secret ${String(secret)} present dans l'etat public`).toBe(
+        expect(found.has(secret), `secret number ${String(secret)} found in the public state`).toBe(
           false,
         );
       }
@@ -106,7 +106,7 @@ describe('protection des informations secretes', () => {
     expect(pub.finalReveal).toBeNull();
   });
 
-  it("l'etat public expose les couleurs des supports, dans l'ordre", () => {
+  it('the public state shows the constellations of every rack, in order', () => {
     const { state } = game(9);
     const pub = toPublicGameState(state);
     for (const player of pub.players) {
@@ -115,7 +115,7 @@ describe('protection des informations secretes', () => {
     }
   });
 
-  it('ne fuit rien apres une serie complete de coups (classer + comparer)', () => {
+  it('leaks nothing after a full series of moves (PLACE + GAUGE)', () => {
     const { state, rng } = game(12);
     for (let i = 0; i < 8; i += 1) {
       const active = state.activePlayerId!;
@@ -138,7 +138,7 @@ describe('protection des informations secretes', () => {
     }
   });
 
-  it('ne donne la reponse COMPARER qu au repondeur', () => {
+  it('only gives the GAUGE answer to the responder', () => {
     const { state, rng } = game(15);
     revealTile(state, 'alice', 'blue', rng);
     requestCompare(state, 'alice', state.publicTiles[5]!.tile.number, 1);
@@ -148,7 +148,7 @@ describe('protection des informations secretes', () => {
     expect(typeof bobView.pendingResponse!.truth).toBe('boolean');
   });
 
-  it("ne revele les secrets qu'a la fin de la partie", () => {
+  it('only reveals secrets once the game is over', () => {
     const { state } = game(16);
     const alice = getPlayer(state, 'alice')!;
     submitGuess(state, 'alice', alice.secret);
@@ -159,7 +159,7 @@ describe('protection des informations secretes', () => {
     expect(pub.finalReveal!['bob']!.map((t) => t.number)).toEqual(getPlayer(state, 'bob')!.secret);
   });
 
-  it("l'historique public ne cite que des tuiles publiques", () => {
+  it('the public history only mentions public stars', () => {
     const { state, rng } = game(21);
     revealTile(state, 'alice', 'orange', rng);
     requestClassify(state, 'alice', state.publicTiles[5]!.tile.number);
@@ -172,7 +172,7 @@ describe('protection des informations secretes', () => {
     }
   });
 
-  it('le garde-fou detecte reellement une fuite volontaire', () => {
+  it('the guard really catches a deliberate leak', () => {
     const { state } = game(23);
     const alice = getPlayer(state, 'alice')!;
     const target = alice.secret.find((n) => n > 6)!;
@@ -180,35 +180,35 @@ describe('protection des informations secretes', () => {
     const leak = findSecretLeak(state, 'alice', forged);
     expect(leak).not.toBeNull();
     expect(leak!.number).toBe(target);
-    // ...et dans un texte d'historique falsifie.
-    const forgedLog = { log: [{ text: `Tes tuiles sont ${String(target)}` }] };
+    // ...and inside a forged history text.
+    const forgedLog = { log: [{ text: `Your stars are ${String(target)}` }] };
     expect(findSecretLeak(state, 'alice', forgedLog)).not.toBeNull();
-    // ...alors qu'un identifiant contenant des chiffres n'est pas une fuite.
+    // ...while an identifier containing digits is not a leak.
     expect(findSecretLeak(state, 'alice', { id: `log-${String(target)}-42` })).toBeNull();
   });
 
-  it('renvoie null pour un joueur inconnu', () => {
+  it('returns null for an unknown player', () => {
     const { state } = game(22);
     expect(toPlayerPrivateState(state, 'mallory')).toBeNull();
     expect(findSecretLeak(state, 'mallory', {})).toBeNull();
   });
 });
 
-describe('robustesse du garde-fou anti-fuite', () => {
-  it('ne se declenche pas sur les chiffres des identifiants opaques', () => {
+describe('robustness of the leak guard', () => {
+  it('ignores the digits of opaque identifiers', () => {
     const { state } = game(31);
     const alice = getPlayer(state, 'alice')!;
     const secret = alice.secret.find((n) => n > 6)!;
     const payload = {
       publicTiles: [{ revealedBy: `p_x${String(secret)}Zq`, order: 1 }],
-      log: [{ id: `log-${String(secret)}-991`, text: 'La partie continue.' }],
+      log: [{ id: `log-${String(secret)}-991`, text: 'The game goes on.' }],
       room: { code: `A${String(secret)}K9` },
-      privateState: { playerId: `p_${String(secret)}abc`, opponentId: `p_${String(secret)}def` },
+      privateState: { playerId: `p_${String(secret)}abc`, rivalId: `p_${String(secret)}def` },
     };
     expect(findSecretLeak(state, 'alice', payload)).toBeNull();
   });
 
-  it('ne se declenche pas sur un pseudo contenant des chiffres', () => {
+  it('ignores a name that contains digits', () => {
     const rng = createSeededRng(33);
     const state = createGame(
       [
@@ -219,16 +219,28 @@ describe('robustesse du garde-fou anti-fuite', () => {
     );
     const alice = getPlayer(state, 'alice')!;
     const payload = {
-      log: [{ text: `Bob37 joue contre Alice12 au tour ${String(state.turn)}.` }],
+      log: [{ text: `Bob37 plays against Alice12 on turn ${String(state.turn)}.` }],
       players: [{ name: 'Bob37' }, { name: 'Alice12' }],
     };
     expect(findSecretLeak(state, 'alice', payload)).toBeNull();
-    // Mais un vrai numero secret dans le meme texte reste detecte.
+    // But a real secret number in the same text is still caught.
     const secret = alice.secret.find((n) => n > 6 && n !== 37 && n !== 12)!;
     expect(
       findSecretLeak(state, 'alice', {
-        log: [{ text: `Bob37 possede la tuile ${String(secret)}.` }],
+        log: [{ text: `Bob37 holds star ${String(secret)}.` }],
       }),
     ).not.toBeNull();
+  });
+});
+
+describe('leak guard and the turn order', () => {
+  it('reads the published turn order as identifiers, not as numbers', () => {
+    const { state } = game(41);
+    const alice = getPlayer(state, 'alice')!;
+    const secret = alice.secret.find((n) => n > 6)!;
+    // Player ids are random and may contain any digits.
+    const payload = { publicState: { order: [`p_${String(secret)}x`, `p_q${String(secret)}`] } };
+    expect(findSecretLeak(state, 'alice', payload)).toBeNull();
+    expect(findSecretLeak(state, 'alice', { room: { rematchReady: [`p_${String(secret)}`] } })).toBeNull();
   });
 });

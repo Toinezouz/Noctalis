@@ -16,14 +16,14 @@ export interface GuessDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (numbers: number[]) => void;
-  /** Valeurs pre-remplies depuis la carte du ciel. */
+  /** Values pre-filled from the star chart. */
   initial?: string[];
   busy?: boolean;
 }
 
 /**
- * Annonce CONSTELLATION : 5 numeros entiers, entre 1 et 60, en ordre croissant,
- * une etoile de chaque constellation. Une seule tentative par joueur.
+ * The CONSTELLATION! call: five whole numbers from 1 to 60, in ascending
+ * order, one star of each constellation. One call per player.
  */
 export function GuessDialog({
   open,
@@ -32,7 +32,7 @@ export function GuessDialog({
   initial,
   busy = false,
 }: GuessDialogProps): JSX.Element | null {
-  const { t } = useI18n();
+  const { t, points: pointsLabel } = useI18n();
   const [values, setValues] = useState<string[]>(['', '', '', '', '']);
   const [confirming, setConfirming] = useState(false);
 
@@ -124,7 +124,7 @@ export function GuessDialog({
                   setValues(next);
                 }}
               />
-              {tile ? <span className="badge badge--muted">{tile.points} pt</span> : null}
+              {tile ? <span className="badge badge--muted">{pointsLabel(tile.points)}</span> : null}
             </label>
           );
         })}

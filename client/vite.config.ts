@@ -18,7 +18,7 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
     proxy: {
-      // En developpement, le client parle au serveur via la meme origine.
+      // In development, the client talks to the server through the same origin.
       '/socket.io': {
         target: process.env['VITE_SERVER_URL'] ?? 'http://localhost:3001',
         ws: true,

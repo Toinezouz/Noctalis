@@ -1,106 +1,107 @@
-# Déploiement
+# Deployment
 
-NOCTALIS se déploie en **un seul service**. Le serveur Express sert à la fois
-le client compilé, l'API et Socket.IO : même origine, aucun réglage CORS à
-faire, aucun second service à payer ou à surveiller.
+NOCTALIS deploys as **a single service**. The Express server serves the
+built client, the API and Socket.IO at once: same origin, no CORS settings,
+no second service to pay for or keep an eye on.
 
 ```
-git push  →  GitHub Actions  →  Render
-              types, style,       build, start,
-              contrat, tests,     sonde /health
-              build, E2E
+git push  →  GitHub Actions   →  Render
+             types, lint,         build, start,
+             contract, tests,     /health probe
+             build, E2E
 ```
 
-## Ce que le dépôt fournit déjà
+## What the repository already provides
 
-| Élément | Où | État |
+| Piece | Where | Status |
 | --- | --- | --- |
-| Description du service | [`render.yaml`](../render.yaml) | prêt |
-| Écoute sur `0.0.0.0` et `process.env.PORT` | `server/src/index.ts` | prêt |
-| Sonde de santé `GET /health` | `server/src/createServer.ts` | prêt |
-| Arrêt propre sur `SIGTERM` | `server/src/index.ts` | prêt |
-| Client servi par le serveur | `createServer.ts` (`express.static` + repli SPA) | prêt |
-| Vérifications avant déploiement | `.github/workflows/ci.yml` | prêt |
+| Service description | [`render.yaml`](../render.yaml) | ready |
+| Listens on `0.0.0.0` and `process.env.PORT` | `server/src/index.ts` | ready |
+| Health probe `GET /health` | `server/src/createServer.ts` | ready |
+| Clean shutdown on `SIGTERM` | `server/src/index.ts` | ready |
+| Client served by the server | `createServer.ts` (`express.static` + SPA fallback) | ready |
+| Checks before deploying | `.github/workflows/ci.yml` | ready |
 
-Aucun secret n'est nécessaire : le projet n'en utilise aucun.
+No secret is needed: the project uses none.
 
-## Mettre le service en ligne
+## Putting the service online
 
-1. Sur [render.com](https://render.com), connectez votre compte GitHub et
-   autorisez l'accès au dépôt.
-2. **New → Blueprint**, puis choisissez `Toinezouz/Noctalis`.
-3. Render lit `render.yaml` et propose un Web Service nommé `noctalis` :
-   - construction : `npm ci --include=dev && npm run build`
-   - démarrage : `npm start`
-   - sonde : `/health`
-   - déploiement automatique **seulement si les vérifications passent**
+1. On [render.com](https://render.com), connect your GitHub account and allow
+   access to the repository.
+2. **New → Blueprint**, then pick `Toinezouz/Noctalis` (or your fork).
+3. Render reads `render.yaml` and offers a Web Service called `noctalis`:
+   - build: `npm ci --include=dev && npm run build`
+   - start: `npm start`
+   - probe: `/health`
+   - automatic deploys **only once the checks pass**
      (`autoDeployTrigger: checksPass`)
-4. Validez. La première construction prend quelques minutes.
+4. Confirm. The first build takes a few minutes.
 
-## Un piège à connaître : `NODE_ENV` pendant la construction
+## A trap worth knowing: `NODE_ENV` during the build
 
-`render.yaml` déclare `NODE_ENV=production`, et cette variable s'applique
-**aussi à la phase de construction**. Or `npm ci` saute les
-`devDependencies` quand `NODE_ENV` vaut `production` — c'est-à-dire
-exactement esbuild, TypeScript et Vite, les outils qui construisent le
-projet. La construction échoue alors sur :
+`render.yaml` sets `NODE_ENV=production`, and that variable **also applies to
+the build**. But `npm ci` skips `devDependencies` when `NODE_ENV` is
+`production` — that is, exactly esbuild, TypeScript and Vite, the tools that
+build the project. The build then fails with:
 
 ```
 sh: 1: esbuild: not found
 ```
 
-D'où le `--include=dev` de la commande de construction :
+Hence the `--include=dev` in the build command:
 
 ```yaml
 buildCommand: npm ci --include=dev && npm run build
 ```
 
-Les dépendances de développement ne servent qu'à construire ; le service qui
-tourne ensuite n'utilise que `express`, `socket.io` et `cors`.
+Development dependencies are only used to build; the running service only
+uses `express`, `socket.io` and `cors`.
 
-## L'instance publique
+## The public instance
 
-Le service de référence du projet est
-[noctalis.onrender.com](https://noctalis.onrender.com), déployé depuis `main`
-par le blueprint ci-dessus. Vérifié en ligne le 23/09/2026 :
+The project's reference table is
+[noctalis.onrender.com](https://noctalis.onrender.com), deployed from `main`
+by the blueprint above. Checked online on 23 September 2026 (version 1.0):
 
 ```
 GET /health → {"status":"ok","rooms":1,"uptime":290.4,"env":"production"}
 GET /       → <title>NOCTALIS - Devine ta constellation avant lui</title>
 ```
 
-## Vérifier que tout fonctionne
+From version 1.1 on, the served title is
+`NOCTALIS - Find your constellation before anyone else`.
+
+## Checking that everything works
 
 ```bash
-# 1. Le service répond
-curl https://<votre-service>.onrender.com/health
-# attendu : {"status":"ok","rooms":0,"uptime":...,"env":"production"}
+# 1. The service answers
+curl https://<your-service>.onrender.com/health
+# expected: {"status":"ok","rooms":0,"uptime":...,"env":"production"}
 
-# 2. Le client est servi
-curl -s https://<votre-service>.onrender.com/ | grep -o '<title>.*</title>'
-# attendu : <title>NOCTALIS - Devine ta constellation avant lui</title>
+# 2. The client is served
+curl -s https://<your-service>.onrender.com/ | grep -o '<title>.*</title>'
+# expected: <title>NOCTALIS - Find your constellation before anyone else</title>
 ```
 
-Puis, dans un navigateur :
+Then, in a browser:
 
-1. ouvrez l'adresse publique ;
-2. créez une observation — un code à 5 caractères s'affiche ;
-3. ouvrez une **seconde fenêtre** (ou un autre appareil), rejoignez avec le
-   code ;
-4. jouez deux ou trois tours : révélation, SITUER, JAUGER ;
-5. ouvrez la carte du ciel, barrez quelques numéros ;
-6. rechargez une des deux pages : la partie doit reprendre où elle en était ;
-7. faites une annonce pour atteindre la fin de partie ;
-8. vérifiez les liens du pied de page : code source, licence, À propos,
-   soutien.
+1. open the public address;
+2. start a game — a 5-character code shows up;
+3. open **one to three more windows** (or other devices) and join with the
+   code;
+4. play a few turns: reveal, PLACE, GAUGE;
+5. open the star chart, cross out a few numbers;
+6. reload one of the pages: the game must pick up where it was;
+7. make a call to reach the end of the game;
+8. check the footer links: source code, licence, About, support.
 
-Si le point 3 fonctionne, Socket.IO passe correctement — c'est le seul point
-qui pourrait poser problème derrière un hébergeur.
+If step 3 works, Socket.IO gets through — the only thing that could go wrong
+behind a host.
 
-### Reproduire la séquence de Render en local
+### Replaying Render's sequence locally
 
-Avant de pousser un changement touchant au déploiement, la même séquence se
-rejoue à l'identique sur votre machine :
+Before pushing a change that touches deployment, the same sequence can be
+replayed exactly on your machine:
 
 ```bash
 git clone . /tmp/render-sim && cd /tmp/render-sim
@@ -108,46 +109,47 @@ NODE_ENV=production npm ci --include=dev
 NODE_ENV=production npm run build
 NODE_ENV=production PORT=3001 CLIENT_URL=127.0.0.1:3001 npm start
 
-# dans un autre terminal
+# in another terminal
 curl -s localhost:3001/health
 ```
 
-`CLIENT_URL` est volontairement donné **sans schéma** : c'est ce que fournit
-`fromService` chez Render, et le serveur doit le compléter tout seul.
+`CLIENT_URL` is deliberately given **without a scheme**: that is what
+Render's `fromService` provides, and the server must complete it by itself.
 
-## Le plan gratuit de Render
+## Render's free plan
 
-Un service gratuit **s'endort après 15 minutes sans trafic**. Le réveil prend
-30 à 60 secondes, et **les observations en cours sont perdues** : les salons
-vivent en mémoire.
+A free service **falls asleep after 15 minutes without traffic**. Waking up
+takes 30 to 60 seconds, and **games in progress are lost**: rooms live in
+memory.
 
-Ce n'est pas gênant pour une partie entre amis — on ouvre le lien, on attend
-le réveil, on joue. Ça le devient si vous voulez un service toujours prêt :
-il faut alors un plan payant, ou accepter le réveil.
+That is no trouble for a game among friends — open the link, wait for it to
+wake, play. It becomes one if you want a service that is always ready: you
+then need a paid plan, or to accept the wake-up.
 
-## Limite assumée : la mémoire
+## A deliberate limit: memory
 
-`RoomManager` garde les observations en mémoire. Conséquences :
+`RoomManager` keeps games in memory. As a consequence:
 
-- un redémarrage, un déploiement ou une mise en veille perd les parties ;
-- le service doit rester en **une seule instance** — avec deux machines, un
-  joueur pourrait arriver sur celle qui ne connaît pas son salon.
+- a restart, a deploy or a sleep loses the games in progress;
+- the service must stay **a single instance** — with two machines, a player
+  could land on the one that does not know their room.
 
-C'est un choix, pas un oubli : une base de données serait un poids inutile
-pour des parties de quelques dizaines de minutes. Si le besoin apparaît,
-l'interface `RoomManager` est le seul point à remplacer.
+That is a choice, not an oversight: a database would be dead weight for
+games played in one sitting. Should the need arise, `RoomManager` is the only
+piece to replace.
 
-## Héberger ailleurs
+## Hosting elsewhere
 
-Le projet n'a besoin que de Node 20, d'un port et d'un processus persistant.
-Toute plateforme capable de faire tourner `npm ci && npm run build` puis
-`npm start` convient — à condition de **supporter les WebSockets** et de ne
-pas exécuter le service en mode sans état.
+The project only needs Node 20, a port and a long-running process. Any
+platform able to run `npm ci --include=dev && npm run build` and then
+`npm start` will do — as long as it **supports WebSockets** and does not run
+the service in a stateless way.
 
-Pour une partie ponctuelle entre amis, sans rien héberger :
+For a one-off game among friends, without hosting anything:
 
 ```bash
 npm run share
 ```
 
-ouvre un tunnel éphémère vers votre machine et affiche un lien à partager.
+opens a temporary tunnel to your machine and prints a link to share (on
+Windows, double-click `play.cmd`).

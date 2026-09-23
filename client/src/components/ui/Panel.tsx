@@ -5,7 +5,7 @@ export interface PanelProps {
   children: ReactNode;
   className?: string;
   flat?: boolean;
-  /** Element affiche a droite du titre (compteur, bouton...). */
+  /** Shown to the right of the title (counter, button...). */
   aside?: ReactNode;
   id?: string;
 }

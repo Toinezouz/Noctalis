@@ -8,11 +8,11 @@ export interface PublicTilePoolProps {
   onSelect?: (tileNumber: number) => void;
   selectable: boolean;
   reserveByColor: Record<TileColor, number>;
-  /** Numero de la derniere etoile revelee (mise en avant). */
+  /** Number of the last revealed star (highlighted). */
   lastRevealed?: number | null;
 }
 
-/** La releve commun : toutes les etoiles revelees, visibles jusqu'a la fin. */
+/** The shared sky: every revealed star not yet used for a hint. */
 export function PublicTilePool({
   tiles,
   selectedNumber,
@@ -22,8 +22,8 @@ export function PublicTilePool({
   lastRevealed = null,
 }: PublicTilePoolProps): JSX.Element {
   const { t, color: colorName } = useI18n();
-  // Une etoile utilisee pour un indice a rejoint un support : elle disparait du
-  // centre. L'historique complet reste disponible pour la carte du ciel.
+  // A star used for a hint has joined a rack: it leaves the middle. The full
+  // memory stays available to the star chart.
   const available = tiles.filter((entry) => !entry.used);
   const sorted = [...available].sort((a, b) => a.tile.number - b.tile.number);
   const total = COLOR_ORDER.reduce((sum, color) => sum + reserveByColor[color], 0);

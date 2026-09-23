@@ -1,35 +1,37 @@
-## Ce que fait cette PR
+## What this PR does
 
-## Pourquoi
+## Why
 
-<!-- Issue liée, ou le problème que ça résout. -->
+<!-- Linked issue, or the problem it solves. -->
 
-## Vérifications
+## Checks
 
-- [ ] `npm run typecheck` passe
-- [ ] `npm run lint` passe
-- [ ] `npm test` passe
-- [ ] `npm run build` passe
-- [ ] `npm run check:contract` passe
-- [ ] `npm run test:e2e` passe (si l'interface est touchée)
+- [ ] `npm run typecheck` passes
+- [ ] `npm run lint` passes
+- [ ] `npm test` passes
+- [ ] `npm run build` passes
+- [ ] `npm run check:contract` passes
+- [ ] `npm run test:e2e` passes (if the interface is touched)
 
 ## Documentation
 
-- [ ] `docs/PROJECT_CONTRACT.md` mis à jour si une signature change
-- [ ] README ou docs mis à jour si le comportement visible change
-- [ ] Aucun `TODO` ni code mort laissé derrière
+- [ ] `docs/PROJECT_CONTRACT.md` updated if a signature changes
+- [ ] README or docs updated if visible behaviour changes
+- [ ] Texts added in all three languages (English, French, Spanish), in an
+      inclusive, non-technical tone
+- [ ] No `TODO` or dead code left behind
 
-## Sécurité
+## Security
 
-- [ ] Aucun secret, jeton ou identifiant ajouté au dépôt
-- [ ] Aucune information secrète supplémentaire n'est envoyée au client
-- [ ] Les entrées venant du client restent validées côté serveur
+- [ ] No secret, token or credential added to the repository
+- [ ] No extra secret information is sent to any client
+- [ ] Input coming from clients is still validated on the server
 
-## Impact visuel
+## Visual impact
 
-<!-- Captures avant / après si l'interface change. Préciser clair ET sombre. -->
+<!-- Before / after screenshots if the interface changes. Light AND dark, please. -->
 
-## Impact réseau
+## Network impact
 
-- [ ] Aucun changement du protocole Socket.IO
-- [ ] Protocole modifié — les événements et charges utiles sont documentés dans le contrat
+- [ ] No change to the Socket.IO protocol
+- [ ] Protocol changed — events and payloads are documented in the contract

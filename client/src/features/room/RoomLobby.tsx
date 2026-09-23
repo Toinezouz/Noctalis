@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { RoomState } from '@noctalis/shared';
+import { MAX_PLAYERS, MIN_PLAYERS, type RoomState } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Panel } from '../../components/ui/Panel.js';
@@ -13,12 +13,14 @@ export interface RoomLobbyProps {
   busy?: boolean;
 }
 
-/** Salon d'attente : code a partager, joueurs presents, lancement de la partie. */
+/** Waiting room: the code to share, who is here, and the start button. */
 export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLobbyProps): JSX.Element {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const me = room.players.find((p) => p.id === myId);
   const isHost = me?.isHost ?? false;
+  const count = room.players.length;
+  const hostName = room.players.find((p) => p.isHost)?.name ?? '';
 
   const copy = async (): Promise<void> => {
     try {
@@ -37,9 +39,7 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
       <BrandMark size="xl" as="h1" className="center" />
 
       <Panel className="lobby__card">
-        <p className="center" style={{ fontWeight: 800 }}>
-          {t('lobby.share')}
-        </p>
+        <p className="lobby__share">{t('lobby.share', { max: MAX_PLAYERS - 1 })}</p>
         <div className="lobby__code" data-testid="room-code">
           {room.code.split('').map((char, index) => (
             <span className="lobby__char" key={`${char}-${String(index)}`}>
@@ -53,8 +53,8 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
           </Button>
         </div>
 
-        <div className="lobby__players">
-          {[0, 1].map((index) => {
+        <div className="lobby__players" data-count={count}>
+          {Array.from({ length: MAX_PLAYERS }, (_, index) => {
             const player = room.players[index];
             return (
               <div
@@ -63,17 +63,22 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
                 data-testid={`lobby-player-${String(index)}`}
               >
                 <span className="lobby__avatar" aria-hidden="true">
-                  {player ? player.name.slice(0, 1).toUpperCase() : '?'}
+                  {player ? player.name.slice(0, 1).toUpperCase() : '✦'}
                 </span>
-                <span>
-                  <strong>{player ? player.name : t('lobby.waitingPlayer')}</strong>
-                  <br />
-                  <span className="muted" style={{ fontSize: 'var(--fs-sm)' }}>
+                <span className="lobby__who">
+                  <strong>{player ? player.name : t('lobby.freeSeat')}</strong>
+                  <span className="muted">
                     {player
-                      ? `${player.isHost ? t('lobby.host') : t('lobby.guest')} — ${
-                          player.connected ? t('common.online') : t('common.offline')
-                        }`
-                      : t('lobby.waitingHint')}
+                      ? [
+                          player.id === myId ? t('common.you') : null,
+                          player.isHost ? t('lobby.host') : null,
+                          player.connected ? null : t('common.offline'),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')
+                      : index < MIN_PLAYERS
+                        ? t('lobby.neededSeat')
+                        : t('lobby.optionalSeat')}
                   </span>
                 </span>
               </div>
@@ -90,13 +95,16 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
               onClick={onStart}
               data-testid="start-game"
             >
-              {room.canStart ? t('lobby.start') : t('lobby.waitingSecond')}
+              {room.canStart ? t('lobby.start', { count }) : t('lobby.waitingSecond')}
             </Button>
           ) : (
-            <p className="center" data-testid="waiting-host">
-              {room.canStart ? t('lobby.waitingHost') : t('lobby.waitingSecond')}
+            <p className="center lobby__wait" data-testid="waiting-host">
+              {room.canStart ? t('lobby.waitingHost', { name: hostName }) : t('lobby.waitingSecond')}
             </p>
           )}
+          {room.canStart && count < MAX_PLAYERS ? (
+            <p className="center muted lobby__more">{t('lobby.roomForMore', { count: MAX_PLAYERS - count })}</p>
+          ) : null}
           <Button variant="secondary" onClick={onLeave} data-testid="leave-room">
             {t('lobby.leave')}
           </Button>

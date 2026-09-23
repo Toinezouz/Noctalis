@@ -3,15 +3,15 @@ import { useI18n } from '../../i18n/index.js';
 import { Tile } from './Tile.js';
 
 export interface CompareAreaProps {
-  /** Comparaisons concernant une position secrete donnee. */
+  /** Gauges made against one given secret position. */
   results: CompareResult[];
   position: number;
   ownerName: string;
 }
 
 /**
- * Zone JAUGER : les etoiles jaugees sont posees devant le paravent, en face
- * de la position visee. Droites si la reponse est OUI, inclinees si NON.
+ * GAUGE area: gauged stars sit right under the position they were measured
+ * against, bright for a YES, dimmed for a NO.
  */
 export function CompareArea({ results, position, ownerName }: CompareAreaProps): JSX.Element | null {
   const { t } = useI18n();

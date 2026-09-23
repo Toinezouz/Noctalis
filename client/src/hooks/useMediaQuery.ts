@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-/** Suit une media query (responsive piloté par le composant). */
+/** Follows a media query (component-driven responsiveness). */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
@@ -27,7 +27,7 @@ export function useMediaQuery(query: string): boolean {
   return matches;
 }
 
-/** `true` sur les ecrans etroits (telephones). */
+/** `true` on narrow screens (phones). */
 export function useIsMobile(): boolean {
   return useMediaQuery('(max-width: 860px)');
 }
