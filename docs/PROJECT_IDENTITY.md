@@ -148,9 +148,10 @@ Each star is **a star seen through the eyepiece**:
   coloured field ring with four reticle marks, the constellation's figure at
   the top, the number in Space Grotesk, and one to three round **sparks**
   underneath, as in a star chart's brightness legend;
-- my own, hidden — **not observed yet**: a dark field, a dashed ring in the
-  constellation's colour, its figure, a question mark, and the position in a
-  small badge;
+- my own, hidden — **not observed yet**: a dark core inside a field of the
+  constellation's colour, a bright dashed ring and a coloured halo (so each
+  one is recognised at a glance), its figure, a question mark, and the
+  position in a small badge;
 - gauged with a NO — dimmed, inside a dashed halo.
 
 The constellation figures carry the identity even without colour, which

@@ -163,32 +163,36 @@
 }
 
 /* --- My hidden stars: not observed yet ---------------------------------------
-   A dark field with a dashed ring in the constellation's colour: the target
-   is known, its light is not. */
+   The target is known, its light is not: a dark core, but the constellation's
+   colour clearly visible all around — a coloured field, a bright dashed ring
+   and a halo — so that each hidden star is recognised at a glance. */
 
 .tile-back {
   color: var(--tile-light, #fff);
-  background: var(--eclipse-face);
+  background: var(--tile-edge, #173b86);
   background: radial-gradient(
     circle at 50% 50%,
-    var(--eclipse-face) 0 58%,
-    color-mix(in srgb, var(--tile-face, #4f8ff7) 20%, var(--eclipse-face)) 100%
+    var(--eclipse-face) 0 30%,
+    color-mix(in srgb, var(--tile-face, #4f8ff7) 38%, var(--eclipse-face)) 62%,
+    color-mix(in srgb, var(--tile-face, #4f8ff7) 70%, var(--eclipse-face)) 100%
   );
   box-shadow:
-    0 0 12px -5px var(--tile-face, transparent),
+    0 0 0 1.5px var(--tile-face, #4f8ff7),
+    0 0 16px -2px var(--tile-face, transparent),
     var(--sh-tile);
 }
 
 .tile-back::before {
-  inset: 2px;
+  inset: 3px;
   background: none;
-  border: 1.5px dashed var(--tile-face, #fff);
-  opacity: 0.9;
+  border: 2px dashed var(--tile-light, #fff);
+  opacity: 0.85;
 }
 
 .tile-back .tile__asterism {
   color: var(--tile-light, #fff);
-  opacity: 0.9;
+  opacity: 1;
+  filter: drop-shadow(0 0 3px var(--tile-face, transparent));
 }
 
 .tile-back__mark {
@@ -198,7 +202,7 @@
   font-weight: 600;
   line-height: 1;
   color: var(--tile-light, #fff);
-  opacity: 0.9;
+  text-shadow: 0 0 8px var(--tile-face, transparent);
 }
 
 .tile-back__position {
