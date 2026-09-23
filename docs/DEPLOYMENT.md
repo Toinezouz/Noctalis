@@ -37,6 +37,27 @@ Aucun secret n'est nécessaire : le projet n'en utilise aucun.
      (`autoDeployTrigger: checksPass`)
 4. Validez. La première construction prend quelques minutes.
 
+## Un piège à connaître : `NODE_ENV` pendant la construction
+
+`render.yaml` déclare `NODE_ENV=production`, et cette variable s'applique
+**aussi à la phase de construction**. Or `npm ci` saute les
+`devDependencies` quand `NODE_ENV` vaut `production` — c'est-à-dire
+exactement esbuild, TypeScript et Vite, les outils qui construisent le
+projet. La construction échoue alors sur :
+
+```
+sh: 1: esbuild: not found
+```
+
+D'où le `--include=dev` de la commande de construction :
+
+```yaml
+buildCommand: npm ci --include=dev && npm run build
+```
+
+Les dépendances de développement ne servent qu'à construire ; le service qui
+tourne ensuite n'utilise que `express`, `socket.io` et `cors`.
+
 ## Vérifier que tout fonctionne
 
 ```bash
@@ -64,6 +85,24 @@ Puis, dans un navigateur :
 
 Si le point 3 fonctionne, Socket.IO passe correctement — c'est le seul point
 qui pourrait poser problème derrière un hébergeur.
+
+### Reproduire la séquence de Render en local
+
+Avant de pousser un changement touchant au déploiement, la même séquence se
+rejoue à l'identique sur votre machine :
+
+```bash
+git clone . /tmp/render-sim && cd /tmp/render-sim
+NODE_ENV=production npm ci --include=dev
+NODE_ENV=production npm run build
+NODE_ENV=production PORT=3001 CLIENT_URL=127.0.0.1:3001 npm start
+
+# dans un autre terminal
+curl -s localhost:3001/health
+```
+
+`CLIENT_URL` est volontairement donné **sans schéma** : c'est ce que fournit
+`fromService` chez Render, et le serveur doit le compléter tout seul.
 
 ## Le plan gratuit de Render
 

@@ -13,7 +13,10 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    buildCommand: npm ci && npm run build
+    # `--include=dev` est indispensable : NODE_ENV vaut `production` ci-dessous,
+    # et sans ce drapeau `npm ci` sauterait les devDependencies — donc esbuild,
+    # TypeScript et Vite, qui sont precisement ce qui construit le projet.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /health
     # Deploie seulement quand les verifications GitHub sont passees.
