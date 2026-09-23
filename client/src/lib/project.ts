@@ -6,7 +6,7 @@
 export const PROJECT_NAME = 'NOCTALIS';
 
 /** Displayed version. Follows `package.json`. */
-export const PROJECT_VERSION = '1.2.0';
+export const PROJECT_VERSION = '1.3.0';
 
 export const GITHUB_OWNER = 'Toinezouz';
 export const GITHUB_REPO = 'Noctalis';

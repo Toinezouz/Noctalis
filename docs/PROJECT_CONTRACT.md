@@ -48,6 +48,18 @@ Additions only; no signature of `@noctalis/shared` changes.
 | — | markers `<!-- preview:start -->` / `<!-- preview:end -->` in `client/index.html` | the server fills in the preview there |
 | — | `data-testid` `invite-link`, `copy-link`, `copy-feedback`, `home-invited` | tests |
 
+### 1.3 — two themes, chosen by the person
+
+The automatic theme (following the device) is gone: each person picks light
+or dark, and a first visit starts dark. A stored `'auto'` becomes `'dark'`.
+
+| Before | After | Why |
+| --- | --- | --- |
+| `ThemePreference = 'auto' \| 'light' \| 'dark'`, `ResolvedTheme` | `Theme = 'light' \| 'dark'` | a single, explicit choice |
+| `resolveTheme`, `nextThemePreference`, `THEME_PREFERENCES`, `isThemePreference`, `DARK_MEDIA_QUERY` | `otherTheme`, `THEMES`, `isTheme`, `DEFAULT_THEME` | same |
+| `data-testid` `theme-auto`, `theme-cycle` | `theme-toggle` (game header) | same |
+| key `theme.auto` | removed | same |
+
 ## 1. Data types (`@noctalis/shared`)
 
 ```ts
@@ -373,11 +385,11 @@ use technical words and, in French and Spanish, avoid gendered forms (see
 ## 15. Theme
 
 ```ts
-type ThemePreference = 'auto' | 'light' | 'dark';
-type ResolvedTheme = 'light' | 'dark';
-function resolveTheme(preference: ThemePreference, systemPrefersDark: boolean): ResolvedTheme;
-function nextThemePreference(preference: ThemePreference): ThemePreference;
-function applyTheme(theme: ResolvedTheme): void;
+type Theme = 'light' | 'dark';
+const DEFAULT_THEME: Theme; // 'dark'
+function isTheme(value: unknown): value is Theme;
+function otherTheme(theme: Theme): Theme;
+function applyTheme(theme: Theme): void;
 ```
 
 ## 16. Local storage
@@ -428,6 +440,6 @@ Stable: the end-to-end tests depend on them.
 `confirm-compare`, `confirm-compare-answer`, `game-over`, `game-over-result`,
 `rematch`, `rematch-count`, `back-home`, `opponent-offline`, `leave-game`,
 `skip-onboarding`, `next-onboarding`, `lang-fr`, `lang-en`, `lang-es`,
-`lang-select`, `theme-auto`, `theme-light`, `theme-dark`, `theme-cycle`,
+`lang-select`, `theme-light`, `theme-dark`, `theme-toggle`,
 `roulette`, `roulette-continue`, `roulette-note`, `support-link`,
 `about-open`, `about-dialog`.

@@ -1,47 +1,32 @@
 /**
  * Light and dark themes.
  *
- * The player's choice is 'auto' (follow the device), 'light' or 'dark'. The
- * *resolved* theme is only ever 'light' or 'dark': that is what goes on
- * `<html>`, so the stylesheet has a single dark block to maintain
+ * Each person picks one, and that choice is the only thing that decides:
+ * the device's own setting is not consulted. The theme goes on `<html>`, so
+ * the stylesheet has a single dark block to maintain
  * (`:root[data-theme='dark']`).
  */
 
-export const THEME_PREFERENCES = ['auto', 'light', 'dark'] as const;
-export type ThemePreference = (typeof THEME_PREFERENCES)[number];
-export type ResolvedTheme = 'light' | 'dark';
+export const THEMES = ['light', 'dark'] as const;
+export type Theme = (typeof THEMES)[number];
 
-/** Media query of the device theme. */
-export const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+/** Theme of a first visit: the night sky, which is what the game is about. */
+export const DEFAULT_THEME: Theme = 'dark';
 
 /** Storage key of the preference (see `storage.ts`). */
 export const THEME_STORAGE_KEY = 'noctalis:prefs';
 
-export function isThemePreference(value: unknown): value is ThemePreference {
-  return (
-    typeof value === 'string' && (THEME_PREFERENCES as readonly string[]).includes(value)
-  );
+export function isTheme(value: unknown): value is Theme {
+  return typeof value === 'string' && (THEMES as readonly string[]).includes(value);
 }
 
-/** Effective theme: 'auto' follows the device, anything else wins. */
-export function resolveTheme(
-  preference: ThemePreference,
-  systemPrefersDark: boolean,
-): ResolvedTheme {
-  if (preference === 'auto') {
-    return systemPrefersDark ? 'dark' : 'light';
-  }
-  return preference;
-}
-
-/** Next preference in the auto -> light -> dark -> auto cycle. */
-export function nextThemePreference(preference: ThemePreference): ThemePreference {
-  const index = THEME_PREFERENCES.indexOf(preference);
-  return THEME_PREFERENCES[(index + 1) % THEME_PREFERENCES.length]!;
+/** The other theme: what the one-button switch of the game header does. */
+export function otherTheme(theme: Theme): Theme {
+  return theme === 'dark' ? 'light' : 'dark';
 }
 
 /** Colour of the browser bar (mobile), per theme: the page background. */
-export const THEME_COLORS: Record<ResolvedTheme, string> = {
+export const THEME_COLORS: Record<Theme, string> = {
   light: '#f2ecdf',
   dark: '#070b1a',
 };
@@ -50,7 +35,7 @@ export const THEME_COLORS: Record<ResolvedTheme, string> = {
  * Applies the theme to the document and updates `theme-color` (the colour
  * of the browser bar on phones).
  */
-export function applyTheme(theme: ResolvedTheme): void {
+export function applyTheme(theme: Theme): void {
   if (typeof document === 'undefined') {
     return;
   }

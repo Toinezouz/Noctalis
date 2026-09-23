@@ -7,7 +7,7 @@ import { LanguageSwitch } from '../../components/ui/LanguageSwitch.js';
 import { ThemeSwitch } from '../../components/ui/ThemeSwitch.js';
 import { BrandMark } from '../../components/ui/BrandMark.js';
 import { Astrolabe } from '../../components/ui/Astrolabe.js';
-import type { ThemePreference } from '../../lib/theme.js';
+import type { Theme } from '../../lib/theme.js';
 import { errorMessageKey, useGame } from '../../app/GameContext.js';
 
 export interface HomeProps {
@@ -16,8 +16,8 @@ export interface HomeProps {
   inviteCode?: string | null;
   onNameChange: (name: string) => void;
   onOpenHelp: () => void;
-  theme: ThemePreference;
-  onThemeChange: (value: ThemePreference) => void;
+  theme: Theme;
+  onThemeChange: (value: Theme) => void;
 }
 
 type Mode = 'menu' | 'create' | 'join';

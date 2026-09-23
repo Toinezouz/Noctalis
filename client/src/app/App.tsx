@@ -12,13 +12,7 @@ import { SiteFooter } from '../components/ui/SiteFooter.js';
 import { loadPreferences, savePreferences } from '../lib/storage.js';
 import { clearInviteFromUrl } from '../lib/invite.js';
 import { setSoundEnabled } from '../lib/audio.js';
-import { useMediaQuery } from '../hooks/useMediaQuery.js';
-import {
-  DARK_MEDIA_QUERY,
-  applyTheme,
-  resolveTheme,
-  type ThemePreference,
-} from '../lib/theme.js';
+import { applyTheme, type Theme } from '../lib/theme.js';
 
 /**
  * Screen routing: home -> lobby -> table.
@@ -56,12 +50,10 @@ export function App({ inviteCode = null }: AppProps): JSX.Element {
     setSoundEnabled(prefs.soundEnabled);
   }, [prefs.soundEnabled]);
 
-  // Theme: 'auto' follows the device and reacts to its changes live.
-  const systemPrefersDark = useMediaQuery(DARK_MEDIA_QUERY);
-  const theme = resolveTheme(prefs.theme, systemPrefersDark);
+  // Theme: the person's choice, nothing else.
   useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+    applyTheme(prefs.theme);
+  }, [prefs.theme]);
 
   // Tutorial on the very first game only.
   useEffect(() => {
@@ -77,7 +69,7 @@ export function App({ inviteCode = null }: AppProps): JSX.Element {
     setPrefs((current) => savePreferences({ soundEnabled: !current.soundEnabled }));
   }, []);
 
-  const changeTheme = useCallback((next: ThemePreference) => {
+  const changeTheme = useCallback((next: Theme) => {
     setPrefs(savePreferences({ theme: next }));
   }, []);
 

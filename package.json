@@ -1,7 +1,7 @@
 {
   "name": "noctalis",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "NOCTALIS - a real-time online deduction game for 2 to 4 people, in the browser",
   "license": "AGPL-3.0-or-later",
   "workspaces": [

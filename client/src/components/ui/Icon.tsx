@@ -5,7 +5,6 @@
 export type IconName =
   | 'sun'
   | 'moon'
-  | 'auto'
   | 'sound'
   | 'mute'
   | 'help'
@@ -33,12 +32,6 @@ const PATHS: Record<IconName, JSX.Element> = {
     </>
   ),
   moon: <path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z" />,
-  auto: (
-    <>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 3.5v17a8.5 8.5 0 0 0 0-17Z" fill="currentColor" stroke="none" />
-    </>
-  ),
   sound: (
     <>
       <path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4Z" />

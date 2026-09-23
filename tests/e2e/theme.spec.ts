@@ -6,7 +6,7 @@ test.afterEach(async ({ browser }) => {
   await Promise.all(browser.contexts().map((context) => context.close()));
 });
 
-/** Opens the home screen with a given device preference. */
+/** Opens the home screen on a device with a given preference (which the game ignores). */
 async function openHome(browser: Browser, colorScheme: 'light' | 'dark'): Promise<Page> {
   const context = await browser.newContext({ colorScheme });
   const page = await context.newPage();
@@ -27,72 +27,77 @@ function brightness(color: string): number {
 }
 
 test.describe('Light and dark themes', () => {
-  test('follows the device preference by default', async ({ browser }) => {
-    const dark = await openHome(browser, 'dark');
-    await expect(dark.locator('html')).toHaveAttribute('data-theme', 'dark');
-    expect(brightness(await pageBackground(dark))).toBeLessThan(0.25);
-
-    const light = await openHome(browser, 'light');
-    await expect(light.locator('html')).toHaveAttribute('data-theme', 'light');
-    expect(brightness(await pageBackground(light))).toBeGreaterThan(0.75);
+  test('starts with the night sky, whatever the device prefers', async ({ browser }) => {
+    for (const device of ['light', 'dark'] as const) {
+      const page = await openHome(browser, device);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      expect(brightness(await pageBackground(page))).toBeLessThan(0.25);
+      await expect(page.getByTestId('theme-dark')).toHaveAttribute('aria-pressed', 'true');
+      // Two choices only: no "automatic" mode any more.
+      await expect(page.getByTestId('theme-auto')).toHaveCount(0);
+      await expect(page.locator('.theme-switch button')).toHaveCount(2);
+    }
   });
 
-  test('the player\'s choice beats the device and survives a reload', async ({
-    browser,
-  }) => {
-    // Device in light mode, player wants dark.
-    const page = await openHome(browser, 'light');
-    await expect(page.getByTestId('theme-auto')).toHaveAttribute('aria-pressed', 'true');
+  test('the player\'s choice sticks, even across a reload', async ({ browser }) => {
+    // Device in dark mode, player wants light.
+    const page = await openHome(browser, 'dark');
+    await page.getByTestId('theme-light').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    expect(brightness(await pageBackground(page))).toBeGreaterThan(0.75);
+
+    await page.reload();
+    // Applied from the first paint: no dark flash before React starts.
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByTestId('theme-light')).toHaveAttribute('aria-pressed', 'true');
 
     await page.getByTestId('theme-dark').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    expect(brightness(await pageBackground(page))).toBeLessThan(0.25);
+  });
 
+  test('an old "automatic" setting becomes the default theme', async ({ browser }) => {
+    const page = await openHome(browser, 'light');
+    await page.evaluate(() => {
+      window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'auto' }));
+    });
     await page.reload();
-    // Applied from the first paint: no light flash before React starts.
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect(page.getByTestId('theme-dark')).toHaveAttribute('aria-pressed', 'true');
-
-    // Back to "automatic": the device takes over again.
-    await page.getByTestId('theme-auto').click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   });
 
   test('the browser bar follows the theme too', async ({ browser }) => {
     const page = await openHome(browser, 'light');
     const meta = page.locator('meta[name="theme-color"]');
-    await expect(meta).toHaveAttribute('content', /#f2ecdf/i);
-    await page.getByTestId('theme-dark').click();
     await expect(meta).toHaveAttribute('content', /#070b1a/i);
+    await page.getByTestId('theme-light').click();
+    await expect(meta).toHaveAttribute('content', /#f2ecdf/i);
   });
 
   test('the theme can change mid-game without disturbing it', async ({ browser }) => {
     const { first, second } = await startGame(browser, ['Alice', 'Bob']);
 
-    // In the game header, one button cycles auto / light / dark.
-    const cycle = first.getByTestId('theme-cycle');
-    await expect(cycle).toHaveAttribute('data-theme-value', 'auto');
-    await cycle.click();
-    await expect(cycle).toHaveAttribute('data-theme-value', 'light');
-    await cycle.click();
-    await expect(cycle).toHaveAttribute('data-theme-value', 'dark');
-    await expect(first.locator('html')).toHaveAttribute('data-theme', 'dark');
-    expect(brightness(await pageBackground(first))).toBeLessThan(0.25);
+    // In the game header, one button switches to the other theme.
+    const toggle = first.getByTestId('theme-toggle');
+    await expect(toggle).toHaveAttribute('data-theme-value', 'dark');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('data-theme-value', 'light');
+    await expect(first.locator('html')).toHaveAttribute('data-theme', 'light');
+    expect(brightness(await pageBackground(first))).toBeGreaterThan(0.75);
     // The choice is personal: the other player is not affected.
-    await expect(second.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(second.locator('html')).toHaveAttribute('data-theme', 'dark');
 
     // The table stays readable and the game playable.
     await expect(first.locator('.pool__tiles .tile')).toHaveCount(5);
     const ink = await first.evaluate(() => getComputedStyle(document.body).color);
-    expect(brightness(ink)).toBeGreaterThan(0.75);
+    expect(brightness(ink)).toBeLessThan(0.25);
     await expect(first.getByTestId('announce-button')).toBeVisible();
+
+    await toggle.click();
+    await expect(first.locator('html')).toHaveAttribute('data-theme', 'dark');
   });
 
   test('the star chart stays readable in dark mode', async ({ browser }) => {
     const { first } = await startGame(browser, ['Alice', 'Bob']);
-    const cycle = first.getByTestId('theme-cycle');
-    await cycle.click();
-    await cycle.click();
     await expect(first.locator('html')).toHaveAttribute('data-theme', 'dark');
     await first.getByTestId('open-sheet').click();
 

@@ -4,9 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { I18nProvider } from '../../client/src/i18n/index.js';
 import { ThemeSwitch } from '../../client/src/components/ui/ThemeSwitch.js';
 import { applyTheme, THEME_COLORS } from '../../client/src/lib/theme.js';
-import type { ThemePreference } from '../../client/src/lib/theme.js';
+import type { Theme } from '../../client/src/lib/theme.js';
+import { loadPreferences } from '../../client/src/lib/storage.js';
 
-function show(value: ThemePreference, onChange = (): void => {}, compact = false): void {
+function show(value: Theme, onChange = (): void => {}, compact = false): void {
   render(
     <I18nProvider initialLanguage="fr">
       <ThemeSwitch value={value} onChange={onChange} compact={compact} />
@@ -20,16 +21,17 @@ afterEach(() => {
 });
 
 describe('Theme choice (component)', () => {
-  it('offers the three choices and marks the active one', () => {
+  it('offers the two choices, no automatic one, and marks the active one', () => {
     show('dark');
-    expect(screen.getByTestId('theme-auto')).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('theme-light')).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('theme-dark')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByTestId('theme-auto')).toBeNull();
+    expect(screen.getAllByRole('button')).toHaveLength(2);
   });
 
   it('reports the player\'s choice', async () => {
     const onChange = vi.fn();
-    show('auto', onChange);
+    show('light', onChange);
     await userEvent.click(screen.getByTestId('theme-dark'));
     expect(onChange).toHaveBeenCalledWith('dark');
     await userEvent.click(screen.getByTestId('theme-light'));
@@ -37,22 +39,21 @@ describe('Theme choice (component)', () => {
   });
 
   it('works with the keyboard and carries translated labels', () => {
-    show('auto');
+    show('dark');
     expect(screen.getByRole('group', { name: 'Thème' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Automatique/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Clair/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sombre/ })).toBeInTheDocument();
   });
 
-  it('in its compact form, one button cycles through the three choices', async () => {
+  it('in its compact form, one button switches to the other theme', async () => {
     const onChange = vi.fn();
-    show('auto', onChange, true);
-    const button = screen.getByTestId('theme-cycle');
+    show('dark', onChange, true);
+    const button = screen.getByTestId('theme-toggle');
     // The button announces the current state: essential without a visible label.
-    expect(button).toHaveAccessibleName('Thème : Automatique. Cliquer pour changer.');
+    expect(button).toHaveAccessibleName('Thème : Sombre. Cliquer pour changer.');
     await userEvent.click(button);
     expect(onChange).toHaveBeenCalledWith('light');
-    // The three pills do not clutter the game header.
+    // The two pills do not clutter the game header.
     expect(screen.queryByTestId('theme-dark')).toBeNull();
   });
 
@@ -69,5 +70,15 @@ describe('Theme choice (component)', () => {
     expect(document.documentElement.dataset['theme']).toBe('light');
     expect(meta.getAttribute('content')).toBe(THEME_COLORS.light);
     meta.remove();
+  });
+
+  it('starts dark, and turns the old "automatic" setting into the default', () => {
+    window.localStorage.removeItem('noctalis:prefs');
+    expect(loadPreferences().theme).toBe('dark');
+    window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'auto', name: 'Kim' }));
+    expect(loadPreferences()).toMatchObject({ theme: 'dark', name: 'Kim' });
+    window.localStorage.setItem('noctalis:prefs', JSON.stringify({ theme: 'light' }));
+    expect(loadPreferences().theme).toBe('light');
+    window.localStorage.removeItem('noctalis:prefs');
   });
 });

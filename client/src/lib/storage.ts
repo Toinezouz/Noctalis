@@ -1,5 +1,5 @@
 import type { PlayerCredentials } from '@noctalis/shared';
-import { isThemePreference, type ThemePreference } from './theme.js';
+import { DEFAULT_THEME, isTheme, type Theme } from './theme.js';
 
 /**
  * Local persistence.
@@ -61,8 +61,8 @@ export interface Preferences {
   onboardingDone: boolean;
   /** Chosen language ('fr' | 'en' | 'es'); empty = detected automatically. */
   language: string;
-  /** Theme: 'auto' follows the device, otherwise 'light' or 'dark'. */
-  theme: ThemePreference;
+  /** Theme chosen by the person: 'light' or 'dark'. */
+  theme: Theme;
 }
 
 const DEFAULT_PREFS: Preferences = {
@@ -70,16 +70,16 @@ const DEFAULT_PREFS: Preferences = {
   soundEnabled: true,
   onboardingDone: false,
   language: '',
-  theme: 'auto',
+  theme: DEFAULT_THEME,
 };
 
 export function loadPreferences(): Preferences {
   const stored = readJson<Partial<Preferences>>(PREFS_KEY) ?? {};
   const prefs = { ...DEFAULT_PREFS, ...stored };
-  // A damaged value (manual edit, older version) must not leave the page
-  // without a theme: fall back to automatic detection.
-  if (!isThemePreference(prefs.theme)) {
-    prefs.theme = 'auto';
+  // A damaged value (manual edit), or the 'auto' of versions up to 1.2,
+  // falls back to the default theme.
+  if (!isTheme(prefs.theme)) {
+    prefs.theme = DEFAULT_THEME;
   }
   return prefs;
 }

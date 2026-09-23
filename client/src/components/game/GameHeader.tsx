@@ -5,14 +5,14 @@ import { Button } from '../ui/Button.js';
 import { LanguageSwitch } from '../ui/LanguageSwitch.js';
 import { BrandMark } from '../ui/BrandMark.js';
 import { ThemeSwitch } from '../ui/ThemeSwitch.js';
-import type { ThemePreference } from '../../lib/theme.js';
+import type { Theme } from '../../lib/theme.js';
 
 export interface GameHeaderProps {
   roomCode: string;
   soundEnabled: boolean;
   onToggleSound: () => void;
-  theme: ThemePreference;
-  onThemeChange: (value: ThemePreference) => void;
+  theme: Theme;
+  onThemeChange: (value: Theme) => void;
   onOpenHelp: () => void;
   onOpenSheet: () => void;
   onLeave: () => void;

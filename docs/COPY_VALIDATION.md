@@ -145,3 +145,22 @@ Everything below was run on 2026-09-23, before the push.
 | Render sequence on a clean copy, with `RENDER_EXTERNAL_URL=https://noctalis.onrender.com` | ✅ `/health` ok; `/?join=ab7k9&lang=es` carries `og:url` `https://noctalis.onrender.com/?join=AB7K9`, the Spanish invite title and an absolute `og:image`; `/og-image.jpg` served as `image/jpeg`, 65 KB; 14 E2E tests (invites, game flow, secrecy) pass against it |
 | Secret search | ✅ only the deliberately fake `'invalid-token'` of a unit test; no `.env` |
 | Original GOT FIVE! repository | ✅ untouched: clean working tree, still at `f650a15` |
+
+## Version 1.3 — light or dark, chosen by the person
+
+The automatic theme is removed; a first visit starts dark. Run on
+2026-09-23, before the push.
+
+| Step | Result |
+| --- | --- |
+| `npm run typecheck` | ✅ 0 errors |
+| `npm run lint` | ✅ 0 errors |
+| `npm run check:contract` | ✅ 63 exports, 23 types, 19 events, 310 keys × 3 languages |
+| `npm test` | ✅ **211 tests** in 14 files |
+| `npm run build` | ✅ |
+| `npm run test:e2e` | ✅ **74 tests** (37 desktop + 37 mobile), 4.0 min |
+| Secret search | ✅ only the deliberately fake `'invalid-token'` of a unit test; no `.env` |
+| Original GOT FIVE! repository | ✅ untouched, still at `f650a15` |
+
+The Render sequence was not replayed for this version: nothing on the server
+or in the deployment changed.

@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_THEME,
   THEME_COLORS,
-  THEME_PREFERENCES,
-  isThemePreference,
-  nextThemePreference,
-  resolveTheme,
+  THEMES,
+  isTheme,
+  otherTheme,
 } from '../../client/src/lib/theme.js';
 import { en } from '../../client/src/i18n/en.js';
 import { fr } from '../../client/src/i18n/fr.js';
@@ -48,34 +48,29 @@ function readTokens(): string {
   return cache;
 }
 
-describe('theme preference', () => {
-  it('offers exactly automatic, light and dark', () => {
-    expect(THEME_PREFERENCES).toEqual(['auto', 'light', 'dark']);
+describe('theme choice', () => {
+  it('offers exactly light and dark, and starts with the night sky', () => {
+    expect(THEMES).toEqual(['light', 'dark']);
+    expect(DEFAULT_THEME).toBe('dark');
   });
 
-  it('resolves "auto" from the device and enforces the others', () => {
-    expect(resolveTheme('auto', true)).toBe('dark');
-    expect(resolveTheme('auto', false)).toBe('light');
-    expect(resolveTheme('light', true)).toBe('light');
-    expect(resolveTheme('dark', false)).toBe('dark');
+  it('switches to the other theme', () => {
+    expect(otherTheme('light')).toBe('dark');
+    expect(otherTheme('dark')).toBe('light');
   });
 
-  it('cycles through the three choices', () => {
-    expect(nextThemePreference('auto')).toBe('light');
-    expect(nextThemePreference('light')).toBe('dark');
-    expect(nextThemePreference('dark')).toBe('auto');
+  it('refuses an invalid stored value, including the old "auto"', () => {
+    expect(isTheme('dark')).toBe(true);
+    expect(isTheme('light')).toBe(true);
+    expect(isTheme('auto')).toBe(false);
+    expect(isTheme('DARK')).toBe(false);
+    expect(isTheme(null)).toBe(false);
+    expect(isTheme(undefined)).toBe(false);
   });
 
-  it('refuses an invalid stored value', () => {
-    expect(isThemePreference('dark')).toBe(true);
-    expect(isThemePreference('AUTO')).toBe(false);
-    expect(isThemePreference(null)).toBe(false);
-    expect(isThemePreference(undefined)).toBe(false);
-  });
-
-  it('names the three choices in every language', () => {
+  it('names both choices in every language', () => {
     for (const catalogue of [en, fr, es]) {
-      for (const key of ['theme.label', 'theme.auto', 'theme.light', 'theme.dark'] as const) {
+      for (const key of ['theme.label', 'theme.light', 'theme.dark'] as const) {
         expect(catalogue[key].trim().length).toBeGreaterThan(0);
       }
     }

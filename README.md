@@ -79,8 +79,8 @@ minutes: **the first visit can take 30 to 60 seconds** while it wakes up.
 After that, it is quick.
 
 Everyone chooses their own **language** (English, French or Spanish) and
-**theme** (a light one like an old star atlas, a dark one like the night sky,
-or automatic). Four people can share a table in three languages.
+**theme**: a dark one like the night sky (the default) or a light one like an
+old star atlas. Four people can share a table in three languages.
 
 ### Hosting a game from your own computer
 

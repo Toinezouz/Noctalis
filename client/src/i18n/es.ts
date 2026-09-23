@@ -106,7 +106,6 @@ export const es: Messages = {
 
   // --- Tema ----------------------------------------------------------------
   'theme.label': 'Tema',
-  'theme.auto': 'Automático',
   'theme.light': 'Claro',
   'theme.dark': 'Oscuro',
   'theme.current': 'Tema: {mode}. Pulsa para cambiar.',

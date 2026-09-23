@@ -109,7 +109,6 @@ export const en = {
 
   // --- Theme --------------------------------------------------------------
   'theme.label': 'Theme',
-  'theme.auto': 'Automatic',
   'theme.light': 'Light',
   'theme.dark': 'Dark',
   'theme.current': 'Theme: {mode}. Click to change.',

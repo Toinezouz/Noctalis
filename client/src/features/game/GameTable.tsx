@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { pickResponder, type TileColor } from '@noctalis/shared';
-import type { ThemePreference } from '../../lib/theme.js';
+import type { Theme } from '../../lib/theme.js';
 import { useGame } from '../../app/GameContext.js';
 import { useI18n } from '../../i18n/index.js';
 import { useIsMobile } from '../../hooks/useMediaQuery.js';
@@ -25,8 +25,8 @@ import { GameOverScreen } from './GameOverScreen.js';
 export interface GameTableProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
-  theme: ThemePreference;
-  onThemeChange: (value: ThemePreference) => void;
+  theme: Theme;
+  onThemeChange: (value: Theme) => void;
   onOpenHelp: () => void;
   onLeave: () => void;
 }
