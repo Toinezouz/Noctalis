@@ -68,9 +68,11 @@ The full rules, with pictures, are one click away in the game itself.
 ## Playing
 
 The easiest way is the public table at
-**[noctalis.onrender.com](https://noctalis.onrender.com)**: start a game, share
-the five-character code with up to three friends, and you are off. Nothing to
-install, nothing to sign up for.
+**[noctalis.onrender.com](https://noctalis.onrender.com)**: start a game, send
+the invite link to up to three friends, and you are off. The link opens the
+game with the code already filled in, so they only have to pick a name (the
+five-character code still works for those who would rather type it). Nothing
+to install, nothing to sign up for.
 
 It runs on Render's free plan, which falls asleep after fifteen quiet
 minutes: **the first visit can take 30 to 60 seconds** while it wakes up.
@@ -117,6 +119,22 @@ network traffic. Most technical choices follow from that.
 The end-to-end tests check all of this in a real browser, at two and at four
 players, by inspecting the page, local storage **and every WebSocket frame
 received**.
+
+### Invite links and link previews
+
+An invite link looks like `https://noctalis.onrender.com/?join=AB7K9&lang=fr`.
+The client reads `join`, opens the join form with that code, then removes the
+parameters from the address bar once the person is seated. When the link
+points to a different game than the one remembered on the device, the invite
+wins.
+
+Chat apps draw their preview card from the page's Open Graph tags without
+running any JavaScript, so the server writes those tags into `index.html`
+itself (`server/src/http/preview.ts`): absolute URLs, a dedicated card for
+invite links, in the language given by `lang`. The card only repeats the code
+that is already in the link; it says nothing about the game behind it.
+Absolute URLs come from `PUBLIC_URL`, or from `RENDER_EXTERNAL_URL`, which
+Render sets by itself.
 
 ### How the code is organised
 

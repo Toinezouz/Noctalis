@@ -12,7 +12,8 @@ import { App } from './app/App.js';
 import { GameProvider } from './app/GameContext.js';
 import { ToastProvider } from './hooks/useToasts.js';
 import { I18nProvider, detectLanguage, type Language } from './i18n/index.js';
-import { loadPreferences, savePreferences } from './lib/storage.js';
+import { clearSession, loadPreferences, loadSession, savePreferences } from './lib/storage.js';
+import { readInviteCode } from './lib/invite.js';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -20,6 +21,16 @@ if (!container) {
 }
 
 const preferences = loadPreferences();
+
+/*
+ * An invite link is a fresh intention: when it points to another game than
+ * the one remembered on this device, the invite wins and the old seat is
+ * not resumed automatically.
+ */
+const inviteCode = readInviteCode(window.location.search);
+if (inviteCode !== null && loadSession()?.roomCode !== inviteCode) {
+  clearSession();
+}
 
 const rememberLanguage = (language: Language): void => {
   savePreferences({ language });
@@ -33,7 +44,7 @@ createRoot(container).render(
     >
       <ToastProvider>
         <GameProvider>
-          <App />
+          <App inviteCode={inviteCode} />
         </GameProvider>
       </ToastProvider>
     </I18nProvider>

@@ -129,3 +129,19 @@ Everything below was run on 2026-09-23, before the push.
 
 The screenshots in `docs/images/` were taken from a real four-player game on
 the production build.
+
+## Version 1.2 — invite links and link previews
+
+Everything below was run on 2026-09-23, before the push.
+
+| Step | Result |
+| --- | --- |
+| `npm run typecheck` | ✅ 0 errors |
+| `npm run lint` | ✅ 0 errors |
+| `npm run check:contract` | ✅ 63 exports, 23 types, 19 events, 311 keys × 3 languages |
+| `npm test` | ✅ **211 tests** in 14 files (18 new: invite links, preview tags, the served page) |
+| `npm run build` | ✅ |
+| `npm run test:e2e` | ✅ **72 tests** (36 desktop + 36 mobile), 4.1 min |
+| Render sequence on a clean copy, with `RENDER_EXTERNAL_URL=https://noctalis.onrender.com` | ✅ `/health` ok; `/?join=ab7k9&lang=es` carries `og:url` `https://noctalis.onrender.com/?join=AB7K9`, the Spanish invite title and an absolute `og:image`; `/og-image.jpg` served as `image/jpeg`, 65 KB; 14 E2E tests (invites, game flow, secrecy) pass against it |
+| Secret search | ✅ only the deliberately fake `'invalid-token'` of a unit test; no `.env` |
+| Original GOT FIVE! repository | ✅ untouched: clean working tree, still at `f650a15` |

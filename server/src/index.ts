@@ -28,6 +28,8 @@ const { httpServer, close } = createNoctalisServer({
   origins: NODE_ENV === 'production' ? CLIENT_URLS : true,
   roomTtlMs: ROOM_TTL_MS,
   serveClient: true,
+  // Render sets RENDER_EXTERNAL_URL by itself; PUBLIC_URL overrides it.
+  publicUrl: process.env['PUBLIC_URL'] ?? process.env['RENDER_EXTERNAL_URL'],
 });
 
 // 0.0.0.0 is required behind a containerised host (Render), where listening

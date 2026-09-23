@@ -1,5 +1,5 @@
 import { createServer, type Server as HttpServer } from 'node:http';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import cors from 'cors';
@@ -7,6 +7,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 import { RoomManager } from './rooms/RoomManager.js';
 import { registerHandlers, type GameServer, type GameSocket } from './socket/handlers.js';
+import { renderIndexHtml, resolveOrigin, toInviteCode, toPreviewLang } from './http/preview.js';
 
 export interface CreateServerOptions {
   /** Allowed origins (CORS + Socket.IO). `true` = any (outside production). */
@@ -17,6 +18,13 @@ export interface CreateServerOptions {
   strictLeakCheck?: boolean;
   /** Serves the built client from the same service when the folder exists. */
   serveClient?: boolean;
+  /** Folder of the built client (defaults to client/dist). */
+  clientDist?: string;
+  /**
+   * Public address of the site, used for absolute links in link previews.
+   * When absent, the address of each request is used.
+   */
+  publicUrl?: string;
   env?: string;
 }
 
@@ -45,18 +53,29 @@ export function createNoctalisServer(options: CreateServerOptions = {}): Noctali
   });
 
   if (options.serveClient) {
-    const clientDist = path.resolve(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../../client/dist',
-    );
-    if (existsSync(clientDist)) {
-      app.use(express.static(clientDist));
-      app.get('*', (_req, res) => {
-        res.sendFile(path.join(clientDist, 'index.html'), (error) => {
-          if (error) {
-            res.status(500).end();
-          }
+    const clientDist =
+      options.clientDist ??
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+    const indexPath = path.join(clientDist, 'index.html');
+    if (existsSync(indexPath)) {
+      // Read once: the built page does not change while the server runs.
+      const template = readFileSync(indexPath, 'utf8');
+      // `index: false`: the page itself always goes through the handler
+      // below, which fills in the link preview.
+      app.use(express.static(clientDist, { index: false }));
+      app.get('*', (req, res) => {
+        const html = renderIndexHtml(template, {
+          origin: resolveOrigin(options.publicUrl, {
+            // Behind a proxy or a tunnel, the visitor's scheme is in this
+            // header; resolveOrigin only accepts http or https from it.
+            protocol: req.get('x-forwarded-proto')?.split(',')[0]?.trim() ?? req.protocol,
+            host: req.get('host'),
+          }),
+          lang: toPreviewLang(req.query['lang']),
+          inviteCode: toInviteCode(req.query['join']),
         });
+        res.set('Cache-Control', 'no-cache');
+        res.type('html').send(html);
       });
     }
   }

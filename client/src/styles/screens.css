@@ -61,6 +61,24 @@
   color: var(--c-violet);
 }
 
+/* Arriving from an invite on a phone: the form comes first. */
+@media (max-width: 600px) {
+  .home--invited .home__sub,
+  .home--invited .home__players {
+    display: none;
+  }
+}
+
+.home__invited {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-rule);
+  background: var(--c-wash);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
 .home__status {
   display: flex;
   align-items: center;
@@ -180,6 +198,69 @@
   font-weight: 600;
 }
 
+.lobby__invite {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: stretch;
+}
+
+.lobby__link {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6em 0.9em;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-field);
+  box-shadow: var(--sh-inset);
+  color: var(--c-ink);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+}
+
+.lobby__link:focus {
+  border-color: var(--c-gold);
+  outline: none;
+  box-shadow: var(--sh-inset), 0 0 0 3px rgba(216, 169, 63, 0.25);
+}
+
+.lobby__invite .btn {
+  flex: none;
+}
+
+@media (max-width: 460px) {
+  .lobby__invite {
+    flex-direction: column;
+  }
+}
+
+.lobby__feedback {
+  margin: 0;
+  min-height: 0;
+  text-align: center;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-danger);
+}
+
+.lobby__feedback:empty {
+  display: none;
+}
+
+.lobby__or {
+  margin: var(--sp-1) 0 0;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--c-ink-soft);
+}
+
+.lobby__code-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
 .lobby__code {
   display: flex;
   justify-content: center;
@@ -189,15 +270,15 @@
 .lobby__char {
   display: grid;
   place-items: center;
-  width: clamp(44px, 12vw, 60px);
-  height: clamp(54px, 15vw, 72px);
+  width: clamp(40px, 11vw, 52px);
+  height: clamp(48px, 13vw, 62px);
   border-radius: var(--r-md);
   background: var(--plate-face);
   color: var(--plate-ink);
   border: 1px solid rgba(232, 189, 90, 0.55);
   font-family: var(--font-title);
   font-weight: 700;
-  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  font-size: clamp(1.4rem, 5.5vw, 1.9rem);
   box-shadow: 0 8px 20px -8px rgba(var(--shadow-rgb), 0.5);
 }
 

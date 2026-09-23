@@ -36,6 +36,18 @@
 
 The rest of the engine keeps its names: they describe mechanisms, not a brand.
 
+### 1.2 — invite links and link previews
+
+Additions only; no signature of `@noctalis/shared` changes.
+
+| Before | After | Why |
+| --- | --- | --- |
+| — | URL parameters `?join=CODE` and `&lang=en\|fr\|es` | invite links |
+| — | `CreateServerOptions.clientDist`, `CreateServerOptions.publicUrl` | tests, absolute preview URLs |
+| — | environment variable `PUBLIC_URL` (optional; `RENDER_EXTERNAL_URL` otherwise) | absolute preview URLs |
+| — | markers `<!-- preview:start -->` / `<!-- preview:end -->` in `client/index.html` | the server fills in the preview there |
+| — | `data-testid` `invite-link`, `copy-link`, `copy-feedback`, `home-invited` | tests |
+
 ## 1. Data types (`@noctalis/shared`)
 
 ```ts

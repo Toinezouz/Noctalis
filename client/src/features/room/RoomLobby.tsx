@@ -4,6 +4,8 @@ import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Panel } from '../../components/ui/Panel.js';
 import { BrandMark } from '../../components/ui/BrandMark.js';
+import { buildInviteLink } from '../../lib/invite.js';
+import { canShareNatively, copyText } from '../../lib/clipboard.js';
 
 export interface RoomLobbyProps {
   room: RoomState;
@@ -13,24 +15,47 @@ export interface RoomLobbyProps {
   busy?: boolean;
 }
 
-/** Waiting room: the code to share, who is here, and the start button. */
+type CopyFeedback = 'idle' | 'link' | 'code' | 'failed';
+
+/** Waiting room: the link to share, who is here, and the start button. */
 export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLobbyProps): JSX.Element {
-  const { t } = useI18n();
-  const [copied, setCopied] = useState(false);
+  const { t, lang } = useI18n();
+  const [feedback, setFeedback] = useState<CopyFeedback>('idle');
   const me = room.players.find((p) => p.id === myId);
   const isHost = me?.isHost ?? false;
   const count = room.players.length;
   const hostName = room.players.find((p) => p.isHost)?.name ?? '';
 
-  const copy = async (): Promise<void> => {
-    try {
-      await navigator.clipboard.writeText(room.code);
-      setCopied(true);
+  const inviteLink = buildInviteLink(window.location.origin, room.code, lang);
+  const nativeShare = canShareNatively();
+
+  const flash = (value: CopyFeedback): void => {
+    setFeedback(value);
+    if (value !== 'failed') {
       window.setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+        setFeedback('idle');
+      }, 2500);
+    }
+  };
+
+  const copy = async (what: 'link' | 'code'): Promise<void> => {
+    const done = await copyText(what === 'link' ? inviteLink : room.code);
+    flash(done ? what : 'failed');
+  };
+
+  const shareLink = async (): Promise<void> => {
+    if (!nativeShare) {
+      await copy('link');
+      return;
+    }
+    try {
+      await navigator.share({
+        title: 'NOCTALIS',
+        text: t('lobby.shareText', { code: room.code }),
+        url: inviteLink,
+      });
     } catch {
-      setCopied(false);
+      // Closing the share sheet is not an error worth showing.
     }
   };
 
@@ -40,16 +65,41 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
 
       <Panel className="lobby__card">
         <p className="lobby__share">{t('lobby.share', { max: MAX_PLAYERS - 1 })}</p>
-        <div className="lobby__code" data-testid="room-code">
-          {room.code.split('').map((char, index) => (
-            <span className="lobby__char" key={`${char}-${String(index)}`}>
-              {char}
-            </span>
-          ))}
+        <div className="lobby__invite">
+          <input
+            className="lobby__link"
+            type="text"
+            readOnly
+            value={inviteLink}
+            aria-label={t('lobby.inviteLabel')}
+            data-testid="invite-link"
+            onFocus={(event) => {
+              event.currentTarget.select();
+            }}
+          />
+          <Button variant="primary" onClick={() => void shareLink()} data-testid="copy-link">
+            {feedback === 'link'
+              ? t('lobby.linkCopied')
+              : nativeShare
+                ? t('lobby.shareLink')
+                : t('lobby.copyLink')}
+          </Button>
         </div>
-        <div className="row" style={{ justifyContent: 'center' }}>
-          <Button variant="secondary" onClick={() => void copy()} data-testid="copy-code">
-            {copied ? t('lobby.copied') : t('lobby.copy')}
+        <p className="lobby__feedback" role="status" data-testid="copy-feedback">
+          {feedback === 'failed' ? t('lobby.copyFailed') : ''}
+        </p>
+
+        <p className="lobby__or">{t('lobby.orCode')}</p>
+        <div className="lobby__code-row">
+          <div className="lobby__code" data-testid="room-code">
+            {room.code.split('').map((char, index) => (
+              <span className="lobby__char" key={`${char}-${String(index)}`}>
+                {char}
+              </span>
+            ))}
+          </div>
+          <Button variant="secondary" size="sm" onClick={() => void copy('code')} data-testid="copy-code">
+            {feedback === 'code' ? t('lobby.copied') : t('lobby.copy')}
           </Button>
         </div>
 

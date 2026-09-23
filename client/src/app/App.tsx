@@ -10,6 +10,7 @@ import { StartRoulette } from '../features/game/StartRoulette.js';
 import { AboutDialog } from '../features/room/AboutDialog.js';
 import { SiteFooter } from '../components/ui/SiteFooter.js';
 import { loadPreferences, savePreferences } from '../lib/storage.js';
+import { clearInviteFromUrl } from '../lib/invite.js';
 import { setSoundEnabled } from '../lib/audio.js';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
 import {
@@ -23,7 +24,12 @@ import {
  * Screen routing: home -> lobby -> table.
  * The state comes from the server; no screen is simulated locally.
  */
-export function App(): JSX.Element {
+export interface AppProps {
+  /** Room code from an invite link, read once when the page opens. */
+  inviteCode?: string | null;
+}
+
+export function App({ inviteCode = null }: AppProps): JSX.Element {
   const {
     room,
     publicState,
@@ -79,6 +85,18 @@ export function App(): JSX.Element {
     void actions.leaveRoom();
   }, [actions]);
 
+  // Once seated, the invite has done its job: it is forgotten (leaving the
+  // game later leads back to the plain home screen) and the address bar is
+  // tidied up.
+  const [pendingInvite, setPendingInvite] = useState(inviteCode);
+  const seated = room !== null;
+  useEffect(() => {
+    if (seated) {
+      setPendingInvite(null);
+      clearInviteFromUrl();
+    }
+  }, [seated]);
+
   const inGame = room !== null && publicState !== null && credentials !== null;
   const inLobby = room !== null && publicState === null && credentials !== null;
 
@@ -113,6 +131,7 @@ export function App(): JSX.Element {
       ) : (
         <Home
           initialName={prefs.name}
+          inviteCode={pendingInvite}
           onNameChange={(name) => {
             setPrefs(savePreferences({ name }));
           }}

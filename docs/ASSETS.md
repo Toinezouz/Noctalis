@@ -15,8 +15,9 @@ A resource of uncertain origin would not be published.
 | Star medallions, rows, name plates, starfield | pure CSS (gradients, masks, shadows) | written for this project | AGPL-3.0-or-later | `client/src/styles/` |
 | Opening wheel | CSS | written for this project | AGPL-3.0-or-later | `client/src/features/game/StartRoulette.tsx`, `game.css` |
 
-**The game ships no bitmap image.** Everything players see is vector or
-computed by the browser.
+**The game itself shows no bitmap image.** Everything players see is vector
+or computed by the browser. The only bitmap served with it is the link
+preview below, which chat apps display, not the game.
 
 ## Screenshots
 
@@ -27,6 +28,17 @@ computed by the browser.
 
 They are captures of this project, used by the README only. They are not
 part of the game.
+
+## Link preview
+
+| File | What | Licence |
+| --- | --- | --- |
+| `client/public/og-image.jpg` | 1200 × 630 card shown by chat apps and social networks when a link is shared | AGPL-3.0-or-later |
+
+It is a composition made for this project: the favicon, the NOCTALIS name
+set in Cinzel, five CSS medallions, and `docs/images/table-dark.png` in
+perspective, rendered with the project's own Chromium (Playwright) and saved
+as a JPEG (quality 86, about 65 KB, well under the size limits of chat apps).
 
 ## Fonts
 

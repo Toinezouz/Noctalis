@@ -88,7 +88,7 @@ Then, in a browser:
 1. open the public address;
 2. start a game — a 5-character code shows up;
 3. open **one to three more windows** (or other devices) and join with the
-   code;
+   invite link shown in the lobby: the code must already be filled in;
 4. play a few turns: reveal, PLACE, GAUGE;
 5. open the star chart, cross out a few numbers;
 6. reload one of the pages: the game must pick up where it was;
@@ -97,6 +97,18 @@ Then, in a browser:
 
 If step 3 works, Socket.IO gets through — the only thing that could go wrong
 behind a host.
+
+To check the link preview, look at the tags the server writes:
+
+```bash
+curl -s "https://<your-service>.onrender.com/?join=AB7K9&lang=fr" | grep 'og:'
+# expected: og:title "Une partie de NOCTALIS t’attend", and an og:image that
+# starts with https://<your-service>.onrender.com/
+```
+
+Chat apps keep previews in cache for a while: after a change, a new link (or
+a debugger such as the one of the social network concerned) shows the fresh
+card.
 
 ### Replaying Render's sequence locally
 
@@ -144,6 +156,12 @@ The project only needs Node 20, a port and a long-running process. Any
 platform able to run `npm ci --include=dev && npm run build` and then
 `npm start` will do — as long as it **supports WebSockets** and does not run
 the service in a stateless way.
+
+Set `PUBLIC_URL` to the public address (for example
+`https://noctalis.example.org`) so that link previews use absolute URLs.
+Without it, the server uses the address each request came in on, which works
+behind most proxies as long as they pass the `Host` and `X-Forwarded-Proto`
+headers along.
 
 For a one-off game among friends, without hosting anything:
 

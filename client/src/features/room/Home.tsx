@@ -12,6 +12,8 @@ import { errorMessageKey, useGame } from '../../app/GameContext.js';
 
 export interface HomeProps {
   initialName: string;
+  /** Code carried by an invite link: opens the join form, already filled in. */
+  inviteCode?: string | null;
   onNameChange: (name: string) => void;
   onOpenHelp: () => void;
   theme: ThemePreference;
@@ -23,6 +25,7 @@ type Mode = 'menu' | 'create' | 'join';
 /** Home screen: start or join a game, and learn how to play. */
 export function Home({
   initialName,
+  inviteCode = null,
   onNameChange,
   onOpenHelp,
   theme,
@@ -30,9 +33,11 @@ export function Home({
 }: HomeProps): JSX.Element {
   const { actions, status } = useGame();
   const { t } = useI18n();
-  const [mode, setMode] = useState<Mode>('menu');
+  const [mode, setMode] = useState<Mode>(inviteCode ? 'join' : 'menu');
   const [name, setName] = useState(initialName);
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(inviteCode ?? '');
+  // With an invite and a name already known, joining is one tap away.
+  const invitedWithName = inviteCode !== null && initialName.trim().length > 0;
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -65,7 +70,7 @@ export function Home({
   };
 
   return (
-    <div className="home">
+    <div className={`home ${inviteCode !== null && mode === 'join' ? 'home--invited' : ''}`.trim()}>
       <div className="home__hero">
         <Astrolabe />
         <BrandMark size="xl" as="h1" />
@@ -111,11 +116,16 @@ export function Home({
             <h2 className="home__form-title">
               {mode === 'create' ? t('home.createTitle') : t('home.joinTitle')}
             </h2>
+            {mode === 'join' && inviteCode !== null && code === inviteCode ? (
+              <p className="home__invited" data-testid="home-invited">
+                {t('home.invited')}
+              </p>
+            ) : null}
             <Field
               label={t('home.nameLabel')}
               value={name}
               maxLength={NAME_MAX_LENGTH}
-              autoFocus
+              autoFocus={!invitedWithName}
               data-testid="name-input"
               hint={t('home.nameHint', { min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH })}
               onChange={(event) => {
@@ -147,6 +157,7 @@ export function Home({
               variant="primary"
               block
               disabled={busy}
+              autoFocus={mode === 'join' && invitedWithName}
               data-testid="submit-room"
             >
               {busy
