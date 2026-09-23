@@ -72,15 +72,21 @@ The five constellations, in internal order (`green`, `pink`, `blue`, `red`,
 `orange` — technical identifiers, unchanged):
 
 All five are **real constellations**, drawn from their actual stick figures
-(simplified, north up), and each colour has an astronomical reason:
+(simplified, north up). Their colours form a palette of their own, inspired
+by the false colours of space-telescope images rather than by any card game,
+and each has an astronomical reason:
 
-| Identifier | English | French | Spanish | Figure | Why this colour |
+| Identifier | English | French | Spanish | Figure | Colour, and why |
 | --- | --- | --- | --- | --- | --- |
-| `green` | Lyra | Lyre | Lira | Vega above a small parallelogram | the blue-green glow of the Ring Nebula (M57) |
-| `pink` | Orion | Orion | Orión | the shoulders, the belt, Saiph and Rigel | the pink of the Orion Nebula (M42) |
-| `blue` | Cygnus | Cygne | Cisne | the Northern Cross, from Deneb to Albireo | the blue companion of Albireo |
-| `red` | Scorpius | Scorpion | Escorpio | the claws, Antares, the curved tail | Antares, a red supergiant |
-| `orange` | Cassiopeia | Cassiopée | Casiopea | the W | Schedar, an orange giant |
+| `green` | Lyra | Lyre | Lira | Vega above a small parallelogram | lime — the green glow of oxygen in the Ring Nebula (M57) |
+| `pink` | Orion | Orion | Orión | the shoulders, the belt, Saiph and Rigel | violet — the hot young stars of the Orion Nebula |
+| `blue` | Cygnus | Cygne | Cisne | the Northern Cross, from Deneb to Albireo | silver — Deneb, a white supergiant |
+| `red` | Scorpius | Scorpion | Escorpio | the claws, Antares, the curved tail | copper — Antares, red and low in the sky |
+| `orange` | Cassiopeia | Cassiopée | Casiopea | the W | pale gold — the warm light of its stars |
+
+The palette deliberately stays away from the green, pink, blue, red and
+orange of the game this project started from; `tests/unit/theme.test.ts`
+checks that each colour keeps a clear distance from those.
 
 Up to version 1.4 the pink, red and orange constellations were invented
 ones (Aurora, Ember, Phoenix); they were replaced by real ones in 1.5.
@@ -129,13 +135,13 @@ Both are self-hosted and released under the SIL Open Font License.
 The five constellations keep the same colours in both themes, so the star
 chart always matches the table:
 
-| Constellation | Colour | Deep | Light |
-| --- | --- | --- | --- |
-| Lyra | `#2fbf9f` | `#0e5b52` | `#b9f5e4` |
-| Orion | `#e0679f` | `#6e1f47` | `#ffd0e4` |
-| Cygnus | `#4f8ff7` | `#173b86` | `#d0e2ff` |
-| Scorpius | `#ec5a47` | `#7a1d17` | `#ffd2c6` |
-| Cassiopeia | `#f0a232` | `#7a4a08` | `#ffe7bd` |
+| Constellation | Colour | Deep | Light | Text on a fill |
+| --- | --- | --- | --- | --- |
+| Lyra | `#9ccc3a` lime | `#3b5410` | `#e8f8c6` | navy |
+| Orion | `#8f6cf0` violet | `#33207a` | `#e2d6ff` | white |
+| Cygnus | `#9aa8c2` silver | `#3a455c` | `#f1f4fa` | navy |
+| Scorpius | `#b86a45` copper | `#4f2213` | `#ffd9c4` | white |
+| Cassiopeia | `#e3c85f` pale gold | `#5c4a0c` | `#fff4c9` | navy |
 
 Contrast is measured, not guessed: `tests/unit/theme.test.ts` checks the WCAG
 ratios of the main text and accent pairs in both themes.

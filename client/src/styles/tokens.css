@@ -80,28 +80,34 @@
   --c-info: #2553b8;
 
   /* --- The five constellations -------------------------------------------
-     Each colour has an astronomical reason: the blue-green of doubly
-     ionised oxygen in the Ring Nebula (Lyra), the pink of the Orion Nebula,
-     the blue of Albireo's companion (Cygnus), red Antares (Scorpius) and
-     orange Schedar (Cassiopeia). `-deep` is the rim of a star's halo,
-     `-light` its white-hot heart. The technical identifiers (green, pink...)
-     are only names: players see the constellations, each with its real
-     star figure. */
-  --t-green: #2fbf9f;
-  --t-green-deep: #0e5b52;
-  --t-green-light: #b9f5e4;
-  --t-pink: #e0679f;
-  --t-pink-deep: #6e1f47;
-  --t-pink-light: #ffd0e4;
-  --t-blue: #4f8ff7;
-  --t-blue-deep: #173b86;
-  --t-blue-light: #d0e2ff;
-  --t-red: #ec5a47;
-  --t-red-deep: #7a1d17;
-  --t-red-light: #ffd2c6;
-  --t-orange: #f0a232;
-  --t-orange-deep: #7a4a08;
-  --t-orange-light: #ffe7bd;
+     A palette of its own, inspired by the false colours of space-telescope
+     images rather than by any card game: lime, violet, silver, copper and
+     pale gold. Each keeps an astronomical reason: the green glow of oxygen in
+     the Ring Nebula (Lyra), the hot young stars of Orion, white Deneb (Cygnus),
+     coppery Antares low in the sky (Scorpius), the warm light of Cassiopeia.
+     `-deep` is the rim of a star's halo, `-light` its heart, `-ink` the text
+     set on a flat fill of that colour (dark on the light colours). The
+     technical identifiers (green, pink...) are only names, never shown. */
+  --t-green: #9ccc3a;
+  --t-green-deep: #3b5410;
+  --t-green-light: #e8f8c6;
+  --t-green-ink: #101a33;
+  --t-pink: #8f6cf0;
+  --t-pink-deep: #33207a;
+  --t-pink-light: #e2d6ff;
+  --t-pink-ink: #ffffff;
+  --t-blue: #9aa8c2;
+  --t-blue-deep: #3a455c;
+  --t-blue-light: #f1f4fa;
+  --t-blue-ink: #101a33;
+  --t-red: #b86a45;
+  --t-red-deep: #4f2213;
+  --t-red-light: #ffd9c4;
+  --t-red-ink: #ffffff;
+  --t-orange: #e3c85f;
+  --t-orange-deep: #5c4a0c;
+  --t-orange-light: #fff4c9;
+  --t-orange-ink: #101a33;
   /* Kept for components that still name them (sheet, buttons). */
   --t-green-dark: var(--t-green-deep);
   --t-pink-dark: var(--t-pink-deep);
@@ -237,24 +243,29 @@
   --tile-face: var(--t-green);
   --tile-edge: var(--t-green-deep);
   --tile-light: var(--t-green-light);
+  --tile-ink: var(--t-green-ink);
 }
 [data-color='pink'] {
   --tile-face: var(--t-pink);
   --tile-edge: var(--t-pink-deep);
   --tile-light: var(--t-pink-light);
+  --tile-ink: var(--t-pink-ink);
 }
 [data-color='blue'] {
   --tile-face: var(--t-blue);
   --tile-edge: var(--t-blue-deep);
   --tile-light: var(--t-blue-light);
+  --tile-ink: var(--t-blue-ink);
 }
 [data-color='red'] {
   --tile-face: var(--t-red);
   --tile-edge: var(--t-red-deep);
   --tile-light: var(--t-red-light);
+  --tile-ink: var(--t-red-ink);
 }
 [data-color='orange'] {
   --tile-face: var(--t-orange);
   --tile-edge: var(--t-orange-deep);
   --tile-light: var(--t-orange-light);
+  --tile-ink: var(--t-orange-ink);
 }

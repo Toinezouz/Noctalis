@@ -118,6 +118,6 @@ test.describe('Light and dark themes', () => {
     const cell = first.getByTestId('sheet-cell-1');
     await expect(cell).toHaveAttribute('data-color', 'green');
     const face = await cell.evaluate((node) => getComputedStyle(node).backgroundImage);
-    expect(face).toContain('rgb(47, 191, 159)');
+    expect(face).toContain('rgb(156, 204, 58)');
   });
 });

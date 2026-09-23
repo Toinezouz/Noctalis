@@ -78,6 +78,33 @@ describe('theme choice', () => {
   });
 });
 
+describe('the five constellation colours', () => {
+  const colors = ['green', 'pink', 'blue', 'red', 'orange'] as const;
+
+  it('carry readable text on a flat fill (star chart cells, counters)', () => {
+    // Numbers there are bold and short: the WCAG threshold for large text.
+    for (const color of colors) {
+      const ratio = contrast(token(`--t-${color}-ink`, 'light'), token(`--t-${color}`, 'light'));
+      expect(ratio, `${color}: ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('stay well away from the colours of the game UMBRASTRA started from', () => {
+    // The green, pink, blue, red and orange of that earlier project.
+    const original = ['#2fb061', '#f05a9c', '#2aa7e0', '#e8453c', '#f79020'];
+    const rgb = (hex: string): number[] =>
+      [0, 2, 4].map((i) => Number.parseInt(hex.replace('#', '').slice(i, i + 2), 16));
+    const distance = (a: string, b: string): number =>
+      Math.hypot(...rgb(a).map((value, i) => value - rgb(b)[i]!));
+    for (const color of colors) {
+      const face = token(`--t-${color}`, 'light');
+      for (const old of original) {
+        expect(distance(face, old), `${color} ${face} too close to ${old}`).toBeGreaterThan(55);
+      }
+    }
+  });
+});
+
 describe('readability of both themes', () => {
   // AA asks for 4.5:1 for body text, 3:1 for large text.
   const pairs: [string, string, string, number][] = [
