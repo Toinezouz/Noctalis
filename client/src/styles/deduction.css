@@ -153,7 +153,8 @@
 
 .sheet__grid-wrap {
   overflow-x: auto;
-  padding-bottom: var(--sp-1);
+  /* Room for the corner badges of the outer cells. */
+  padding: 4px 4px var(--sp-1);
 }
 
 .sheet__columns {
@@ -266,28 +267,58 @@
   background: currentColor;
 }
 
-/* Already revealed in the open sky: a small yellow star. */
-.sheet-cell__revealed {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 9px;
-  height: 9px;
-  background: var(--c-gold-bright);
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.6));
+/*
+ * Markers sit on a small dark badge with a white edge, astride the cell's
+ * corner: readable on every constellation colour, light or dark, and even on
+ * a crossed-out cell.
+ */
+.sheet-cell__revealed,
+.sheet-cell__held,
+.sheet__legend-dot,
+.sheet__legend-ring {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #101a33;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
-/* Seen on someone else's row: a thin white ring. */
+.sheet-cell__revealed,
 .sheet-cell__held {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 8px;
-  height: 8px;
+  top: -4px;
+  z-index: 1;
+}
+
+/* Already revealed in the open sky: a bright yellow star. */
+.sheet-cell__revealed {
+  right: -4px;
+}
+
+.sheet-cell__revealed::before,
+.sheet__legend-dot::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  background: #ffd873;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+}
+
+/* Seen on someone else's row: a white ring. */
+.sheet-cell__held {
+  left: -4px;
+}
+
+.sheet-cell__held::before,
+.sheet__legend-ring::before {
+  content: '';
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  border: 1.5px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid #ffffff;
 }
 
 .sheet-cell.is-crossed {
@@ -319,22 +350,11 @@
   stroke-width: 4;
 }
 
-.sheet__legend-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  background: var(--c-gold-bright);
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-  vertical-align: middle;
-}
-
+.sheet__legend-dot,
 .sheet__legend-ring {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1.5px solid var(--c-ink);
-  vertical-align: middle;
+  display: inline-grid;
+  vertical-align: -3px;
+  margin-right: 2px;
 }
 
 .sheet__footer {
