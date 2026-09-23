@@ -249,7 +249,7 @@ test.describe('Translations', () => {
     // The label gets a suffix if the star is already revealed or held by
     // someone else: only its beginning is checked.
     await expect(spanish.getByTestId('sheet-cell-17')).toHaveAccessibleName(
-      /^Número 17, Aurora, 1 destello, tachado/,
+      /^Número 17, Orión, 1 destello, tachado/,
     );
     await spanish.getByTestId('close-sheet').click();
 

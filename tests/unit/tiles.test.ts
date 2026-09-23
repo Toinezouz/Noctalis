@@ -89,7 +89,7 @@ describe('data of the 60 stars', () => {
     }
   });
 
-  it('repeats the pattern from 16 and ends on 60, Phoenix, 3 sparks', () => {
+  it('repeats the pattern from 16 and ends on 60, Cassiopeia, 3 sparks', () => {
     expect(getTileByNumber(16)).toMatchObject({ color: 'green', points: 1 });
     expect(getTileByNumber(17)).toMatchObject({ color: 'pink', points: 1 });
     expect(getTileByNumber(37)).toMatchObject({ color: 'pink', points: 2 });

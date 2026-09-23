@@ -7,9 +7,10 @@ export interface BrandMarkProps {
 }
 
 /**
- * The UMBRASTRA mark: a disc of night carrying stars joined by the lines of a
- * constellation, followed by the name. Drawn in SVG within the project, with
- * no dependency and no external resource.
+ * The UMBRASTRA mark: a total solar eclipse. The Moon's disc is the umbra,
+ * the shadow the name comes from; around it the corona, and on its edge the
+ * last bright bead of sunlight. A few stars show, as they do in the sky
+ * during totality. Drawn in SVG within the project, with no dependency.
  */
 export function BrandMark({ size = 'sm', as = 'span', className = '' }: BrandMarkProps): JSX.Element {
   const Tag = as;
@@ -22,23 +23,18 @@ export function BrandMark({ size = 'sm', as = 'span', className = '' }: BrandMar
         aria-label="UMBRASTRA"
         focusable="false"
       >
-        <circle cx="32" cy="32" r="30" className="brand__disc" />
-        <path
-          d="M17 41 L26 24 L39 32 L47 19 M26 24 L34 45"
-          className="brand__lines"
-          fill="none"
-          strokeLinecap="round"
-        />
+        <circle cx="32" cy="32" r="31" className="brand__sky" />
         <g className="brand__stars">
-          <circle cx="17" cy="41" r="2.6" />
-          <circle cx="39" cy="32" r="2.6" />
-          <circle cx="47" cy="19" r="2.2" />
-          <circle cx="34" cy="45" r="3" />
+          <circle cx="12" cy="15" r="1.1" />
+          <circle cx="51" cy="49" r="1.3" />
+          <circle cx="14" cy="50" r="0.8" />
+          <circle cx="50" cy="12" r="0.8" />
         </g>
-        <path
-          d="M26 17.5 L27.1 22.9 L32.5 24 L27.1 25.1 L26 30.5 L24.9 25.1 L19.5 24 L24.9 22.9 Z"
-          className="brand__nova"
-        />
+        <circle cx="32" cy="32" r="19" className="brand__corona brand__corona--outer" />
+        <circle cx="32" cy="32" r="17.2" className="brand__corona brand__corona--inner" />
+        <circle cx="32" cy="32" r="16" className="brand__moon" />
+        <circle cx="43.3" cy="20.7" r="2.4" className="brand__bead" />
+        <path d="M43.3 14.8 V26.6 M37.4 20.7 H49.2" className="brand__spikes" />
       </svg>
       <span className="brand__word">UMBRASTRA</span>
     </Tag>

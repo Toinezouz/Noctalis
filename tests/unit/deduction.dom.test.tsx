@@ -65,19 +65,19 @@ describe('Star chart (component)', () => {
     render(<SheetHost />);
     const expected: [number, string, number][] = [
       [1, 'Lyre', 1],
-      [2, 'Aurore', 1],
+      [2, 'Orion', 1],
       [3, 'Cygne', 1],
-      [4, 'Braise', 1],
-      [5, 'Phénix', 1],
+      [4, 'Scorpion', 1],
+      [5, 'Cassiopée', 1],
       [6, 'Lyre', 2],
-      [10, 'Phénix', 2],
+      [10, 'Cassiopée', 2],
       [11, 'Lyre', 3],
-      [15, 'Phénix', 3],
+      [15, 'Cassiopée', 3],
       [16, 'Lyre', 1],
-      [17, 'Aurore', 1],
-      [37, 'Aurore', 2],
+      [17, 'Orion', 1],
+      [37, 'Orion', 2],
       [56, 'Lyre', 3],
-      [60, 'Phénix', 3],
+      [60, 'Cassiopée', 3],
     ];
     for (const [n, color, points] of expected) {
       const cell = screen.getByTestId(`sheet-cell-${String(n)}`);
@@ -209,9 +209,9 @@ describe('Star chart (component)', () => {
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60 tachados');
 
     const cell = screen.getByTestId('sheet-cell-37');
-    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 destellos, aún posible');
+    expect(cell.getAttribute('aria-label')).toBe('Número 37, Orión, 2 destellos, aún posible');
     await user.click(cell);
-    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 destellos, tachado');
+    expect(cell.getAttribute('aria-label')).toBe('Número 37, Orión, 2 destellos, tachado');
 
     // The revealed star keeps its landmark, in the chosen language.
     expect(screen.getByTestId('sheet-cell-12').getAttribute('aria-label')).toContain(
@@ -264,7 +264,7 @@ describe('Star chart (component)', () => {
     render(<SheetHost lang="en" />);
     expect(screen.getByText('My star chart')).toBeInTheDocument();
     expect(screen.getByTestId('sheet-cell-60').getAttribute('aria-label')).toBe(
-      'Number 60, Phoenix, 3 sparks, still possible',
+      'Number 60, Cassiopeia, 3 sparks, still possible',
     );
   });
 });

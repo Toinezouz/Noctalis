@@ -23,10 +23,10 @@ export const es: Messages = {
 
   // --- Constelaciones ------------------------------------------------------
   'color.green': 'Lira',
-  'color.pink': 'Aurora',
+  'color.pink': 'Orión',
   'color.blue': 'Cisne',
-  'color.red': 'Brasa',
-  'color.orange': 'Fénix',
+  'color.red': 'Escorpio',
+  'color.orange': 'Casiopea',
 
   // --- Los seis huecos de SITUAR -------------------------------------------
   'slot.0': 'Antes de la 1.ª',
@@ -114,7 +114,7 @@ export const es: Messages = {
   'roulette.question': '¿Quién empieza?',
   'roulette.drawing': 'El cielo gira…',
   'roulette.landed': '¡Empieza {name}!',
-  'roulette.youStart': 'Las estrellas han hablado: te toca abrir la partida.',
+  'roulette.youStart': 'Sorteo hecho: te toca abrir la partida.',
   'roulette.othersStart': '{name} abre la partida. Tu turno llegará pronto.',
   'roulette.skip': 'Saltar',
   'roulette.go': '¡Vamos!',
@@ -337,7 +337,7 @@ export const es: Messages = {
     'Cada persona recibe cinco estrellas secretas. Ahí está la gracia: ves las estrellas del resto, pero nunca las tuyas. Tu reto es descubrirlas con las pistas que te da la mesa y nombrarlas antes que nadie.',
   'howto.stars.title': 'Sesenta estrellas, cinco constelaciones',
   'howto.stars.text':
-    'Las estrellas llevan un número del 1 al 60. Ese número lo decide todo: su constelación (se van turnando: 1 para Lira, 2 para Aurora, y así sucesivamente) y sus destellos, uno, dos o tres, dibujados bajo el número.',
+    'Las estrellas llevan un número del 1 al 60. Ese número lo decide todo: su constelación (se van turnando: 1 para Lira, 2 para Orión, y así sucesivamente) y sus destellos, uno, dos o tres, dibujados bajo el número.',
   'howto.setup.title': 'Tus cinco estrellas',
   'howto.setup.text':
     'Tienes una estrella de cada constelación, ordenadas del número más pequeño al más grande. Ves su constelación y su lugar en la fila, nunca su número. El resto de la mesa, en cambio, las lee sin ningún problema.',

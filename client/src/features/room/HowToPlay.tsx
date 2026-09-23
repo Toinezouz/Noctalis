@@ -4,7 +4,7 @@ import { Modal } from '../../components/ui/Modal.js';
 import { Button } from '../../components/ui/Button.js';
 import { Tile } from '../../components/game/Tile.js';
 import { TileBack } from '../../components/game/TileBack.js';
-import { ConstellationSigil } from '../../components/game/ConstellationSigil.js';
+import { Asterism } from '../../components/game/Asterism.js';
 import { Icon, type IconName } from '../../components/ui/Icon.js';
 
 export interface HowToPlayProps {
@@ -92,10 +92,10 @@ export function HowToPlay({ open, onClose }: HowToPlayProps): JSX.Element | null
           </li>
         ))}
       </ol>
-      <p className="howto__sigils" aria-hidden="true">
+      <p className="howto__asterisms" aria-hidden="true">
         {COLOR_ORDER.map((color) => (
           <span data-color={color} key={color}>
-            <ConstellationSigil color={color} size={18} />
+            <Asterism color={color} size={18} />
           </span>
         ))}
       </p>

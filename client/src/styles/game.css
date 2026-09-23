@@ -2,7 +2,10 @@
    The table: stars, racks, name plates, open sky, actions
    ========================================================================== */
 
-/* --- Stars: celestial medallions ------------------------------------------ */
+/* --- Stars: a star seen through the eyepiece -------------------------------
+   A disc of night sky, lit by the colour of its constellation, framed by a
+   thin coloured field ring with four reticle marks. No metal, no engraving:
+   an observation, not an ornament. */
 
 .tile {
   position: relative;
@@ -18,14 +21,20 @@
   border: none;
   border-radius: 50%;
   color: #fff;
-  /* A glowing body: bright heart up-left, deep edge. */
+  background: var(--sky-face);
+  /* The star's light, spreading from the centre of the field. */
   background:
-    radial-gradient(circle at 33% 27%, var(--tile-light, #fff) 0%, transparent 44%),
-    radial-gradient(circle at 50% 50%, var(--tile-face, var(--c-violet)) 0%, var(--tile-edge, var(--c-violet-dark)) 80%);
+    radial-gradient(
+      circle at 50% 44%,
+      color-mix(in srgb, var(--tile-face, #4f8ff7) 72%, transparent) 0%,
+      color-mix(in srgb, var(--tile-face, #4f8ff7) 30%, transparent) 46%,
+      transparent 74%
+    ),
+    var(--sky-face);
   box-shadow:
-    inset 0 0 0 1.5px rgba(255, 236, 190, 0.6),
-    inset 0 -5px 10px rgba(0, 0, 0, 0.22),
-    0 0 16px -4px var(--tile-face, transparent),
+    inset 0 0 0 2px var(--tile-face, var(--c-violet)),
+    inset 0 0 0 3.5px rgba(0, 0, 0, 0.35),
+    0 0 14px -4px var(--tile-face, transparent),
     var(--sh-tile);
   text-align: center;
   transition:
@@ -34,15 +43,18 @@
     opacity var(--mo-fast) var(--ease-out);
 }
 
-/* Graduated ring, as on an astrolabe. */
+/* Reticle: four short marks at north, south, east and west. */
 .tile::before {
   content: '';
   position: absolute;
-  inset: 3px;
+  inset: 0;
   border-radius: 50%;
-  background: repeating-conic-gradient(rgba(255, 255, 255, 0.7) 0 1.4deg, transparent 1.4deg 15deg);
-  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px));
-  mask: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px));
+  --mark: linear-gradient(var(--tile-light, #fff), var(--tile-light, #fff));
+  background:
+    var(--mark) 50% 3px / 1.5px 10% no-repeat,
+    var(--mark) 50% calc(100% - 3px) / 1.5px 10% no-repeat,
+    var(--mark) 3px 50% / 10% 1.5px no-repeat,
+    var(--mark) calc(100% - 3px) 50% / 10% 1.5px no-repeat;
   opacity: 0.55;
   pointer-events: none;
 }
@@ -57,22 +69,25 @@
   --tile-w: clamp(76px, 15vw, 96px);
 }
 
-.tile__sigil {
+.tile__asterism {
   width: calc(var(--tile-w) * 0.27);
   height: calc(var(--tile-w) * 0.27);
-  color: rgba(255, 255, 255, 0.88);
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  color: var(--tile-light, #fff);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
   margin-top: calc(var(--tile-w) * -0.02);
 }
 
 .tile__number {
   position: relative;
   font-family: var(--font-title);
-  font-weight: 700;
+  font-weight: 600;
   font-size: calc(var(--tile-w) * 0.34);
+  font-variant-numeric: tabular-nums;
   line-height: 1;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  letter-spacing: -0.01em;
+  text-shadow:
+    0 0 6px rgba(0, 0, 0, 0.7),
+    0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .tile--xs .tile__number {
@@ -81,24 +96,26 @@
 
 .tile__points {
   display: flex;
-  gap: calc(var(--tile-w) * 0.035);
-  min-height: calc(var(--tile-w) * 0.1);
+  gap: calc(var(--tile-w) * 0.04);
+  min-height: calc(var(--tile-w) * 0.09);
 }
 
-/* A spark: a small four-pointed star. */
+/* Brightness: one to three round points, as in a star chart's legend. */
 .tile__dot {
-  width: calc(var(--tile-w) * 0.12);
-  height: calc(var(--tile-w) * 0.12);
-  min-width: 5px;
-  min-height: 5px;
+  width: calc(var(--tile-w) * 0.085);
+  height: calc(var(--tile-w) * 0.085);
+  min-width: 4px;
+  min-height: 4px;
+  border-radius: 50%;
   background: #fff;
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+  box-shadow:
+    0 0 4px 1px var(--tile-light, #fff),
+    0 0 1px rgba(0, 0, 0, 0.6);
 }
 
 .tile--xs .tile__dot {
-  min-width: 4px;
-  min-height: 4px;
+  min-width: 3px;
+  min-height: 3px;
 }
 
 .tile--clickable {
@@ -108,9 +125,9 @@
 .tile--clickable:hover:not(:disabled) {
   transform: translateY(-3px) scale(1.06);
   box-shadow:
-    inset 0 0 0 1.5px rgba(255, 236, 190, 0.8),
-    inset 0 -5px 10px rgba(0, 0, 0, 0.18),
-    0 0 22px -2px var(--tile-face, transparent),
+    inset 0 0 0 2px var(--tile-light, #fff),
+    inset 0 0 0 3.5px rgba(0, 0, 0, 0.3),
+    0 0 20px -2px var(--tile-face, transparent),
     var(--sh-tile-raised);
   z-index: 3;
 }
@@ -145,33 +162,40 @@
   animation: gf-flip-in var(--mo-slow) var(--ease-out) both;
 }
 
-/* --- My hidden stars: eclipsed discs ---------------------------------------- */
+/* --- My hidden stars: not observed yet ---------------------------------------
+   A dark field with a dashed ring in the constellation's colour: the target
+   is known, its light is not. */
 
 .tile-back {
   color: var(--tile-light, #fff);
-  background:
-    radial-gradient(circle at 50% 50%, var(--eclipse-face) 0 56%, var(--tile-edge, #222) 84%, var(--tile-face, #444) 100%);
+  background: var(--eclipse-face);
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--eclipse-face) 0 58%,
+    color-mix(in srgb, var(--tile-face, #4f8ff7) 20%, var(--eclipse-face)) 100%
+  );
   box-shadow:
-    inset 0 0 0 1.5px var(--tile-face, transparent),
-    0 0 18px -5px var(--tile-face, transparent),
+    0 0 12px -5px var(--tile-face, transparent),
     var(--sh-tile);
 }
 
 .tile-back::before {
-  background: repeating-conic-gradient(var(--tile-face, #fff) 0 1.4deg, transparent 1.4deg 15deg);
-  opacity: 0.45;
+  inset: 2px;
+  background: none;
+  border: 1.5px dashed var(--tile-face, #fff);
+  opacity: 0.9;
 }
 
-.tile-back .tile__sigil {
+.tile-back .tile__asterism {
   color: var(--tile-light, #fff);
-  opacity: 0.95;
+  opacity: 0.9;
 }
 
 .tile-back__mark {
   position: relative;
   font-family: var(--font-title);
   font-size: calc(var(--tile-w) * 0.32);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   color: var(--tile-light, #fff);
   opacity: 0.9;
@@ -193,7 +217,7 @@
   color: var(--c-ink);
   font-family: var(--font-title);
   font-size: max(10px, calc(var(--tile-w) * 0.19));
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -250,13 +274,10 @@
   width: 100%;
   padding: var(--sp-3) var(--sp-2);
   border-radius: var(--r-lg);
-  /* Engraved arcs, like the declination lines of a star chart. */
+  /* The coordinate grid of a star chart. */
   background:
-    repeating-radial-gradient(
-      ellipse at 50% 160%,
-      transparent 0 26px,
-      rgba(var(--rack-line-rgb), 0.08) 26px 27px
-    ),
+    linear-gradient(rgba(var(--rack-line-rgb), 0.07) 1px, transparent 1px) 0 0 / 100% 24px,
+    linear-gradient(90deg, rgba(var(--rack-line-rgb), 0.07) 1px, transparent 1px) 0 0 / 24px 100%,
     var(--rack-face);
   border: 1px solid rgba(var(--rack-line-rgb), 0.32);
   box-shadow:
@@ -272,7 +293,7 @@
   border-color: var(--c-gold);
   box-shadow:
     inset 0 1px 0 var(--rack-gloss),
-    0 0 0 3px rgba(216, 169, 63, 0.22),
+    0 0 0 3px rgba(240, 180, 41, 0.24),
     0 12px 28px rgba(var(--shadow-rgb), 0.16);
 }
 
@@ -326,17 +347,18 @@
   border-radius: calc(var(--r-pill));
 }
 
-/* A small brass diamond marks each gap. */
+/* A small crosshair marks each gap, like a reference mark on a chart. */
 .classify-slot__notch {
   position: absolute;
-  top: -4px;
+  top: -5px;
   left: 50%;
-  width: 7px;
-  height: 7px;
-  background: var(--c-gold);
-  transform: translateX(-50%) rotate(45deg);
-  border-radius: 1px;
-  opacity: 0.8;
+  width: 9px;
+  height: 9px;
+  background:
+    linear-gradient(var(--c-violet), var(--c-violet)) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--c-violet), var(--c-violet)) center / 1.5px 100% no-repeat;
+  transform: translateX(-50%);
+  opacity: 0.7;
 }
 
 .rack__arrow {
@@ -427,7 +449,7 @@
     radial-gradient(circle at 84% 25%, rgba(255, 255, 255, 0.6) 0 0.8px, transparent 1.3px),
     var(--plate-face);
   background-size: 53px 29px, 71px 31px, 47px 27px, 100% 100%;
-  border: 1px solid rgba(232, 189, 90, 0.45);
+  border: 1px solid rgba(141, 184, 255, 0.45);
   box-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.18);
   transition: box-shadow var(--mo-base) var(--ease-out);
 }
@@ -449,7 +471,7 @@
   height: 24px;
   flex: none;
   border-radius: 50%;
-  border: 1px solid rgba(232, 189, 90, 0.7);
+  border: 1px solid rgba(141, 184, 255, 0.7);
   font-family: var(--font-title);
   font-size: 0.78rem;
   font-weight: 700;
@@ -487,7 +509,7 @@
 }
 
 .paravent.is-active {
-  box-shadow: 0 0 0 2px rgba(216, 169, 63, 0.35), 0 4px 14px rgba(var(--shadow-rgb), 0.2);
+  box-shadow: 0 0 0 2px rgba(240, 180, 41, 0.35), 0 4px 14px rgba(var(--shadow-rgb), 0.2);
 }
 
 .paravent.is-active .paravent__status {
@@ -544,7 +566,7 @@
   height: 26px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, var(--tile-face), var(--tile-edge) 90%);
-  box-shadow: inset 0 0 0 1px rgba(255, 236, 190, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(214, 228, 255, 0.5);
   color: #fff;
   font-family: var(--font-title);
   font-size: var(--fs-xs);
@@ -613,7 +635,7 @@
   gap: 3px;
   padding: var(--sp-2) 2px;
   min-height: 86px;
-  border: 1px solid rgba(255, 236, 190, 0.4);
+  border: 1px solid rgba(214, 228, 255, 0.4);
   border-radius: var(--r-md);
   background:
     radial-gradient(circle at 50% 18%, var(--tile-light) 0%, transparent 38%),
@@ -641,7 +663,7 @@
   cursor: not-allowed;
 }
 
-.color-button__sigil {
+.color-button__asterism {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
 
@@ -688,7 +710,7 @@
   letter-spacing: 0.26em;
   background: var(--plate-face);
   color: var(--plate-ink);
-  border: 1px solid rgba(232, 189, 90, 0.5);
+  border: 1px solid rgba(141, 184, 255, 0.5);
   padding: 0.2em 0.5em 0.2em 0.75em;
   border-radius: var(--r-pill);
   font-size: var(--fs-sm);
@@ -730,7 +752,7 @@
 
 .turn-indicator--mine {
   border-left-color: var(--c-gold);
-  background: linear-gradient(90deg, rgba(216, 169, 63, 0.16), var(--c-paper) 45%);
+  background: linear-gradient(90deg, rgba(240, 180, 41, 0.16), var(--c-paper) 45%);
 }
 
 .turn-indicator--answer {
@@ -843,7 +865,7 @@
 
 .player-status.is-active {
   border-color: var(--c-gold);
-  background: rgba(216, 169, 63, 0.14);
+  background: rgba(240, 180, 41, 0.14);
 }
 
 .player-status.is-left {
@@ -858,7 +880,7 @@
   border-radius: 50%;
   background: var(--plate-face);
   color: var(--plate-ink);
-  border: 1px solid rgba(232, 189, 90, 0.6);
+  border: 1px solid rgba(141, 184, 255, 0.6);
   font-family: var(--font-title);
   font-weight: 700;
   flex: 0 0 auto;
@@ -933,7 +955,7 @@
 }
 
 .game-log__item[data-kind='guess'] {
-  background: rgba(216, 169, 63, 0.2);
+  background: rgba(240, 180, 41, 0.2);
   font-weight: 600;
 }
 
@@ -1139,14 +1161,14 @@
 
 .roulette__disc {
   border-radius: 50%;
-  border: 2px solid var(--c-gold);
+  border: 2px solid var(--c-violet);
   box-shadow:
-    inset 0 0 0 5px rgba(255, 236, 190, 0.18),
+    inset 0 0 0 5px rgba(214, 228, 255, 0.18),
     inset 0 0 40px rgba(0, 0, 0, 0.35),
     var(--sh-tile-raised);
 }
 
-/* Graduations around the wheel. */
+/* Graduations around the dial. */
 .roulette__disc::after {
   content: '';
   position: absolute;
@@ -1207,7 +1229,7 @@
   aspect-ratio: 1;
   color: var(--c-gold-bright);
   background: var(--plate-face);
-  border: 2px solid var(--c-gold);
+  border: 2px solid var(--c-violet);
   border-radius: 50%;
   transform: translate(-50%, -50%);
 }

@@ -42,7 +42,7 @@ author of your contributions.
 
 ## Assets and dependencies
 
-The project's original assets follow the project's licence. The Cinzel and
+The project's original assets follow the project's licence. The Space Grotesk and
 Jost typefaces are under the SIL Open Font License 1.1, which is compatible.
 Details are in [`ASSETS.md`](ASSETS.md).
 

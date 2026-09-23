@@ -1,6 +1,6 @@
 import type { TileColor } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
-import { ConstellationSigil } from './ConstellationSigil.js';
+import { Asterism } from './Asterism.js';
 
 export interface TileBackProps {
   color: TileColor;
@@ -14,7 +14,7 @@ export interface TileBackProps {
 }
 
 /**
- * One of my own stars, as I see it: an eclipsed medallion. Its constellation
+ * One of my own stars, as I see it: a target not observed yet. Its constellation
  * and position show; its number never does (the client simply does not have
  * it).
  */
@@ -47,7 +47,7 @@ export function TileBack({
 
   const content = (
     <>
-      <ConstellationSigil color={color} className="tile__sigil" size={size === 'lg' ? 22 : 15} />
+      <Asterism color={color} className="tile__asterism" size={size === 'lg' ? 22 : 15} />
       <span className="tile-back__mark" aria-hidden="true">
         ?
       </span>

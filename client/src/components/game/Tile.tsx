@@ -1,6 +1,6 @@
 import type { Tile as TileData } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
-import { ConstellationSigil } from './ConstellationSigil.js';
+import { Asterism } from './Asterism.js';
 
 export type TileSize = 'xs' | 'sm' | 'md' | 'lg';
 
@@ -32,8 +32,8 @@ export function TilePoints({ points }: { points: number }): JSX.Element {
 }
 
 /**
- * A star, face up: a small celestial medallion with its constellation's
- * sigil, its number and its brightness.
+ * A star, face up, as seen through the eyepiece: its constellation's real
+ * star figure, its number and its brightness.
  */
 export function Tile({
   tile,
@@ -74,7 +74,7 @@ export function Tile({
   const content = (
     <>
       {size !== 'xs' ? (
-        <ConstellationSigil color={tile.color} className="tile__sigil" size={size === 'lg' ? 22 : 15} />
+        <Asterism color={tile.color} className="tile__asterism" size={size === 'lg' ? 22 : 15} />
       ) : null}
       <span className="tile__number">{tile.number}</span>
       <TilePoints points={tile.points} />

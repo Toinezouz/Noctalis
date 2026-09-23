@@ -1,103 +1,107 @@
 /* ==========================================================================
    UMBRASTRA — design tokens
-   Two moods for one sky:
-   - light: an old celestial atlas — parchment, indigo ink, brass;
-   - dark: the night itself — deep blue, starlight, the same brass.
+   An observatory, not a grimoire. Two ways of looking at the same sky:
+   - light: a modern printed star chart — cool white paper, navy lines;
+   - dark: the sky itself — near-black, starlight blue, a sun-like yellow.
    Components never write a colour of their own: they use these tokens, and
    the dark theme only has to redefine them.
    ========================================================================== */
 
 :root {
   /* --- Surfaces and ink -------------------------------------------------- */
-  /* Page background (parchment). */
-  --c-cream: #f2ecdf;
-  /* Slightly deeper parchment: wells, secondary surfaces. */
-  --c-cream-deep: #e8dfcb;
+  /* Page background: the cool white of a printed star chart. */
+  --c-cream: #eef2f8;
+  /* Slightly deeper: wells, secondary surfaces. */
+  --c-cream-deep: #e1e7f1;
   /* Hairline shadow under raised surfaces. */
-  --c-cream-shadow: #d6cab0;
+  --c-cream-shadow: #cdd5e3;
   /* Panels and cards. */
-  --c-paper: #faf6ec;
-  /* Main ink: deep indigo. */
-  --c-ink: #1b1d3f;
-  --c-ink-soft: #5c5d7d;
-  /* Accent ink (titles, links, selections). */
-  --c-violet: #3d3fa0;
-  --c-violet-dark: #2a2b78;
-  /* Second accent: a dusky rose, used sparingly. */
-  --c-magenta: #9c3f6e;
-  /* Brass: the instrument's metal. */
-  --c-gold: #a57a23;
-  --c-gold-bright: #d8a93f;
+  --c-paper: #fbfcfe;
+  /* Main ink: the navy of chart lines. */
+  --c-ink: #101a33;
+  --c-ink-soft: #4f5c78;
+  /* Accent ink (titles, links, selections): chart blue. */
+  --c-violet: #2553b8;
+  --c-violet-dark: #183c8c;
+  /* Second accent, used sparingly: the red of hydrogen (H-alpha). */
+  --c-magenta: #b5304f;
+  /* Highlight: a sun-like yellow, flat, never metallic. */
+  --c-gold: #9a6a00;
+  --c-gold-bright: #f0b429;
 
   /* Hovered surface / input background. */
-  --c-surface-hi: #fffdf7;
-  --c-field: #fffdf7;
-  /* Text set on a vivid fill (brass, a star): always dark. */
-  --c-on-vivid: #1b1d3f;
+  --c-surface-hi: #ffffff;
+  --c-field: #ffffff;
+  /* Text set on a vivid fill (a highlight, a star): always dark. */
+  --c-on-vivid: #101a33;
   /* Hairlines and quiet washes. */
-  --c-line: rgba(27, 29, 63, 0.18);
-  --c-line-soft: rgba(27, 29, 63, 0.09);
-  --c-wash: rgba(27, 29, 63, 0.07);
-  /* Brass hairline around instruments and panels. */
-  --c-rule: rgba(184, 138, 45, 0.45);
+  --c-line: rgba(16, 26, 51, 0.18);
+  --c-line-soft: rgba(16, 26, 51, 0.09);
+  --c-wash: rgba(16, 26, 51, 0.06);
+  /* Hairline around panels: the coordinate grid of the chart. */
+  --c-rule: rgba(37, 83, 184, 0.3);
   /* Soft sheen on surfaces. */
-  --c-gloss: rgba(255, 255, 255, 0.55);
-  --c-gloss-panel: rgba(255, 253, 247, 0.72);
-  --c-gloss-wash: rgba(255, 255, 255, 0.4);
+  --c-gloss: rgba(255, 255, 255, 0.6);
+  --c-gloss-panel: rgba(251, 252, 254, 0.8);
+  --c-gloss-wash: rgba(255, 255, 255, 0.45);
   /* Starfield dots of the page background. */
-  --c-dot: rgba(27, 29, 63, 0.16);
-  --c-dot-soft: rgba(27, 29, 63, 0.08);
+  --c-dot: rgba(16, 26, 51, 0.16);
+  --c-dot-soft: rgba(16, 26, 51, 0.08);
   /* Game header, stuck to the top (slightly see-through). */
-  --c-bar: rgba(242, 236, 223, 0.92);
-  /* Lines of the astrolabe drawn on the home screen. */
-  --c-rays: rgba(61, 63, 160, 0.22);
+  --c-bar: rgba(238, 242, 248, 0.92);
+  /* Grid lines of the sky chart drawn on the home screen. */
+  --c-rays: rgba(37, 83, 184, 0.2);
   /* Veil behind the star chart side panel. */
-  --c-veil: rgba(242, 236, 223, 0.97);
+  --c-veil: rgba(238, 242, 248, 0.97);
   /* Notifications. */
-  --c-toast-bg: #1b1d3f;
-  --c-toast-fg: #f6f2e6;
+  --c-toast-bg: #101a33;
+  --c-toast-fg: #eef2f8;
 
-  /* Racks: a strip of engraved parchment. */
-  --rack-face: linear-gradient(180deg, #efe6d2, #e4d8bd);
-  --rack-line-rgb: 118, 96, 52;
-  --rack-gloss: rgba(255, 255, 255, 0.6);
-  --rack-slot: rgba(255, 255, 255, 0.35);
-  --rack-slot-filled: rgba(255, 255, 255, 0.62);
+  /* Racks: a strip of chart paper with its coordinate grid. */
+  --rack-face: linear-gradient(180deg, #f7f9fc, #eaeff7);
+  --rack-line-rgb: 37, 83, 184;
+  --rack-gloss: rgba(255, 255, 255, 0.7);
+  --rack-slot: rgba(255, 255, 255, 0.5);
+  --rack-slot-filled: rgba(255, 255, 255, 0.8);
   /* Name plates: always a strip of night sky. */
-  --plate-face: linear-gradient(90deg, #1d2050, #2c2f78 55%, #1d2050);
-  --plate-ink: #f3efe2;
-  /* Eclipsed discs (my hidden stars): always night. */
-  --eclipse-face: #121633;
+  --plate-face: linear-gradient(90deg, #0b1430, #16244f 55%, #0b1430);
+  --plate-ink: #eef2f8;
+  /* The sky inside a star disc, and my hidden stars: always night. */
+  --eclipse-face: #070c1c;
+  --sky-face: #0a1226;
 
   /* Shadows are built on the ink in light mode, on black in dark mode. */
-  --shadow-rgb: 27, 29, 63;
+  --shadow-rgb: 16, 26, 51;
 
   /* --- States ------------------------------------------------------------ */
-  --c-success: #2f8f6f;
+  --c-success: #1f8a64;
   --c-danger: #b8443a;
-  --c-warning: #b77a1c;
-  --c-info: #3d3fa0;
+  --c-warning: #a86b00;
+  --c-info: #2553b8;
 
   /* --- The five constellations -------------------------------------------
-     Jewel tones that glow on the dark discs, in both themes. `-deep` is the
-     edge of a disc, `-light` its luminous heart. The technical identifiers
-     (green, pink...) are only names: players see Lyra, Aurora, Cygnus, Ember
-     and Phoenix, each with its own sigil. */
-  --t-green: #27b39b;
-  --t-green-deep: #0c5d5a;
-  --t-green-light: #9ef0d8;
-  --t-pink: #cf5fb5;
-  --t-pink-deep: #6a1f63;
-  --t-pink-light: #f7b8e6;
-  --t-blue: #4d8ef0;
-  --t-blue-deep: #1b3b8f;
-  --t-blue-light: #b6d4ff;
-  --t-red: #e2583f;
-  --t-red-deep: #7c1f1c;
-  --t-red-light: #ffc0a8;
-  --t-orange: #e0a02c;
-  --t-orange-deep: #7a4c07;
-  --t-orange-light: #ffe2a0;
+     Each colour has an astronomical reason: the blue-green of doubly
+     ionised oxygen in the Ring Nebula (Lyra), the pink of the Orion Nebula,
+     the blue of Albireo's companion (Cygnus), red Antares (Scorpius) and
+     orange Schedar (Cassiopeia). `-deep` is the rim of a star's halo,
+     `-light` its white-hot heart. The technical identifiers (green, pink...)
+     are only names: players see the constellations, each with its real
+     star figure. */
+  --t-green: #2fbf9f;
+  --t-green-deep: #0e5b52;
+  --t-green-light: #b9f5e4;
+  --t-pink: #e0679f;
+  --t-pink-deep: #6e1f47;
+  --t-pink-light: #ffd0e4;
+  --t-blue: #4f8ff7;
+  --t-blue-deep: #173b86;
+  --t-blue-light: #d0e2ff;
+  --t-red: #ec5a47;
+  --t-red-deep: #7a1d17;
+  --t-red-light: #ffd2c6;
+  --t-orange: #f0a232;
+  --t-orange-deep: #7a4a08;
+  --t-orange-light: #ffe7bd;
   /* Kept for components that still name them (sheet, buttons). */
   --t-green-dark: var(--t-green-deep);
   --t-pink-dark: var(--t-pink-deep);
@@ -106,9 +110,10 @@
   --t-orange-dark: var(--t-orange-deep);
 
   /* --- Type -------------------------------------------------------------- */
-  /* Cinzel: capitals inspired by engraved inscriptions — titles and star
-     numbers. Jost: a clear geometric sans for everything else. */
-  --font-title: 'Cinzel Variable', 'Cinzel', 'Trajan Pro', Georgia, serif;
+  /* Space Grotesk: a grotesque with a technical, instrument-panel feel —
+     titles and star numbers (its figures read like a readout). Jost: a
+     clear geometric sans for everything else. */
+  --font-title: 'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Jost Variable', 'Jost', 'Futura', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --fs-xs: 0.74rem;
@@ -174,47 +179,50 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --c-cream: #070b1a;
-  --c-cream-deep: #0d1330;
-  --c-cream-shadow: #03050c;
-  --c-paper: #10163a;
-  --c-ink: #ecebf8;
-  --c-ink-soft: #a3a6cc;
-  --c-violet: #a4a8ff;
-  --c-violet-dark: #6c70e0;
-  --c-magenta: #f08cc4;
-  --c-gold: #e8bd5a;
-  --c-gold-bright: #f6d27a;
+  /* The sky away from city lights: almost black, slightly blue. */
+  --c-cream: #05080f;
+  --c-cream-deep: #0a1020;
+  --c-cream-shadow: #020308;
+  --c-paper: #0c1428;
+  --c-ink: #e6ebf5;
+  --c-ink-soft: #97a3bf;
+  /* Starlight blue. */
+  --c-violet: #8db8ff;
+  --c-violet-dark: #5b8de6;
+  --c-magenta: #ff8fa6;
+  --c-gold: #f5c451;
+  --c-gold-bright: #ffd873;
 
-  --c-surface-hi: #1a2150;
-  --c-field: #0a0f28;
-  --c-line: rgba(236, 235, 248, 0.2);
-  --c-line-soft: rgba(236, 235, 248, 0.1);
-  --c-wash: rgba(236, 235, 248, 0.07);
-  --c-rule: rgba(232, 189, 90, 0.38);
-  --c-gloss: rgba(255, 255, 255, 0.06);
-  --c-gloss-panel: rgba(16, 22, 58, 0.72);
+  --c-surface-hi: #142040;
+  --c-field: #070c1a;
+  --c-line: rgba(230, 235, 245, 0.18);
+  --c-line-soft: rgba(230, 235, 245, 0.09);
+  --c-wash: rgba(230, 235, 245, 0.06);
+  --c-rule: rgba(141, 184, 255, 0.28);
+  --c-gloss: rgba(255, 255, 255, 0.05);
+  --c-gloss-panel: rgba(12, 20, 40, 0.78);
   --c-gloss-wash: rgba(255, 255, 255, 0.03);
-  --c-dot: rgba(236, 235, 248, 0.5);
-  --c-dot-soft: rgba(236, 235, 248, 0.22);
-  --c-bar: rgba(7, 11, 26, 0.9);
-  --c-rays: rgba(164, 168, 255, 0.2);
-  --c-veil: rgba(7, 11, 26, 0.96);
-  --c-toast-bg: #1a2150;
-  --c-toast-fg: #ecebf8;
+  --c-dot: rgba(230, 235, 245, 0.55);
+  --c-dot-soft: rgba(230, 235, 245, 0.22);
+  --c-bar: rgba(5, 8, 15, 0.9);
+  --c-rays: rgba(141, 184, 255, 0.18);
+  --c-veil: rgba(5, 8, 15, 0.96);
+  --c-toast-bg: #142040;
+  --c-toast-fg: #e6ebf5;
 
-  --rack-face: linear-gradient(180deg, rgba(26, 33, 80, 0.92), rgba(14, 19, 50, 0.92));
-  --rack-line-rgb: 164, 168, 255;
-  --rack-gloss: rgba(255, 255, 255, 0.08);
-  --rack-slot: rgba(255, 255, 255, 0.04);
-  --rack-slot-filled: rgba(255, 255, 255, 0.09);
-  --plate-face: linear-gradient(90deg, #151a46, #262b73 55%, #151a46);
-  --eclipse-face: #0a0e24;
+  --rack-face: linear-gradient(180deg, rgba(18, 28, 56, 0.9), rgba(9, 15, 32, 0.9));
+  --rack-line-rgb: 141, 184, 255;
+  --rack-gloss: rgba(255, 255, 255, 0.06);
+  --rack-slot: rgba(255, 255, 255, 0.03);
+  --rack-slot-filled: rgba(255, 255, 255, 0.07);
+  --plate-face: linear-gradient(90deg, #0a1330, #15254f 55%, #0a1330);
+  --eclipse-face: #04070f;
+  --sky-face: #081022;
 
-  --c-success: #52c7a3;
+  --c-success: #4fd1a5;
   --c-danger: #f07a6e;
-  --c-warning: #efb54f;
-  --c-info: #a4a8ff;
+  --c-warning: #f5c451;
+  --c-info: #8db8ff;
 
   /* A coloured shadow does not show on a dark background: black it is. */
   --shadow-rgb: 0, 0, 0;

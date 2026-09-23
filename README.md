@@ -32,8 +32,8 @@ on a computer, and speaks English, French and Spanish.
 There are **60 stars**, numbered 1 to 60. A star's number tells you
 everything about it:
 
-- its **constellation** — Lyra, Aurora, Cygnus, Ember or Phoenix, in turn
-  (1 is Lyra, 2 is Aurora, and so on), each with its own colour *and* its own
+- its **constellation** — Lyra, Orion, Cygnus, Scorpius or Cassiopeia, in
+  turn (1 is Lyra, 2 is Orion, and so on), each with its own colour *and* its own
   little figure, so you can tell them apart even without colours;
 - its **sparks** — one, two or three, shown under the number.
 
@@ -83,7 +83,7 @@ After that, it is quick.
 
 Everyone chooses their own **language** (English, French or Spanish) and
 **theme**: a dark one like the night sky (the default) or a light one like an
-old star atlas. Four people can share a table in three languages.
+modern star chart. Four people can share a table in three languages.
 
 ### Hosting a game from your own computer
 
@@ -158,7 +158,7 @@ Umbrastra/
 
 | Layer | Tools |
 | --- | --- |
-| Client | React 18, strict TypeScript, Vite, self-hosted fonts (Cinzel, Jost) |
+| Client | React 18, strict TypeScript, Vite, self-hosted fonts (Space Grotesk, Jost) |
 | Server | Node.js 20, Express, Socket.IO 4 |
 | Shared | TypeScript, no dependency |
 | Tests | Vitest, Testing Library, Playwright |
@@ -169,8 +169,9 @@ any library. Public names and signatures are frozen in
 [`docs/PROJECT_CONTRACT.md`](docs/PROJECT_CONTRACT.md), and
 `npm run check:contract` fails if the code drifts from it.
 
-Every drawing in the game — the star medallions, the constellation figures,
-the astrolabe, the icons — is original SVG or CSS made for this project, and
+Every drawing in the game — the stars, the constellation figures (traced from
+the real constellations), the sky chart, the eclipse logo, the icons — is
+original SVG or CSS made for this project, and
 the sounds are synthesised on the fly. See [docs/ASSETS.md](docs/ASSETS.md).
 
 ## Running it yourself

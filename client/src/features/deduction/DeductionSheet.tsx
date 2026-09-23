@@ -4,7 +4,7 @@ import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { IconButton } from '../../components/ui/IconButton.js';
 import { Modal } from '../../components/ui/Modal.js';
-import { ConstellationSigil } from '../../components/game/ConstellationSigil.js';
+import { Asterism } from '../../components/game/Asterism.js';
 import { DeductionCell } from './DeductionCell.js';
 import { DeductionGuessRow } from './DeductionGuessRow.js';
 import type { DeductionApi } from './deductionStore.js';
@@ -73,7 +73,7 @@ export function DeductionSheet({
                   {t('sheet.rowLabel', { color: colorName(COLOR_ORDER[rowIndex]!) })}
                 </span>
                 <span aria-hidden="true" className="sheet__row-chip">
-                  <ConstellationSigil color={COLOR_ORDER[rowIndex]!} size={16} />
+                  <Asterism color={COLOR_ORDER[rowIndex]!} size={16} />
                 </span>
               </span>
               {row.map((tile) => (

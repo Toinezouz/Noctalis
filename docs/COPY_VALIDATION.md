@@ -184,3 +184,21 @@ change; saved settings are carried over. Run on 2026-09-23, before the push.
 | Render sequence on a clean copy (the package names changed) | ✅ `npm ci --include=dev` links `@umbrastra/client`, `server` and `shared`; `/health` ok; title `UMBRASTRA - Find your constellation before anyone else`; French invite card `Une partie d’UMBRASTRA t’attend`; 20 E2E tests (invites, game flow, secrecy, themes) pass against it |
 | Secret search | ✅ only the deliberately fake `'invalid-token'` of a unit test; no `.env` |
 | Original GOT FIVE! repository | ✅ untouched, still at `f650a15` |
+
+## Version 1.5 — astronomy, not astrology
+
+A new look (eyepiece stars, real constellations, sky chart, eclipse logo,
+Space Grotesk instead of Cinzel). Run on 2026-09-23, before the push.
+
+| Step | Result |
+| --- | --- |
+| `npm run typecheck` | ✅ 0 errors |
+| `npm run lint` | ✅ 0 errors |
+| `npm run check:contract` | ✅ 63 exports, 23 types, 19 events, 310 keys × 3 languages |
+| `npm test` | ✅ **212 tests**, including the WCAG contrast checks of the new palette in both themes |
+| `npm run build` | ✅ |
+| `npm run test:e2e` | ✅ 72 of 74 on the first run; the 2 failures (one per device) came from a test still expecting the old Lyra green, `rgb(39, 179, 155)`. With the new value, `rgb(47, 191, 159)`, `theme.spec.ts` passes on both devices (12 tests) |
+| Render sequence on a clean copy (a font package changed) | ✅ Space Grotesk bundled, no Cinzel left; `/health` ok; 20 E2E tests (game flow, secrecy, invites, themes) pass against it |
+| Phone widths 320 and 393 px | ✅ no horizontal scrolling on the home screen or the lobby |
+| Secret search | ✅ only the deliberately fake `'invalid-token'` of a unit test; no `.env` |
+| Original GOT FIVE! repository | ✅ untouched, still at `f650a15` |

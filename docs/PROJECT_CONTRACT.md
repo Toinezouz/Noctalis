@@ -72,6 +72,17 @@ The name NOCTALIS was already in wide use (see `PROJECT_IDENTITY.md`).
 | Render service `noctalis` (`noctalis.onrender.com`) | `umbrastra` (`umbrastra.onrender.com`), a new service | an `onrender.com` address never changes; see `DEPLOYMENT.md`, *The name change* |
 | GitHub repository `Toinezouz/Noctalis` | `Toinezouz/Umbrastra` (GitHub redirects the old address) | new name |
 
+### 1.5 — astronomy, not astrology
+
+A visual change; no signature of `@umbrastra/shared` changes.
+
+| Before | After | Why |
+| --- | --- | --- |
+| `COLOR_LABELS` Aurora, Ember, Phoenix | Orion, Scorpius, Cassiopeia (Lyra and Cygnus stay) | real constellations |
+| `ConstellationSigil` (invented sigils) | `Asterism`, `ASTERISMS` (real stick figures) | real constellations |
+| `Astrolabe` (home screen) | `SkyChart` | a star chart rather than an ornament |
+| fonts Cinzel + Jost | Space Grotesk + Jost | technical rather than engraved |
+
 ## 1. Data types (`@umbrastra/shared`)
 
 ```ts
@@ -85,8 +96,9 @@ interface RivalView { playerId: string; tiles: Tile[] }
 ```
 
 `TileColor` identifiers are technical names and are never shown. Players see
-Lyra, Aurora, Cygnus, Ember and Phoenix (Lyre, Aurore, Cygne, Braise, Phénix;
-Lira, Aurora, Cisne, Brasa, Fénix) from the client's translation catalogues.
+Lyra, Orion, Cygnus, Scorpius and Cassiopeia (Lyre, Orion, Cygne, Scorpion,
+Cassiopée; Lira, Orión, Cisne, Escorpio, Casiopea) from the client's
+translation catalogues.
 `points` is called *sparks* in the interface.
 
 ## 2. Constants
@@ -345,7 +357,8 @@ function LanguageSwitch(props: LanguageSwitchProps): JSX.Element;
 function SupportLink(props: SupportLinkProps): JSX.Element;
 function AboutDialog(props: AboutDialogProps): JSX.Element | null;
 function SiteFooter(props: SiteFooterProps): JSX.Element;
-function ConstellationSigil(props: ConstellationSigilProps): JSX.Element;
+function Asterism(props: AsterismProps): JSX.Element;
+function SkyChart(): JSX.Element;
 function Icon(props: IconProps): JSX.Element;
 
 interface GameActions {

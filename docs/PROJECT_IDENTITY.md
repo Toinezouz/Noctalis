@@ -39,12 +39,15 @@ right, **CONSTELLATION!**, wins.
 
 ## World
 
-A night-time survey of the sky, drawn like an astronomical instrument: brass
-rings and graduations, engraved capitals, constellation figures, a chart
-annotated by hand.
+**Astronomy, not astrology.** The game looks like a night at the
+observatory: stars seen through an eyepiece, real constellations, a star
+chart with its coordinate grid, a total eclipse for a logo. Nothing
+esoteric: no fate, no signs, no engraved brass, no invented symbols.
 
-- **Dark theme** — the night itself: deep blue, a field of stars, brass.
-- **Light theme** — an old celestial atlas: parchment, indigo ink, brass.
+- **Dark theme** (the default) — the sky itself: near-black, starlight blue,
+  a faint band of Milky Way, a sun-like yellow for highlights.
+- **Light theme** — a modern printed star chart: cool white paper, navy
+  lines, chart blue.
 
 ## Vocabulary
 
@@ -68,13 +71,19 @@ interface.
 The five constellations, in internal order (`green`, `pink`, `blue`, `red`,
 `orange` — technical identifiers, unchanged):
 
-| Identifier | English | French | Spanish | Figure |
-| --- | --- | --- | --- | --- |
-| `green` | Lyra | Lyre | Lira | a bright star above a parallelogram |
-| `pink` | Aurora | Aurore | Aurora | an arc of light and its curtain |
-| `blue` | Cygnus | Cygne | Cisne | a swan in flight, a cross |
-| `red` | Ember | Braise | Brasa | a flame over a glowing coal |
-| `orange` | Phoenix | Phénix | Fénix | wings spread above a long tail |
+All five are **real constellations**, drawn from their actual stick figures
+(simplified, north up), and each colour has an astronomical reason:
+
+| Identifier | English | French | Spanish | Figure | Why this colour |
+| --- | --- | --- | --- | --- | --- |
+| `green` | Lyra | Lyre | Lira | Vega above a small parallelogram | the blue-green glow of the Ring Nebula (M57) |
+| `pink` | Orion | Orion | Orión | the shoulders, the belt, Saiph and Rigel | the pink of the Orion Nebula (M42) |
+| `blue` | Cygnus | Cygne | Cisne | the Northern Cross, from Deneb to Albireo | the blue companion of Albireo |
+| `red` | Scorpius | Scorpion | Escorpio | the claws, Antares, the curved tail | Antares, a red supergiant |
+| `orange` | Cassiopeia | Cassiopée | Casiopea | the W | Schedar, an orange giant |
+
+Up to version 1.4 the pink, red and orange constellations were invented
+ones (Aurora, Ember, Phoenix); they were replaced by real ones in 1.5.
 
 The technical identifiers stay as they are: they are never shown, and
 freezing them avoids a pointless migration of the engine, tests and CSS.
@@ -92,15 +101,16 @@ These principles are partly enforced by `tests/unit/i18n.test.ts`.
 
 ## Logo
 
-A disc of night carrying stars joined by the lines of a constellation, ringed
-with brass — drawn in SVG, with no dependency, used as favicon and in the
-header.
+A **total solar eclipse**: the Moon's black disc (the *umbra*, the shadow the
+name comes from), the pale corona around it, the last bead of sunlight on its
+edge, and a few stars, as they appear in the sky during totality. Drawn in
+SVG, with no dependency, used as favicon and in the header.
 
 ## Type
 
 | Role | Typeface | Why |
 | --- | --- | --- |
-| Titles, star numbers | **Cinzel** | capitals inspired by engraved inscriptions, like the lettering of an astrolabe |
+| Titles, star numbers | **Space Grotesk** | a grotesque with a technical, instrument-panel feel; its figures read like a readout |
 | Everything else | **Jost** | a clear geometric sans-serif, very legible at small sizes |
 
 Both are self-hosted and released under the SIL Open Font License.
@@ -109,40 +119,45 @@ Both are self-hosted and released under the SIL Open Font License.
 
 | Role | Light | Dark |
 | --- | --- | --- |
-| Page | `#f2ecdf` parchment | `#070b1a` deep night |
-| Panels | `#faf6ec` | `#10163a` |
-| Ink | `#1b1d3f` indigo | `#ecebf8` |
-| Accent | `#3d3fa0` night indigo | `#a4a8ff` |
-| Second accent | `#9c3f6e` dusky rose | `#f08cc4` |
-| Brass | `#a57a23` | `#e8bd5a` |
+| Page | `#eef2f8` chart paper | `#05080f` night sky |
+| Panels | `#fbfcfe` | `#0c1428` |
+| Ink | `#101a33` navy | `#e6ebf5` |
+| Accent | `#2553b8` chart blue | `#8db8ff` starlight |
+| Second accent | `#b5304f` hydrogen red | `#ff8fa6` |
+| Highlight | `#9a6a00` (text) / `#f0b429` sun yellow | `#f5c451` |
 
-The five constellations are jewel tones that glow on dark discs, identical in
-both themes, so the star chart always matches the table:
+The five constellations keep the same colours in both themes, so the star
+chart always matches the table:
 
 | Constellation | Colour | Deep | Light |
 | --- | --- | --- | --- |
-| Lyra | `#27b39b` | `#0c5d5a` | `#9ef0d8` |
-| Aurora | `#cf5fb5` | `#6a1f63` | `#f7b8e6` |
-| Cygnus | `#4d8ef0` | `#1b3b8f` | `#b6d4ff` |
-| Ember | `#e2583f` | `#7c1f1c` | `#ffc0a8` |
-| Phoenix | `#e0a02c` | `#7a4c07` | `#ffe2a0` |
+| Lyra | `#2fbf9f` | `#0e5b52` | `#b9f5e4` |
+| Orion | `#e0679f` | `#6e1f47` | `#ffd0e4` |
+| Cygnus | `#4f8ff7` | `#173b86` | `#d0e2ff` |
+| Scorpius | `#ec5a47` | `#7a1d17` | `#ffd2c6` |
+| Cassiopeia | `#f0a232` | `#7a4a08` | `#ffe7bd` |
 
 Contrast is measured, not guessed: `tests/unit/theme.test.ts` checks the WCAG
 ratios of the main text and accent pairs in both themes.
 
 ## The stars
 
-Stars are **round medallions**, like the dial of an astronomical instrument:
+Each star is **a star seen through the eyepiece**:
 
-- face up — a glowing sphere in the constellation's colour, a brass rim with
-  graduations, the constellation's figure at the top, the number engraved in
-  Cinzel, and one to three four-pointed **sparks** underneath;
-- my own, hidden — an **eclipsed** disc: dark heart, coloured halo, the
-  constellation's figure, a question mark, and the position in a small moon;
+- face up — a disc of night sky lit by the constellation's colour, a thin
+  coloured field ring with four reticle marks, the constellation's figure at
+  the top, the number in Space Grotesk, and one to three round **sparks**
+  underneath, as in a star chart's brightness legend;
+- my own, hidden — **not observed yet**: a dark field, a dashed ring in the
+  constellation's colour, its figure, a question mark, and the position in a
+  small badge;
 - gauged with a NO — dimmed, inside a dashed halo.
 
 The constellation figures carry the identity even without colour, which
 matters for colour-blind players.
+
+The home screen shows a **sky chart** turning slowly around the celestial
+pole: circles of declination, hour circles, and the five constellations.
 
 ## Positioning
 

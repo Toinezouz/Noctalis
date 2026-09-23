@@ -7,12 +7,12 @@ A resource of uncertain origin would not be published.
 
 | Asset | Kind | Origin | Licence | Location |
 | --- | --- | --- | --- | --- |
-| UMBRASTRA mark | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/BrandMark.tsx` |
+| UMBRASTRA mark (a total eclipse) | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/BrandMark.tsx` |
 | Favicon | SVG | drawn for this project | AGPL-3.0-or-later | `client/public/favicon.svg` |
-| Constellation figures (5) | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/game/ConstellationSigil.tsx` |
+| Constellation figures (5) | inline SVG | drawn for this project, traced from the real stick figures of Lyra, Orion, Cygnus, Scorpius and Cassiopeia (star positions are facts, not anyone's work) | AGPL-3.0-or-later | `client/src/components/game/Asterism.tsx` |
 | Line icons | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/Icon.tsx` |
-| Astrolabe of the home screen | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/Astrolabe.tsx` |
-| Star medallions, rows, name plates, starfield | pure CSS (gradients, masks, shadows) | written for this project | AGPL-3.0-or-later | `client/src/styles/` |
+| Sky chart of the home screen | inline SVG | drawn for this project | AGPL-3.0-or-later | `client/src/components/ui/SkyChart.tsx` |
+| Stars (eyepiece discs), rows, name plates, starfield | pure CSS (gradients, shadows) | written for this project | AGPL-3.0-or-later | `client/src/styles/` |
 | Opening wheel | CSS | written for this project | AGPL-3.0-or-later | `client/src/features/game/StartRoulette.tsx`, `game.css` |
 
 **The game itself shows no bitmap image.** Everything players see is vector
@@ -35,16 +35,17 @@ part of the game.
 | --- | --- | --- |
 | `client/public/og-image.jpg` | 1200 × 630 card shown by chat apps and social networks when a link is shared | AGPL-3.0-or-later |
 
-It is a composition made for this project: the favicon, the UMBRASTRA name
-set in Cinzel, five CSS medallions, and `docs/images/table-dark.png` in
-perspective, rendered with the project's own Chromium (Playwright) and saved
-as a JPEG (quality 86, about 63 KB, well under the size limits of chat apps).
+It is a composition made for this project: the eclipse logo, the UMBRASTRA
+name set in Space Grotesk, five CSS stars not observed yet, and
+`docs/images/table-dark.png` in perspective, rendered with the project's own
+Chromium (Playwright) and saved as a JPEG (quality 86, well under the size
+limits of chat apps).
 
 ## Fonts
 
 | Font | Origin | Licence | Delivery |
 | --- | --- | --- | --- |
-| Cinzel Variable | `@fontsource-variable/cinzel` (npm), by the Cinzel Project Authors | SIL Open Font License 1.1 | bundled at build time, served from the same domain |
+| Space Grotesk Variable | `@fontsource-variable/space-grotesk` (npm), by the Space Grotesk Project Authors | SIL Open Font License 1.1 | bundled at build time, served from the same domain |
 | Jost Variable | `@fontsource-variable/jost` (npm), by the Jost Project Authors | SIL Open Font License 1.1 | same |
 
 The SIL OFL allows use, modification and redistribution, including in an

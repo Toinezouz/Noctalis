@@ -10,10 +10,10 @@ import type { Tile, TileColor, TilePoints } from '../types/tiles.js';
  *
  * Constellations (rows of the star chart, cycle of 5):
  *   green  / Lyra    : 1  6  11 16 21 26 31 36 41 46 51 56
- *   pink   / Aurora  : 2  7  12 17 22 27 32 37 42 47 52 57
+ *   pink   / Orion   : 2  7  12 17 22 27 32 37 42 47 52 57
  *   blue   / Cygnus  : 3  8  13 18 23 28 33 38 43 48 53 58
- *   red    / Ember   : 4  9  14 19 24 29 34 39 44 49 54 59
- *   orange / Phoenix : 5  10 15 20 25 30 35 40 45 50 55 60
+ *   red    / Scorpius: 4  9  14 19 24 29 34 39 44 49 54 59
+ *   orange / Cassiopeia: 5  10 15 20 25 30 35 40 45 50 55 60
  *
  * Brightness (columns of the chart, cycle 1/2/3 in blocks of five):
  *   1-5 -> 1, 6-10 -> 2, 11-15 -> 3, 16-20 -> 1, ... 56-60 -> 3
@@ -43,10 +43,10 @@ export const SECRET_TILE_COUNT = COLOR_ORDER.length;
  */
 export const COLOR_LABELS: Readonly<Record<TileColor, string>> = Object.freeze({
   green: 'Lyra',
-  pink: 'Aurora',
+  pink: 'Orion',
   blue: 'Cygnus',
-  red: 'Ember',
-  orange: 'Phoenix',
+  red: 'Scorpius',
+  orange: 'Cassiopeia',
 });
 
 /** Constellation of a star, from its number. */

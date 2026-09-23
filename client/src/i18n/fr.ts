@@ -23,10 +23,10 @@ export const fr: Messages = {
 
   // --- Constellations ------------------------------------------------------
   'color.green': 'Lyre',
-  'color.pink': 'Aurore',
+  'color.pink': 'Orion',
   'color.blue': 'Cygne',
-  'color.red': 'Braise',
-  'color.orange': 'Phénix',
+  'color.red': 'Scorpion',
+  'color.orange': 'Cassiopée',
 
   // --- Les six places de SITUER --------------------------------------------
   'slot.0': 'Avant la 1re',
@@ -114,7 +114,7 @@ export const fr: Messages = {
   'roulette.question': 'Qui commence ?',
   'roulette.drawing': 'Le ciel tourne…',
   'roulette.landed': '{name} commence !',
-  'roulette.youStart': 'Les étoiles ont parlé : à toi d’ouvrir la partie.',
+  'roulette.youStart': 'Tirage au sort : c’est à toi d’ouvrir la partie.',
   'roulette.othersStart': '{name} ouvre la partie. Ton tour viendra vite.',
   'roulette.skip': 'Passer',
   'roulette.go': 'C’est parti !',
@@ -337,7 +337,7 @@ export const fr: Messages = {
     'Chaque personne reçoit cinq étoiles secrètes. Toute la malice est là : tu vois les étoiles des autres, mais jamais les tiennes. À toi de les deviner grâce aux indices que la table te donne, et de les nommer avant tout le monde.',
   'howto.stars.title': 'Soixante étoiles, cinq constellations',
   'howto.stars.text':
-    'Les étoiles portent un numéro de 1 à 60. Ce numéro décide de tout : de sa constellation (elles se suivent, 1 pour la Lyre, 2 pour l’Aurore, et ainsi de suite) et de ses éclats — un, deux ou trois, dessinés sous le numéro.',
+    'Les étoiles portent un numéro de 1 à 60. Ce numéro décide de tout : de sa constellation (elles se suivent, 1 pour la Lyre, 2 pour Orion, et ainsi de suite) et de ses éclats — un, deux ou trois, dessinés sous le numéro.',
   'howto.setup.title': 'Tes cinq étoiles',
   'howto.setup.text':
     'Tu as une étoile de chaque constellation, rangées du plus petit numéro au plus grand. Tu vois leur constellation et leur place dans la rangée, jamais leur numéro. Le reste de la table, en revanche, les lit sans aucun mal.',

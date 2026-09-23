@@ -29,7 +29,7 @@ test.describe('Drawing the first player', () => {
     await expect(bob.locator('.roulette__title')).toContainText(`${firstName} goes first!`);
 
     // Each reads the announcement from their own point of view.
-    await expect(first.getByTestId('roulette-note')).toContainText('The stars chose you');
+    await expect(first.getByTestId('roulette-note')).toContainText('The draw picked you');
     const second = first === alice ? bob : alice;
     await expect(second.getByTestId('roulette-note')).toContainText('opens the game');
 

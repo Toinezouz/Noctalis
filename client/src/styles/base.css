@@ -27,8 +27,8 @@ body {
     radial-gradient(circle at 20% 30%, var(--c-dot) 0 1px, transparent 1.6px),
     radial-gradient(circle at 70% 80%, var(--c-dot-soft) 0 1px, transparent 1.5px),
     radial-gradient(circle at 40% 60%, var(--c-dot) 0 1.3px, transparent 2px),
-    radial-gradient(ellipse at 15% 0%, rgba(61, 63, 160, 0.1), transparent 55%),
-    radial-gradient(ellipse at 90% 100%, rgba(184, 138, 45, 0.09), transparent 50%);
+    radial-gradient(ellipse at 15% 0%, rgba(37, 83, 184, 0.08), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(37, 83, 184, 0.07), transparent 50%);
   background-size: 97px 89px, 61px 67px, 173px 157px, 100% 100%, 100% 100%;
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
@@ -41,9 +41,10 @@ body {
     radial-gradient(circle at 20% 30%, var(--c-dot) 0 1px, transparent 1.6px),
     radial-gradient(circle at 70% 80%, var(--c-dot-soft) 0 1px, transparent 1.5px),
     radial-gradient(circle at 40% 60%, var(--c-dot) 0 1.3px, transparent 2px),
-    radial-gradient(ellipse at 15% 0%, rgba(92, 70, 190, 0.28), transparent 55%),
-    radial-gradient(ellipse at 95% 90%, rgba(30, 110, 160, 0.2), transparent 50%),
-    linear-gradient(180deg, #070b1a, #0b1027 60%, #070b1a);
+    /* A faint band of Milky Way across the sky. */
+    linear-gradient(118deg, transparent 30%, rgba(141, 184, 255, 0.05) 45%, rgba(214, 228, 255, 0.07) 50%, rgba(141, 184, 255, 0.05) 55%, transparent 70%),
+    radial-gradient(ellipse at 90% 100%, rgba(40, 80, 150, 0.16), transparent 50%),
+    linear-gradient(180deg, #05080f, #08101f 60%, #05080f);
   background-size: 97px 89px, 61px 67px, 173px 157px, 100% 100%, 100% 100%, 100% 100%;
 }
 
@@ -55,7 +56,7 @@ h4 {
   font-weight: 600;
   line-height: 1.12;
   margin: 0 0 var(--sp-3);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.005em;
 }
 
 p {
@@ -82,7 +83,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(184, 138, 45, 0.35);
+  background: rgba(37, 83, 184, 0.35);
 }
 
 /* --- Utilities ------------------------------------------------------------ */
@@ -131,14 +132,14 @@ textarea {
   vertical-align: -0.2em;
 }
 
-.sigil {
+.asterism {
   flex: none;
   display: block;
 }
 
 /* --- Brand ---------------------------------------------------------------- */
 
-/* The brand: a disc of night, then the engraved name. */
+/* The brand: a total eclipse, then the name. */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -158,23 +159,45 @@ textarea {
   flex: none;
 }
 
-.brand__disc {
-  fill: #1d2050;
-  stroke: var(--c-gold);
-  stroke-width: 2;
-}
-
-.brand__lines {
-  stroke: rgba(214, 196, 255, 0.7);
-  stroke-width: 1.8;
+.brand__sky {
+  fill: #0a1226;
 }
 
 .brand__stars {
-  fill: #f4f2ff;
+  fill: #e6ebf5;
+  opacity: 0.8;
 }
 
-.brand__nova {
-  fill: var(--c-gold-bright);
+/* The corona: two soft rings of pale light around the Moon. */
+.brand__corona {
+  fill: none;
+  stroke: #f4f1e6;
+}
+
+.brand__corona--outer {
+  stroke-width: 5;
+  opacity: 0.18;
+}
+
+.brand__corona--inner {
+  stroke-width: 2.4;
+  opacity: 0.85;
+}
+
+.brand__moon {
+  fill: #03050b;
+}
+
+/* The last bead of sunlight on the Moon's edge. */
+.brand__bead {
+  fill: #fff7dc;
+}
+
+.brand__spikes {
+  stroke: #fff7dc;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  opacity: 0.85;
 }
 
 .brand__word {
@@ -286,10 +309,10 @@ textarea {
 @keyframes gf-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(216, 169, 63, 0.35);
+    box-shadow: 0 0 0 0 rgba(240, 180, 41, 0.35);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(216, 169, 63, 0);
+    box-shadow: 0 0 0 6px rgba(240, 180, 41, 0);
   }
 }
 

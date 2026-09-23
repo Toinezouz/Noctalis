@@ -6,7 +6,7 @@ import { Field } from '../../components/ui/Field.js';
 import { LanguageSwitch } from '../../components/ui/LanguageSwitch.js';
 import { ThemeSwitch } from '../../components/ui/ThemeSwitch.js';
 import { BrandMark } from '../../components/ui/BrandMark.js';
-import { Astrolabe } from '../../components/ui/Astrolabe.js';
+import { SkyChart } from '../../components/ui/SkyChart.js';
 import type { Theme } from '../../lib/theme.js';
 import { errorMessageKey, useGame } from '../../app/GameContext.js';
 
@@ -72,7 +72,7 @@ export function Home({
   return (
     <div className={`home ${inviteCode !== null && mode === 'join' ? 'home--invited' : ''}`.trim()}>
       <div className="home__hero">
-        <Astrolabe />
+        <SkyChart />
         <BrandMark size="xl" as="h1" />
         <p className="home__tagline">{t('home.tagline')}</p>
         <p className="home__sub">{t('home.pitch')}</p>

@@ -26,10 +26,10 @@ export const en = {
 
   // --- Constellations -----------------------------------------------------
   'color.green': 'Lyra',
-  'color.pink': 'Aurora',
+  'color.pink': 'Orion',
   'color.blue': 'Cygnus',
-  'color.red': 'Ember',
-  'color.orange': 'Phoenix',
+  'color.red': 'Scorpius',
+  'color.orange': 'Cassiopeia',
 
   // --- The six PLACE gaps -------------------------------------------------
   'slot.0': 'Before the 1st',
@@ -117,7 +117,7 @@ export const en = {
   'roulette.question': 'Who goes first?',
   'roulette.drawing': 'The sky is spinning…',
   'roulette.landed': '{name} goes first!',
-  'roulette.youStart': 'The stars chose you: you open the game.',
+  'roulette.youStart': 'The draw picked you: you open the game.',
   'roulette.othersStart': '{name} opens the game. Your turn will come.',
   'roulette.skip': 'Skip',
   'roulette.go': 'Let’s go!',
@@ -155,7 +155,7 @@ export const en = {
   'action.step2Title': 'Ask a question',
   'action.step2Hint': 'Tap any star in the open sky, then choose PLACE or GAUGE.',
   'action.step2Selected': 'Star {tile} selected: now choose PLACE or GAUGE.',
-  'action.revealColor': 'Reveal a {color} star ({count} still hidden)',
+  'action.revealColor': 'Reveal a star from {color} ({count} still hidden)',
   'action.leftCount': '{count} left',
 
   // --- Open sky -----------------------------------------------------------
@@ -340,7 +340,7 @@ export const en = {
     'Everyone gets five secret stars. The twist: you can see everybody’s stars except your own. Your goal is to work out your five stars, from the clues the others give you, and be the first to name them.',
   'howto.stars.title': 'Sixty stars, five constellations',
   'howto.stars.text':
-    'The stars are numbered from 1 to 60. The number decides everything: its constellation (they take turns, 1 is Lyra, 2 is Aurora, and so on) and its sparks — one, two or three, shown under the number.',
+    'The stars are numbered from 1 to 60. The number decides everything: its constellation (they take turns, 1 is Lyra, 2 is Orion, and so on) and its sparks — one, two or three, shown under the number.',
   'howto.setup.title': 'Your five stars',
   'howto.setup.text':
     'You hold one star of each constellation, lined up from the smallest number to the largest. You can see their constellation and their place in the row, never their number. Everyone else can read them easily.',

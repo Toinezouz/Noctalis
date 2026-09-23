@@ -1,6 +1,6 @@
 import { COLOR_ORDER, type GamePhase, type TileColor } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
-import { ConstellationSigil } from '../../components/game/ConstellationSigil.js';
+import { Asterism } from '../../components/game/Asterism.js';
 
 export interface ActionPanelProps {
   phase: GamePhase;
@@ -92,7 +92,7 @@ export function ActionPanel({
                 }}
                 aria-label={t('action.revealColor', { color: colorName(color), count: left })}
               >
-                <ConstellationSigil color={color} className="color-button__sigil" size={26} />
+                <Asterism color={color} className="color-button__asterism" size={26} />
                 <span className="color-button__label">{colorName(color)}</span>
                 <span className="color-button__count">{t('action.leftCount', { count: left })}</span>
               </button>

@@ -68,9 +68,9 @@ test.describe('Light and dark themes', () => {
   test('the browser bar follows the theme too', async ({ browser }) => {
     const page = await openHome(browser, 'light');
     const meta = page.locator('meta[name="theme-color"]');
-    await expect(meta).toHaveAttribute('content', /#070b1a/i);
+    await expect(meta).toHaveAttribute('content', /#05080f/i);
     await page.getByTestId('theme-light').click();
-    await expect(meta).toHaveAttribute('content', /#f2ecdf/i);
+    await expect(meta).toHaveAttribute('content', /#eef2f8/i);
   });
 
   test('the theme can change mid-game without disturbing it', async ({ browser }) => {
@@ -118,6 +118,6 @@ test.describe('Light and dark themes', () => {
     const cell = first.getByTestId('sheet-cell-1');
     await expect(cell).toHaveAttribute('data-color', 'green');
     const face = await cell.evaluate((node) => getComputedStyle(node).backgroundImage);
-    expect(face).toContain('rgb(39, 179, 155)');
+    expect(face).toContain('rgb(47, 191, 159)');
   });
 });

@@ -6,7 +6,7 @@
 
 /**
  * The five constellations. The identifiers are technical and never shown:
- * players see Lyra, Aurora, Cygnus, Ember and Phoenix, in their own language.
+ * players see Lyra, Orion, Cygnus, Scorpius and Cassiopeia, in their own language.
  */
 export type TileColor = 'green' | 'pink' | 'blue' | 'red' | 'orange';
 

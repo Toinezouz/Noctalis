@@ -1,7 +1,7 @@
 {
   "name": "umbrastra",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "UMBRASTRA - a real-time online deduction game for 2 to 4 people, in the browser",
   "license": "AGPL-3.0-or-later",
   "workspaces": [

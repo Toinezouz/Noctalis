@@ -53,7 +53,7 @@ describe('Opening wheel (component)', () => {
   it('tells the drawn player it is their turn to open', async () => {
     show('p_alice', 'p_alice');
     await advance(SPIN_MS + 200);
-    expect(screen.getByTestId('roulette-note')).toHaveTextContent('Les étoiles ont parlé');
+    expect(screen.getByTestId('roulette-note')).toHaveTextContent('Tirage au sort : c’est à toi');
   });
 
   it('stops the wheel on the drawn player\'s sector', async () => {

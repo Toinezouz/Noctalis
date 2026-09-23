@@ -27,9 +27,10 @@
 .home__tagline {
   font-family: var(--font-title);
   font-size: var(--fs-xl);
-  color: var(--c-magenta);
+  font-weight: 500;
+  color: var(--c-violet);
   margin: var(--sp-3) 0 var(--sp-3);
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
 }
 
 .home__sub {
@@ -101,57 +102,67 @@
   box-shadow: 0 0 0 3px rgba(47, 143, 111, 0.18);
 }
 
-/* The astrolabe behind the brand. */
-.astrolabe {
+/* The sky chart behind the brand, turning slowly around the pole. */
+.skychart {
   position: absolute;
   top: 0;
   left: 50%;
   z-index: -1;
-  width: min(520px, 112vw);
+  width: min(540px, 116vw);
   aspect-ratio: 1;
   transform: translate(-50%, -34%);
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(circle, #000 60%, transparent 74%);
-  mask-image: radial-gradient(circle, #000 60%, transparent 74%);
+  -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 74%);
+  mask-image: radial-gradient(circle, #000 58%, transparent 74%);
 }
 
-.astrolabe__rings {
+.skychart__sky {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  animation: gf-rays 240s linear infinite;
+  animation: gf-rays 300s linear infinite;
 }
 
-.astrolabe__line {
+.skychart__line {
   fill: none;
   stroke: var(--c-rays);
-  stroke-width: 1.2;
+  stroke-width: 1.1;
 }
 
-.astrolabe__line--soft {
+.skychart__line--soft {
   stroke-dasharray: 2 5;
 }
 
-.astrolabe__tick {
-  stroke: var(--c-rays);
+.skychart__label {
+  fill: var(--c-rays);
+  font-family: var(--font-title);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.skychart__star {
+  fill: var(--c-dot);
+}
+
+.skychart__pole {
+  stroke: var(--c-violet);
   stroke-width: 1.2;
+  opacity: 0.5;
 }
 
-.astrolabe__rete {
-  position: absolute;
-  inset: 0;
-  animation: gf-rays 160s linear infinite reverse;
+.skychart__constellation {
+  fill: var(--tile-face);
+  opacity: 0.4;
 }
 
-.astrolabe__sigil {
-  position: absolute;
-  color: var(--tile-face);
-  opacity: 0.6;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0 6px var(--tile-face));
-  /* Counter-rotates, so that each sigil stays upright while the rete turns. */
-  animation: gf-rays 160s linear infinite;
+.skychart__figure {
+  fill: none;
+  stroke: var(--tile-face);
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
 }
 
 /* The hero text keeps a soft halo of the page colour over the rings. */
@@ -220,7 +231,7 @@
 .lobby__link:focus {
   border-color: var(--c-gold);
   outline: none;
-  box-shadow: var(--sh-inset), 0 0 0 3px rgba(216, 169, 63, 0.25);
+  box-shadow: var(--sh-inset), 0 0 0 3px rgba(240, 180, 41, 0.25);
 }
 
 .lobby__invite .btn {
@@ -275,7 +286,7 @@
   border-radius: var(--r-md);
   background: var(--plate-face);
   color: var(--plate-ink);
-  border: 1px solid rgba(232, 189, 90, 0.55);
+  border: 1px solid rgba(141, 184, 255, 0.55);
   font-family: var(--font-title);
   font-weight: 700;
   font-size: clamp(1.4rem, 5.5vw, 1.9rem);
@@ -320,7 +331,7 @@
   border-radius: 50%;
   background: var(--plate-face);
   color: var(--plate-ink);
-  border: 1px solid rgba(232, 189, 90, 0.6);
+  border: 1px solid rgba(141, 184, 255, 0.6);
   font-family: var(--font-title);
   font-weight: 700;
   font-size: var(--fs-lg);
@@ -399,7 +410,7 @@
   border-radius: 50%;
   background: var(--plate-face);
   color: var(--c-gold-bright);
-  border: 1px solid rgba(232, 189, 90, 0.55);
+  border: 1px solid rgba(141, 184, 255, 0.55);
 }
 
 .howto__body h3 {
@@ -432,14 +443,14 @@
   color: var(--c-ink);
 }
 
-.howto__sigils {
+.howto__asterisms {
   display: flex;
   justify-content: center;
   gap: var(--sp-4);
   margin: var(--sp-5) 0 0;
 }
 
-.howto__sigils span {
+.howto__asterisms span {
   color: var(--tile-face);
   opacity: 0.7;
 }
@@ -492,7 +503,7 @@
 
 .onboarding__big-icon--gold {
   color: var(--c-gold-bright);
-  filter: drop-shadow(0 0 10px rgba(216, 169, 63, 0.5));
+  filter: drop-shadow(0 0 10px rgba(240, 180, 41, 0.5));
 }
 
 .onboarding__dots {
@@ -628,7 +639,7 @@
 .slot-picker__slot.is-selected {
   border-style: solid;
   border-color: var(--c-gold);
-  background: rgba(216, 169, 63, 0.22);
+  background: rgba(240, 180, 41, 0.22);
 }
 
 .compare-dialog {
@@ -681,7 +692,7 @@
   background:
     radial-gradient(circle at 33% 27%, var(--tile-light) 0%, transparent 44%),
     radial-gradient(circle at 50% 50%, var(--tile-face) 0%, var(--tile-edge) 80%);
-  box-shadow: inset 0 0 0 1.5px rgba(255, 236, 190, 0.6), 0 0 16px -4px var(--tile-face);
+  box-shadow: inset 0 0 0 1.5px rgba(214, 228, 255, 0.6), 0 0 16px -4px var(--tile-face);
 }
 
 .guess-dialog__input {
@@ -769,7 +780,7 @@
 
 .game-over__player.is-winner {
   border-color: var(--c-gold);
-  background: rgba(216, 169, 63, 0.14);
+  background: rgba(240, 180, 41, 0.14);
 }
 
 .game-over__player h3 {

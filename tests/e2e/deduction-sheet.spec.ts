@@ -118,11 +118,11 @@ test.describe('Star chart', () => {
     const cell = alice.getByTestId('sheet-cell-37');
     // Star 37 may be one of the initial public stars, or on the other rack,
     // which adds a detail at the end of the label.
-    await expect(cell).toHaveAccessibleName(/^Number 37, Aurora, 2 sparks, still possible/);
+    await expect(cell).toHaveAccessibleName(/^Number 37, Orion, 2 sparks, still possible/);
     await cell.focus();
     await expect(cell).toBeFocused();
     await alice.keyboard.press('Enter');
-    await expect(cell).toHaveAccessibleName(/^Number 37, Aurora, 2 sparks, crossed out/);
+    await expect(cell).toHaveAccessibleName(/^Number 37, Orion, 2 sparks, crossed out/);
     await expect(cell).toBeFocused();
     await alice.keyboard.press('Enter');
     await expect(cell).toHaveAccessibleName(/still possible/);
