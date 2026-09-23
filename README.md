@@ -11,7 +11,7 @@ yours. (Until version 1.3, the game was called NOCTALIS.)
 [![CI](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml/badge.svg)](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml)
 [![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
-**▶ [Play now at noctalis.onrender.com](https://noctalis.onrender.com)**
+**▶ [Play now at umbrastra.onrender.com](https://umbrastra.onrender.com)**
 
 ![A game for four in the dark theme: three other players' rows of stars at the top, the open sky in the middle, and your own eclipsed stars at the bottom](docs/images/table-dark.png)
 
@@ -71,7 +71,7 @@ The full rules, with pictures, are one click away in the game itself.
 ## Playing
 
 The easiest way is the public table at
-**[noctalis.onrender.com](https://noctalis.onrender.com)**: start a game, send
+**[umbrastra.onrender.com](https://umbrastra.onrender.com)**: start a game, send
 the invite link to up to three friends, and you are off. The link opens the
 game with the code already filled in, so they only have to pick a name (the
 five-character code still works for those who would rather type it). Nothing
@@ -125,7 +125,7 @@ received**.
 
 ### Invite links and link previews
 
-An invite link looks like `https://noctalis.onrender.com/?join=AB7K9&lang=fr`.
+An invite link looks like `https://umbrastra.onrender.com/?join=AB7K9&lang=fr`.
 The client reads `join`, opens the join form with that code, then removes the
 parameters from the address bar once the person is seated. When the link
 points to a different game than the one remembered on the device, the invite

@@ -92,8 +92,8 @@ describe('Link preview tags', () => {
 describe('Public origin', () => {
   it('prefers the configured address, with or without a scheme', () => {
     const request = { protocol: 'http', host: 'evil.example' };
-    expect(resolveOrigin('https://noctalis.onrender.com/', request)).toBe('https://noctalis.onrender.com');
-    expect(resolveOrigin('noctalis.onrender.com', request)).toBe('https://noctalis.onrender.com');
+    expect(resolveOrigin('https://umbrastra.onrender.com/', request)).toBe('https://umbrastra.onrender.com');
+    expect(resolveOrigin('umbrastra.onrender.com', request)).toBe('https://umbrastra.onrender.com');
   });
 
   it('falls back to the request host only when it is a plain host name', () => {

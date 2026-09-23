@@ -29,8 +29,7 @@ No secret is needed: the project uses none.
 1. On [render.com](https://render.com), connect your GitHub account and allow
    access to the repository.
 2. **New → Blueprint**, then pick the repository (or your fork).
-3. Render reads `render.yaml` and offers a Web Service called `noctalis`
-   (see *The name change* below):
+3. Render reads `render.yaml` and offers a Web Service called `umbrastra`:
    - build: `npm ci --include=dev && npm run build`
    - start: `npm start`
    - probe: `/health`
@@ -40,17 +39,20 @@ No secret is needed: the project uses none.
 
 ## The name change (1.4)
 
-The game was called NOCTALIS up to version 1.3. The code, the texts and the
-link previews now say UMBRASTRA, but two things outside the repository still
-carry the old name, on purpose:
+The game was called NOCTALIS up to version 1.3; the code, the texts and the
+link previews now say UMBRASTRA.
 
-- **the Render service** is still called `noctalis`, and so is its address,
-  `noctalis.onrender.com`. On Render, the `onrender.com` address is chosen
-  when a service is created and never changes afterwards; renaming the
-  service in `render.yaml` would make the blueprint create a *second*
-  service rather than rename the first. `render.yaml` therefore keeps
-  `name: noctalis` until a new service is deliberately created;
-- **the GitHub repository** is still `Toinezouz/Noctalis`. Renaming it is
+- **The Render service.** On Render, the `onrender.com` address is chosen
+  when a service is created and never changes afterwards, even if the
+  service is renamed. Getting `umbrastra.onrender.com` therefore means a
+  *new* service: `render.yaml` now declares `name: umbrastra`. Once the
+  blueprint is synced (automatically, or with **Manual sync** on the
+  blueprint's page), Render creates the `umbrastra` service; the old
+  `noctalis` service is then deleted by hand from the dashboard. Links to
+  `noctalis.onrender.com` stop working at that point. If the name
+  `umbrastra` is already taken on `onrender.com`, Render adds a suffix to the
+  address: the links in the README must then be updated to the real one.
+- **The GitHub repository** is still `Toinezouz/Noctalis`. Renaming it is
   done on GitHub (Settings → General → Repository name), and GitHub then
   redirects the old address, clones included. The links in the README,
   `package.json` and `client/src/lib/project.ts` will be updated after that.
@@ -81,8 +83,9 @@ uses `express`, `socket.io` and `cors`.
 ## The public instance
 
 The project's reference table is
-[noctalis.onrender.com](https://noctalis.onrender.com), deployed from `main`
-by the blueprint above. Checked online on 23 September 2026 (version 1.0):
+[umbrastra.onrender.com](https://umbrastra.onrender.com) from version 1.4 on,
+deployed from `main` by the blueprint above. Up to version 1.3 it was
+`noctalis.onrender.com`, checked online on 23 September 2026 (version 1.0):
 
 ```
 GET /health → {"status":"ok","rooms":1,"uptime":290.4,"env":"production"}

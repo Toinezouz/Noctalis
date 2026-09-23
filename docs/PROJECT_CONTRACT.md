@@ -69,7 +69,8 @@ The name NOCTALIS was already in wide use (see `PROJECT_IDENTITY.md`).
 | `@noctalis/shared` · `@noctalis/server` · `@noctalis/client`, root package `noctalis` | `@umbrastra/*`, `umbrastra` | new name |
 | storage keys `noctalis:*` | `umbrastra:*`, carried over once by `migrateLegacyStorage()` | new name, nobody loses their settings |
 | every displayed `NOCTALIS` | `UMBRASTRA` | new name |
-| — | unchanged for now: Render service `noctalis` (and its address), GitHub repository `Toinezouz/Noctalis` | see `DEPLOYMENT.md`, *The name change* |
+| Render service `noctalis` (`noctalis.onrender.com`) | `umbrastra` (`umbrastra.onrender.com`), a new service | an `onrender.com` address never changes; see `DEPLOYMENT.md`, *The name change* |
+| — | unchanged for now: GitHub repository `Toinezouz/Noctalis` | renamed on GitHub by its owner |
 
 ## 1. Data types (`@umbrastra/shared`)
 

@@ -26,7 +26,7 @@ assignees: ''
 - Browser and version:
 - System:
 - Number of players at the table:
-- Online (noctalis.onrender.com) or local:
+- Online (umbrastra.onrender.com) or local:
 - Language and theme:
 
 ## Screenshots or error messages
