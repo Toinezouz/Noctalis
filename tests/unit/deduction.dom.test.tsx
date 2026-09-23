@@ -166,7 +166,7 @@ describe('Star chart (component)', () => {
       expect(cell.className).toContain('is-revealed');
       expect(cell).toHaveAttribute('aria-pressed', 'false');
       expect(cell.getAttribute('aria-label')).toContain('déjà révélée');
-      expect(cell.querySelector('.sheet-cell__revealed')).not.toBeNull();
+      expect(cell.querySelector('.sheet-cell__seen')).not.toBeNull();
     }
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60');
   });
@@ -254,6 +254,8 @@ describe('Star chart (component)', () => {
       expect(cell.className).toContain('is-held');
       expect(cell).toHaveAttribute('aria-pressed', 'false');
       expect(cell.getAttribute('aria-label')).toContain('held by someone else');
+      // Same marker as a star revealed in the open sky: either way, not mine.
+      expect(cell.querySelector('.sheet-cell__seen')).not.toBeNull();
     }
     expect(screen.getByTestId('sheet-cell-9').className).not.toContain('is-held');
     expect(screen.getByText(/cannot be yours/)).toBeInTheDocument();

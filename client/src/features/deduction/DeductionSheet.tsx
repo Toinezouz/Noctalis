@@ -96,13 +96,8 @@ export function DeductionSheet({
         <p className="sheet__legend muted">{t('sheet.legend')}</p>
         <ul className="sheet__keys muted">
           <li>
-            <span className="sheet__legend-dot" aria-hidden="true" /> {t('sheet.legendRevealed')}
+            <span className="sheet__legend-seen" aria-hidden="true" /> {t('sheet.legendSeen')}
           </li>
-          {heldNumbers.length > 0 ? (
-            <li>
-              <span className="sheet__legend-ring" aria-hidden="true" /> {t('sheet.legendHeld')}
-            </li>
-          ) : null}
         </ul>
         <p className="sheet__legend muted">{t('sheet.legendEnd')}</p>
         <div className="sheet__actions">

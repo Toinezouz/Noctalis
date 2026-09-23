@@ -63,11 +63,14 @@ export function DeductionCell({
           <span key={i} className="sheet-cell__dot" />
         ))}
       </span>
-      {revealed ? (
-        <span className="sheet-cell__revealed" aria-hidden="true" title={t('sheet.cellRevealed')} />
-      ) : null}
-      {held ? (
-        <span className="sheet-cell__held" aria-hidden="true" title={t('sheet.cellHeld')} />
+      {/* One marker for both cases: either way, the star is visible at the
+          table, so it cannot be mine. */}
+      {revealed || held ? (
+        <span
+          className="sheet-cell__seen"
+          aria-hidden="true"
+          title={t(revealed ? 'sheet.cellRevealed' : 'sheet.cellHeld')}
+        />
       ) : null}
       {crossed ? (
         <svg

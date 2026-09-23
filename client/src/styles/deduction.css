@@ -154,7 +154,7 @@
 .sheet__grid-wrap {
   overflow-x: auto;
   /* Room for the corner badges of the outer cells. */
-  padding: 4px 4px var(--sp-1);
+  padding: 3px 3px var(--sp-1);
 }
 
 .sheet__columns {
@@ -268,57 +268,36 @@
 }
 
 /*
- * Markers sit on a small dark badge with a white edge, astride the cell's
- * corner: readable on every constellation colour, light or dark, and even on
- * a crossed-out cell.
+ * Visible at the table (open sky or someone else's row): a small dark badge
+ * with a white edge and a yellow star, astride the cell's corner, readable
+ * on every constellation colour.
  */
-.sheet-cell__revealed,
-.sheet-cell__held,
-.sheet__legend-dot,
-.sheet__legend-ring {
+.sheet-cell__seen,
+.sheet__legend-seen {
   display: grid;
   place-items: center;
-  width: 15px;
-  height: 15px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #101a33;
   border: 1.5px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-.sheet-cell__revealed,
-.sheet-cell__held {
+.sheet-cell__seen {
   position: absolute;
-  top: -4px;
+  top: -3px;
+  right: -3px;
   z-index: 1;
 }
 
-/* Already revealed in the open sky: a bright yellow star. */
-.sheet-cell__revealed {
-  right: -4px;
-}
-
-.sheet-cell__revealed::before,
-.sheet__legend-dot::before {
+.sheet-cell__seen::before,
+.sheet__legend-seen::before {
   content: '';
-  width: 9px;
-  height: 9px;
+  width: 7px;
+  height: 7px;
   background: #ffd873;
   clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-}
-
-/* Seen on someone else's row: a white ring. */
-.sheet-cell__held {
-  left: -4px;
-}
-
-.sheet-cell__held::before,
-.sheet__legend-ring::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: 1.5px solid #ffffff;
 }
 
 .sheet-cell.is-crossed {
@@ -350,10 +329,9 @@
   stroke-width: 4;
 }
 
-.sheet__legend-dot,
-.sheet__legend-ring {
+.sheet__legend-seen {
   display: inline-grid;
-  vertical-align: -3px;
+  vertical-align: -2px;
   margin-right: 2px;
 }
 
