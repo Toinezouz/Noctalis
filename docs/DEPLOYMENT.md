@@ -30,7 +30,7 @@ Aucun secret n'est nécessaire : le projet n'en utilise aucun.
    autorisez l'accès au dépôt.
 2. **New → Blueprint**, puis choisissez `Toinezouz/Noctalis`.
 3. Render lit `render.yaml` et propose un Web Service nommé `noctalis` :
-   - construction : `npm ci && npm run build`
+   - construction : `npm ci --include=dev && npm run build`
    - démarrage : `npm start`
    - sonde : `/health`
    - déploiement automatique **seulement si les vérifications passent**
@@ -57,6 +57,17 @@ buildCommand: npm ci --include=dev && npm run build
 
 Les dépendances de développement ne servent qu'à construire ; le service qui
 tourne ensuite n'utilise que `express`, `socket.io` et `cors`.
+
+## L'instance publique
+
+Le service de référence du projet est
+[noctalis.onrender.com](https://noctalis.onrender.com), déployé depuis `main`
+par le blueprint ci-dessus. Vérifié en ligne le 23/09/2026 :
+
+```
+GET /health → {"status":"ok","rooms":1,"uptime":290.4,"env":"production"}
+GET /       → <title>NOCTALIS - Devine ta constellation avant lui</title>
+```
 
 ## Vérifier que tout fonctionne
 

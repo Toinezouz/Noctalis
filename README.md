@@ -10,6 +10,8 @@ gratuit, open source. Sans compte, sans publicité, sans fonctionnalité payante
 [![CI](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml/badge.svg)](https://github.com/Toinezouz/Noctalis/actions/workflows/ci.yml)
 [![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
+**▶ [Jouer maintenant](https://noctalis.onrender.com)** — rien à installer.
+
 ---
 
 ## Sommaire
@@ -59,6 +61,12 @@ barrez les numéros impossibles, notez vos hypothèses. Rien n'est barré
 automatiquement — la déduction vous appartient.
 
 ## Jouer
+
+Une instance publique tourne sur
+**[noctalis.onrender.com](https://noctalis.onrender.com)**. Elle est hébergée
+sur le plan gratuit de Render : après quinze minutes sans trafic le service
+s'endort, et le **premier chargement prend alors 30 à 60 secondes**. Ensuite,
+le jeu répond normalement.
 
 Un joueur crée une observation et obtient un **code à 5 caractères**. L'autre
 le saisit. Rien à installer, rien à créer comme compte.
