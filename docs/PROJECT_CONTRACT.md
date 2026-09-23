@@ -343,7 +343,7 @@ Aucune de ces variables n'est un secret. Le projet n'en utilise aucun.
 | `npm run build` | shared, puis serveur, puis client |
 | `npm start` | démarre le serveur compilé (commande de Render) |
 | `npm test` | tests Vitest |
-| `npm run test:e2e` | tests Playwright |
+| `npm run test:e2e` | tests Playwright, joues contre le serveur de production |
 | `npm run typecheck` | 4 projets TypeScript |
 | `npm run lint` | ESLint |
 | `npm run check:contract` | vérifie que le code expose ce contrat |

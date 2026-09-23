@@ -154,6 +154,11 @@ npm test          # 154 tests Vitest
 npm run test:e2e  # 29 scénarios Playwright, desktop et mobile
 ```
 
+Les tests bout en bout lancent **le serveur de production** (`npm run build &&
+npm start`) et jouent contre lui : même binaire, même origine, même façon de
+servir le client que sur l'hébergeur. Playwright attend une vraie réponse de
+`/health` avant de commencer.
+
 | Fichier | Couverture |
 | --- | --- |
 | `tiles.test.ts` | les 60 étoiles, constellations et éclats, grille de la carte |

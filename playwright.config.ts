@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4173;
+const PORT = 3001;
 
 /**
  * Certains environnements (CI, conteneurs) fournissent deja un Chromium :
@@ -29,26 +29,25 @@ export default defineConfig({
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 5'] } },
   ],
-  webServer: [
-    {
-      command: 'npm run dev -w server',
-      port: 3001,
-      reuseExistingServer: !process.env.CI,
-      stdout: 'ignore',
-      stderr: 'pipe',
-      env: { PORT: '3001', CLIENT_URL: `http://127.0.0.1:${PORT}`, NODE_ENV: 'test' },
+  /**
+   * Un seul serveur, celui de production : Express sert le client compile,
+   * l'API et Socket.IO sur la meme origine. C'est exactement ce que lance
+   * l'hebergeur, donc les tests traversent le vrai chemin — et il n'y a plus
+   * de serveur d'apercu separe qui puisse ne pas demarrer.
+   *
+   * `NODE_ENV=test` garde le garde-fou anti-fuite actif pendant les tests.
+   */
+  webServer: {
+    command: 'npm run build && npm start',
+    // On attend une vraie reponse de l'application, pas juste un port ouvert.
+    url: `http://127.0.0.1:${String(PORT)}/health`,
+    reuseExistingServer: !process.env.CI,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 300_000,
+    env: {
+      PORT: String(PORT),
+      NODE_ENV: 'test',
     },
-    {
-      // Le client est construit en pointant directement vers le serveur
-      // Socket.IO : les tests traversent exactement le chemin de production
-      // (front statique + backend separe), sans proxy intermediaire.
-      command: `npm run build -w client && npx vite preview --config client/vite.config.ts --port ${PORT} --strictPort`,
-      env: { VITE_SERVER_URL: 'http://127.0.0.1:3001' },
-      port: PORT,
-      reuseExistingServer: !process.env.CI,
-      stdout: 'ignore',
-      stderr: 'pipe',
-      timeout: 180_000,
-    },
-  ],
+  },
 });
