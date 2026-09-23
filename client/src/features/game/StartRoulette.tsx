@@ -14,7 +14,7 @@ const TURNS = 5;
 /** Un instant avant de lancer la roue : le navigateur doit avoir peint 0 deg. */
 const KICK_MS = 60;
 
-/** Couleurs des secteurs, dans l'ordre des joueurs. */
+/** Constellations des secteurs, dans l'ordre des joueurs. */
 const SECTOR_COLORS = ['var(--t-blue)', 'var(--t-pink)', 'var(--t-green)', 'var(--t-orange)'];
 
 export interface StartRoulettePlayer {

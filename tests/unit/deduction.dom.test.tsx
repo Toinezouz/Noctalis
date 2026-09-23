@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { COLOR_LABELS, TILES, getTileByNumber } from '@gotfive/shared';
+import { TILES, getTileByNumber } from '@noctalis/shared';
+import { fr } from '../../client/src/i18n/fr.js';
 import { DeductionSheet } from '../../client/src/features/deduction/DeductionSheet.js';
 import { useDeductionSheet } from '../../client/src/features/deduction/deductionStore.js';
 import { deductionKey } from '../../client/src/lib/storage.js';
@@ -43,15 +44,17 @@ describe('Fiche de deduction (composant)', () => {
     );
   });
 
-  it('affiche la bonne couleur et le bon nombre de points pour les 60 numeros', () => {
+  it('affiche la bonne constellation et le bon nombre d éclats pour les 60 numeros', () => {
     render(<SheetHost />);
     for (const tile of TILES) {
       const cell = screen.getByTestId(`sheet-cell-${String(tile.number)}`);
       expect(cell.getAttribute('data-color')).toBe(tile.color);
       expect(cell.querySelectorAll('.sheet-cell__dot')).toHaveLength(tile.points);
-      expect(cell.getAttribute('aria-label')).toContain(COLOR_LABELS[tile.color]);
+      // La fiche affiche le nom traduit de la constellation, pas le libelle
+      // serveur : c'est bien le catalogue du client qui fait foi ici.
+      expect(cell.getAttribute('aria-label')).toContain(fr[`color.${tile.color}`]);
       expect(cell.getAttribute('aria-label')).toContain(
-        `${String(tile.points)} point${tile.points > 1 ? 's' : ''}`,
+        `${String(tile.points)} éclat${tile.points > 1 ? 's' : ''}`,
       );
     }
   });
@@ -59,25 +62,25 @@ describe('Fiche de deduction (composant)', () => {
   it('verifie les exemples officiels de la fiche', () => {
     render(<SheetHost />);
     const expected: [number, string, number][] = [
-      [1, 'vert', 1],
-      [2, 'rose', 1],
-      [3, 'bleu', 1],
-      [4, 'rouge', 1],
-      [5, 'orange', 1],
-      [6, 'vert', 2],
-      [10, 'orange', 2],
-      [11, 'vert', 3],
-      [15, 'orange', 3],
-      [16, 'vert', 1],
-      [17, 'rose', 1],
-      [37, 'rose', 2],
-      [56, 'vert', 3],
-      [60, 'orange', 3],
+      [1, 'Lyre', 1],
+      [2, 'Aurore', 1],
+      [3, 'Cygne', 1],
+      [4, 'Braise', 1],
+      [5, 'Phénix', 1],
+      [6, 'Lyre', 2],
+      [10, 'Phénix', 2],
+      [11, 'Lyre', 3],
+      [15, 'Phénix', 3],
+      [16, 'Lyre', 1],
+      [17, 'Aurore', 1],
+      [37, 'Aurore', 2],
+      [56, 'Lyre', 3],
+      [60, 'Phénix', 3],
     ];
     for (const [n, color, points] of expected) {
       const cell = screen.getByTestId(`sheet-cell-${String(n)}`);
       expect(cell.getAttribute('aria-label')).toBe(
-        `Numéro ${String(n)}, ${color}, ${String(points)} point${
+        `Numéro ${String(n)}, ${color}, ${String(points)} éclat${
           points > 1 ? 's' : ''
         }, non éliminé`,
       );
@@ -197,15 +200,15 @@ describe('Fiche de deduction (composant)', () => {
     const user = userEvent.setup();
     render(<SheetHost lang="es" revealed={[12]} />);
 
-    expect(screen.getByText('Mi hoja de deducción')).toBeInTheDocument();
+    expect(screen.getByText('Mi carta celeste')).toBeInTheDocument();
     expect(screen.getByText('Privada: ni el servidor ni tu rival la ven.')).toBeInTheDocument();
     expect(screen.getByTestId('reset-sheet')).toHaveTextContent('Borrar mis deducciones');
     expect(screen.getByTestId('crossed-count')).toHaveTextContent('0 / 60 tachados');
 
     const cell = screen.getByTestId('sheet-cell-37');
-    expect(cell.getAttribute('aria-label')).toBe('Número 37, rosa, 2 puntos, no eliminado');
+    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 brillos, no eliminado');
     await user.click(cell);
-    expect(cell.getAttribute('aria-label')).toBe('Número 37, rosa, 2 puntos, eliminado');
+    expect(cell.getAttribute('aria-label')).toBe('Número 37, Aurora, 2 brillos, eliminado');
 
     // La ficha revelada garde son repere, dans la langue choisie.
     expect(screen.getByTestId('sheet-cell-12').getAttribute('aria-label')).toContain(

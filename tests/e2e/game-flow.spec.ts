@@ -14,7 +14,7 @@ test.afterEach(async ({ browser }) => {
 });
 
 test.describe('Partie complete a deux joueurs', () => {
-  test('mise en place, tour complet, CLASSER, COMPARER et changement de tour', async ({
+  test('mise en place, tour complet, SITUER, JAUGER et changement de tour', async ({
     browser,
   }) => {
     // Le premier joueur est tire au sort : on suit les roles, pas les pseudos.
@@ -108,17 +108,17 @@ test.describe('Partie complete a deux joueurs', () => {
     }
 
     // L'historique public raconte la partie.
-    await expect(first.locator('.game-log')).toContainText('a révélé la tuile');
-    await expect(first.locator('.game-log')).toContainText('CLASSER');
+    await expect(first.locator('.game-log')).toContainText('a révélé l’étoile');
+    await expect(first.locator('.game-log')).toContainText('SITUER');
   });
 
-  test('GOT FIVE! gagnant : victoire, revelation finale et revanche', async ({ browser }) => {
+  test('annonce exacte : victoire, revelation finale et revanche', async ({ browser }) => {
     const { alice, bob } = await startGame(browser, ['Alice', 'Bob']);
     const aliceSecrets = await readOpponentTiles(bob);
 
-    await alice.getByTestId('got-five-button').click();
+    await alice.getByTestId('announce-button').click();
     for (const [index, number] of aliceSecrets.entries()) {
-      await alice.getByTestId(`got-five-input-${String(index)}`).fill(String(number));
+      await alice.getByTestId(`announce-input-${String(index)}`).fill(String(number));
     }
     await alice.getByTestId('submit-guess').click();
     await alice.getByTestId('confirm-guess').click();
@@ -159,7 +159,7 @@ test.describe('Partie complete a deux joueurs', () => {
     expect(leads.filter((count) => count > 0)).toHaveLength(1);
   });
 
-  test('GOT FIVE! rate : elimination, une seule tentative, la partie continue', async ({
+  test('annonce ratee : elimination, une seule tentative, l observation continue', async ({
     browser,
   }) => {
     const { alice, bob } = await startGame(browser, ['Alice', 'Bob']);
@@ -178,15 +178,15 @@ test.describe('Partie complete a deux joueurs', () => {
       })
       .sort((a, b) => a - b);
 
-    await alice.getByTestId('got-five-button').click();
+    await alice.getByTestId('announce-button').click();
     for (const [index, number] of wrong.entries()) {
-      await alice.getByTestId(`got-five-input-${String(index)}`).fill(String(number));
+      await alice.getByTestId(`announce-input-${String(index)}`).fill(String(number));
     }
     await alice.getByTestId('submit-guess').click();
     await alice.getByTestId('confirm-guess').click();
 
-    // Alice est eliminee : plus de bouton GOT FIVE!, et Bob prend la main.
-    await expect(alice.getByTestId('got-five-button')).toHaveCount(0);
+    // Alice est eliminee : plus de bouton d'annonce, et Bob prend la main.
+    await expect(alice.getByTestId('announce-button')).toHaveCount(0);
     await expect(bob.locator('.player-status').filter({ hasText: 'Alice' })).toContainText(
       'Éliminé',
     );
@@ -256,7 +256,7 @@ test.describe('Partie complete a deux joueurs', () => {
     const opponentSecrets = await readOpponentTiles(first);
 
     await first.reload();
-    await expect(first.getByTestId('got-five-button')).toBeVisible();
+    await expect(first.getByTestId('announce-button')).toBeVisible();
     // L'etat est restaure : mes 5 dos, les 5 tuiles adverses, la zone publique.
     await expect(first.locator('.player-zone--mine .tile-back')).toHaveCount(5);
     expect(await readOpponentTiles(first)).toEqual(opponentSecrets);

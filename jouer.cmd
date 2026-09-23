@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------
-rem  GOT FIVE! - lanceur double-cliquable (Windows)
+rem  NOCTALIS - lanceur double-cliquable (Windows)
 rem
 rem  Construit le jeu si besoin, ouvre le tunnel Cloudflare et demarre le
 rem  serveur. Equivaut a "npm run share", sans avoir a ouvrir un terminal.
@@ -8,7 +8,7 @@ rem ---------------------------------------------------------------------
 
 rem UTF-8 : sans cela, les accents et le cadre du lien s'affichent en charabia.
 chcp 65001 >nul
-title GOT FIVE! - partie a distance
+title NOCTALIS - observation a distance
 
 rem Se placer dans le dossier du jeu, quel que soit l'endroit du raccourci.
 cd /d "%~dp0"
@@ -25,7 +25,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo   GOT FIVE!  -  preparation de la partie
+echo   NOCTALIS  -  preparation de l observation
 echo   Pour arreter : Ctrl+C, puis O pour confirmer.
 echo.
 

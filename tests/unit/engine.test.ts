@@ -28,7 +28,7 @@ import {
   validateClassify,
   validateGuess,
   validateGuessShape,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { PLAYER_SEEDS, gameStartedByAlice } from './gameFixture.js';
 
 const SEEDS = PLAYER_SEEDS;
@@ -53,7 +53,7 @@ function playFullTurn(state: GameState, rng: Rng): void {
 }
 
 /**
- * Construit une proposition GOT FIVE! valide dans sa forme (5 numeros
+ * Construit une annonce valide dans sa forme (5 numeros
  * croissants, une couleur chacun) mais volontairement fausse.
  */
 function wrongGuess(secret: readonly number[]): number[] {
@@ -502,7 +502,7 @@ describe('deroulement des tours', () => {
   });
 });
 
-describe('GOT FIVE!', () => {
+describe('annonce CONSTELLATION', () => {
   it('accepte une proposition exacte et donne la victoire', () => {
     const { state } = newGame();
     const alice = getPlayer(state, 'alice')!;

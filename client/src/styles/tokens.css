@@ -1,20 +1,20 @@
 /* ==========================================================================
-   GOT FIVE! - Design system : jetons de conception
-   Esprit : jeu de societe familial, retro-pop, chaleureux, cartonne.
+   NOCTALIS - Design system : jetons de conception
+   Esprit : releve astronomique, nuit profonde, gravure, papier d'atlas.
    ========================================================================== */
 
 :root {
   /* --- Couleurs de marque ------------------------------------------------ */
-  --c-cream: #fff4e2;
-  --c-cream-deep: #f8e3c2;
-  --c-cream-shadow: #e9cfa8;
-  --c-paper: #fffaf1;
-  --c-ink: #2b1141;
-  --c-ink-soft: #5b4270;
-  --c-violet: #6a2bae;
-  --c-violet-dark: #4a1a80;
-  --c-magenta: #c2158a;
-  --c-gold: #ffc93c;
+  --c-cream: #f3efe6;
+  --c-cream-deep: #e7e0d2;
+  --c-cream-shadow: #d3cab7;
+  --c-paper: #fbf8f2;
+  --c-ink: #1a1f3c;
+  --c-ink-soft: #55597a;
+  --c-violet: #3f57c9;
+  --c-violet-dark: #2c3d96;
+  --c-magenta: #c2456f;
+  --c-gold: #e0a82e;
 
   /* --- Couleurs des 5 familles de tuiles --------------------------------- */
   --t-green: #2fb061;
@@ -35,34 +35,34 @@
   --c-surface-hi: #fff;
   --c-field: #fff;
   /* Texte pose sur un aplat vif (or, orange, tuile) : toujours sombre. */
-  --c-on-vivid: #2b1141;
+  --c-on-vivid: #1a1f3c;
   /* Traits et aplats discrets, poses sur une surface. */
-  --c-line: rgba(43, 17, 65, 0.16);
-  --c-line-soft: rgba(43, 17, 65, 0.08);
-  --c-wash: rgba(43, 17, 65, 0.12);
+  --c-line: rgba(26, 31, 60, 0.16);
+  --c-line-soft: rgba(26, 31, 60, 0.08);
+  --c-wash: rgba(26, 31, 60, 0.12);
   /* Reflets blancs (papier lustre). Discrets en sombre, sinon ca delave. */
   --c-gloss: rgba(255, 255, 255, 0.6);
   --c-gloss-panel: rgba(255, 255, 255, 0.72);
   --c-gloss-wash: rgba(255, 255, 255, 0.5);
   /* Grain du fond de page. */
-  --c-dot: rgba(43, 17, 65, 0.05);
+  --c-dot: rgba(26, 31, 60, 0.05);
   /* Bandeau de jeu, colle en haut de l'ecran (legerement translucide). */
-  --c-bar: rgba(255, 244, 226, 0.94);
+  --c-bar: rgba(243, 239, 230, 0.94);
   /* Rayons decoratifs de l'accueil : discrets sur fond sombre. */
-  --c-rays: rgba(255, 201, 60, 0.28);
+  --c-rays: rgba(63, 87, 201, 0.16);
   /* Voile du panneau lateral de la fiche (au-dessus de la table). */
-  --c-veil: rgba(255, 244, 226, 0.96);
+  --c-veil: rgba(243, 239, 230, 0.96);
   /* Bulle de notification. */
-  --c-toast-bg: #2b1141;
+  --c-toast-bg: #1a1f3c;
   --c-toast-fg: #fff;
   /* Support en bois des joueurs. */
-  --rack-face: linear-gradient(180deg, #f6e0bd, #e8c79a);
-  --rack-line-rgb: 148, 103, 55;
+  --rack-face: linear-gradient(180deg, #dfd8c6, #c9c0aa);
+  --rack-line-rgb: 120, 116, 96;
   --rack-gloss: rgba(255, 255, 255, 0.65);
   --rack-slot: rgba(255, 255, 255, 0.35);
   --rack-slot-filled: rgba(255, 255, 255, 0.6);
   /* Base des ombres portees : l'encre en clair, le noir en sombre. */
-  --shadow-rgb: 43, 17, 65;
+  --shadow-rgb: 26, 31, 60;
 
   /* --- Etats ------------------------------------------------------------- */
   --c-success: #2fb061;
@@ -138,18 +138,19 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --c-cream: #191029;
-  --c-cream-deep: #221633;
-  --c-cream-shadow: #0d0817;
-  --c-paper: #241934;
-  --c-ink: #f6eeff;
-  --c-ink-soft: #bcabd6;
-  --c-violet: #a377e6;
-  --c-violet-dark: #7d4fd0;
-  --c-magenta: #ef62b9;
+  --c-cream: #0b1022;
+  --c-cream-deep: #121831;
+  --c-cream-shadow: #05070f;
+  --c-paper: #141b33;
+  --c-ink: #eef1ff;
+  --c-ink-soft: #a6afd4;
+  --c-violet: #8aa2ff;
+  --c-violet-dark: #5f77df;
+  --c-magenta: #ff7ba6;
+  --c-gold: #ffc94a;
 
-  --c-surface-hi: #32234a;
-  --c-field: #150e23;
+  --c-surface-hi: #1e2748;
+  --c-field: #0a0f1f;
   --c-line: rgba(255, 255, 255, 0.18);
   --c-line-soft: rgba(255, 255, 255, 0.09);
   --c-wash: rgba(255, 255, 255, 0.1);
@@ -157,14 +158,14 @@
   --c-gloss-panel: rgba(255, 255, 255, 0.05);
   --c-gloss-wash: rgba(255, 255, 255, 0.04);
   --c-dot: rgba(255, 255, 255, 0.05);
-  --c-bar: rgba(25, 16, 41, 0.94);
-  --c-rays: rgba(255, 201, 60, 0.1);
-  --c-veil: rgba(25, 16, 41, 0.97);
-  --c-toast-bg: #32234a;
-  --c-toast-fg: #f6eeff;
+  --c-bar: rgba(11, 16, 34, 0.94);
+  --c-rays: rgba(138, 162, 255, 0.12);
+  --c-veil: rgba(11, 16, 34, 0.97);
+  --c-toast-bg: #1e2748;
+  --c-toast-fg: #eef1ff;
 
-  --rack-face: linear-gradient(180deg, #6d5132, #47331e);
-  --rack-line-rgb: 232, 199, 154;
+  --rack-face: linear-gradient(180deg, #27304f, #171d33);
+  --rack-line-rgb: 150, 166, 214;
   --rack-gloss: rgba(255, 255, 255, 0.12);
   --rack-slot: rgba(255, 255, 255, 0.08);
   --rack-slot-filled: rgba(255, 255, 255, 0.16);

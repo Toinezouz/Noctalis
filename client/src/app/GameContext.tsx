@@ -20,7 +20,7 @@ import type {
   RoomState,
   StatePayload,
   TileColor,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { useI18n, type MessageKey } from '../i18n/index.js';
 import { emitWithAck, getSocket } from '../lib/socket.js';
 import { clearSession, loadSession, saveSession } from '../lib/storage.js';

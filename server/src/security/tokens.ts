@@ -1,5 +1,5 @@
 import { randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
-import { ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH } from '@gotfive/shared';
+import { ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH } from '@noctalis/shared';
 
 /** Identifiant opaque (joueur, room interne...). */
 export function createId(prefix: string): string {

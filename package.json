@@ -1,9 +1,9 @@
 {
-  "name": "got-five",
+  "name": "noctalis",
   "private": true,
   "version": "1.0.0",
-  "description": "GOT FIVE! - jeu de logique et de deduction, version navigateur 2 joueurs en temps reel",
-  "license": "MIT",
+  "description": "NOCTALIS - jeu de deduction a deux joueurs, en temps reel dans le navigateur",
+  "license": "AGPL-3.0-or-later",
   "workspaces": [
     "shared",
     "server",
@@ -21,7 +21,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc -p shared/tsconfig.json --noEmit && tsc -p server/tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit && tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "check:contract": "node scripts/check-contract.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -46,5 +47,13 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Toinezouz/noctalis.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Toinezouz/noctalis/issues"
+  },
+  "homepage": "https://github.com/Toinezouz/noctalis#readme"
 }

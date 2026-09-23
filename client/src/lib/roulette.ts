@@ -44,7 +44,7 @@ export function spinAngle(index: number, count: number, turns: number, offset = 
 /** Secteur se trouvant sous l'aiguille apres une rotation donnee. */
 export function sectorAtPointer(rotation: number, count: number): number {
   const size = sectorSize(count);
-  // La roue a tourne de `rotation` : le point de la roue sous l'aiguille est
+  // La roue a tourne de `rotation` : le eclat de la roue sous l'aiguille est
   // celui qui se trouvait a l'angle `-rotation`.
   const angle = (((-rotation % 360) + 360) % 360) % 360;
   return Math.min(count - 1, Math.floor(angle / size));

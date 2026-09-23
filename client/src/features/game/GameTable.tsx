@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { TileColor } from '@gotfive/shared';
+import type { TileColor } from '@noctalis/shared';
 import type { ThemePreference } from '../../lib/theme.js';
 import { useGame } from '../../app/GameContext.js';
 import { useI18n } from '../../i18n/index.js';
@@ -31,7 +31,7 @@ export interface GameTableProps {
   onLeave: () => void;
 }
 
-/** La table de jeu complete : adversaire en haut, zone publique, mon support. */
+/** La table de jeu complete : adversaire en haut, releve commun, mon support. */
 export function GameTable({
   soundEnabled,
   onToggleSound,
@@ -97,7 +97,7 @@ export function GameTable({
   const finalMyFaces = publicState.finalReveal?.[myId] ?? null;
   const gameOver = phase === 'GAME_OVER';
 
-  const canGotFive = !me.guessUsed && !me.eliminated && !gameOver;
+  const canAnnounce = !me.guessUsed && !me.eliminated && !gameOver;
 
   return (
     <div className="table">
@@ -112,14 +112,14 @@ export function GameTable({
           setSheetOpen(true);
         }}
         onLeave={onLeave}
-        onGotFive={
-          canGotFive
+        onAnnounce={
+          canAnnounce
             ? () => {
                 setGuessOpen(true);
               }
             : undefined
         }
-        gotFiveDisabled={busy}
+        announceDisabled={busy}
         showSheetButton={!sheetOpen}
         online={status === 'online'}
       />
@@ -236,8 +236,8 @@ export function GameTable({
             onClose={() => {
               setSheetOpen(false);
             }}
-            onUseForGotFive={
-              canGotFive
+            onUseForAnnounce={
+              canAnnounce
                 ? () => {
                     setGuessOpen(true);
                   }

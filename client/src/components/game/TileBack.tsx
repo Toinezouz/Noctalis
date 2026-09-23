@@ -1,6 +1,6 @@
-import type { TileColor } from '@gotfive/shared';
+import type { TileColor } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
-import { Character } from './Character.js';
+import { StarGlyph } from './StarGlyph.js';
 
 export interface TileBackProps {
   color: TileColor;
@@ -14,7 +14,7 @@ export interface TileBackProps {
 }
 
 /**
- * Dos d'une tuile secrete, vu par son proprietaire : la couleur et la position
+ * Dos d'une etoile secrete, vu par son proprietaire : la constellation et la position
  * sont visibles, le numero ne l'est jamais (il n'existe pas cote client).
  */
 export function TileBack({
@@ -50,7 +50,7 @@ export function TileBack({
       <span className="tile-back__mark" aria-hidden="true">
         ?
       </span>
-      <Character seed={position * 7 + 3} color={color} size={18} />
+      <StarGlyph seed={position * 7 + 3} color={color} size={18} />
       <span className="tile-back__position" aria-hidden="true">
         {position + 1}
       </span>

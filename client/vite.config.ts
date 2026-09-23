@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@gotfive/shared': path.resolve(here, '../shared/src/index.ts'),
+      '@noctalis/shared': path.resolve(here, '../shared/src/index.ts'),
       '@': path.resolve(here, 'src'),
     },
   },

@@ -1,4 +1,4 @@
-import type { PlayerCredentials } from '@gotfive/shared';
+import type { PlayerCredentials } from '@noctalis/shared';
 import { isThemePreference, type ThemePreference } from './theme.js';
 
 /**
@@ -8,8 +8,8 @@ import { isThemePreference, type ThemePreference } from './theme.js';
  * *personnelles* du joueur (numeros barres, hypotheses).
  */
 
-const SESSION_KEY = 'gotfive:session';
-const PREFS_KEY = 'gotfive:prefs';
+const SESSION_KEY = 'noctalis:session';
+const PREFS_KEY = 'noctalis:prefs';
 
 function readJson<T>(key: string): T | null {
   try {
@@ -90,9 +90,9 @@ export function savePreferences(prefs: Partial<Preferences>): Preferences {
   return next;
 }
 
-/** Cle de la fiche de deduction : une fiche par (partie, joueur). */
+/** Cle de la carte du ciel : une fiche par (partie, joueur). */
 export function deductionKey(roomCode: string, playerId: string): string {
-  return `gotfive:sheet:${roomCode}:${playerId}`;
+  return `noctalis:sheet:${roomCode}:${playerId}`;
 }
 
 export interface StoredDeduction {

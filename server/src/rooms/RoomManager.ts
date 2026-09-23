@@ -7,7 +7,7 @@ import {
   createGame,
   defaultRng,
   setPlayerConnected,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { createId, createRoomCode, createToken, safeCompare } from '../security/tokens.js';
 
 export interface RoomPlayer {

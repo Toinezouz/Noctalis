@@ -6,7 +6,7 @@ import {
   isValidTileNumber,
   validateGuessShape,
   type GuessIssue,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { useI18n, type MessageKey } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
@@ -16,14 +16,14 @@ export interface GuessDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (numbers: number[]) => void;
-  /** Valeurs pre-remplies depuis la fiche de deduction. */
+  /** Valeurs pre-remplies depuis la carte du ciel. */
   initial?: string[];
   busy?: boolean;
 }
 
 /**
- * Tentative GOT FIVE! : 5 numeros entiers, entre 1 et 60, en ordre croissant,
- * une tuile de chaque couleur. Une seule tentative par joueur.
+ * Annonce CONSTELLATION : 5 numeros entiers, entre 1 et 60, en ordre croissant,
+ * une etoile de chaque constellation. Une seule tentative par joueur.
  */
 export function GuessDialog({
   open,
@@ -116,7 +116,7 @@ export function GuessDialog({
                 maxLength={2}
                 placeholder="?"
                 value={value}
-                data-testid={`got-five-input-${String(index)}`}
+                data-testid={`announce-input-${String(index)}`}
                 disabled={confirming}
                 onChange={(event) => {
                   const next = [...values];

@@ -1,4 +1,4 @@
-import type { PublicPlayer } from '@gotfive/shared';
+import type { PublicPlayer } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface PlayerStatusProps {
@@ -7,7 +7,7 @@ export interface PlayerStatusProps {
   isActive: boolean;
 }
 
-/** Pastille d'identite : nom, connexion, tentative GOT FIVE!, elimination. */
+/** Pastille d'identite : nom, connexion, annonce faite, elimination. */
 export function PlayerStatus({ player, isMe, isActive }: PlayerStatusProps): JSX.Element {
   const { t } = useI18n();
 
@@ -33,7 +33,7 @@ export function PlayerStatus({ player, isMe, isActive }: PlayerStatusProps): JSX
             <span className="badge badge--danger">{t('status.eliminated')}</span>
           ) : null}
           {player.guessUsed && !player.eliminated ? (
-            <span className="badge badge--gold">{t('status.gotFiveUsed')}</span>
+            <span className="badge badge--gold">{t('status.announceUsed')}</span>
           ) : null}
         </span>
       </span>

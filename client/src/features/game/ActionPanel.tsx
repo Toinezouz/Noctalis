@@ -1,4 +1,4 @@
-import { COLOR_ORDER, type GamePhase, type TileColor } from '@gotfive/shared';
+import { COLOR_ORDER, type GamePhase, type TileColor } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface ActionPanelProps {

@@ -1,4 +1,4 @@
-import { getTileByNumber, type ClassifyResult } from '@gotfive/shared';
+import { getTileByNumber, type ClassifyResult } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { TileStack } from './TileStack.js';
 import { Tile } from './Tile.js';
@@ -9,7 +9,7 @@ export interface ClassifySlotProps {
   ownerName: string;
 }
 
-/** Une des 6 encoches du support : elle accueille les tuiles classees. */
+/** Une des 6 encoches du support : elle accueille les etoiles situees. */
 export function ClassifySlot({ slot, results, ownerName }: ClassifySlotProps): JSX.Element {
   const { t, slot: slotLabel } = useI18n();
   const tiles = results.map((r) => getTileByNumber(r.tileNumber));
@@ -39,7 +39,7 @@ export function ClassifySlot({ slot, results, ownerName }: ClassifySlotProps): J
 export interface ClassifySlotPickerProps {
   /** Les 5 numeros secrets du demandeur, visibles par le repondeur. */
   secretNumbers: number[];
-  /** Tuile a classer. */
+  /** Etoile a situer. */
   tileNumber: number;
   value: number | null;
   onChange: (slot: number) => void;
@@ -47,7 +47,7 @@ export interface ClassifySlotPickerProps {
 }
 
 /**
- * Selecteur des 6 positions, utilise par l'adversaire pour repondre a CLASSER.
+ * Selecteur des 6 positions, utilise par l'adversaire pour repondre a SITUER.
  * Il voit les vrais numeros : il lui suffit de designer l'encoche.
  */
 export function ClassifySlotPicker({

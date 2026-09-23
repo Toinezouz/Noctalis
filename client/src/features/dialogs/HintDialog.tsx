@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getTileByNumber, type SecretTileView } from '@gotfive/shared';
+import { getTileByNumber, type SecretTileView } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
@@ -9,7 +9,7 @@ import { TileBack } from '../../components/game/TileBack.js';
 export interface HintDialogProps {
   open: boolean;
   tileNumber: number | null;
-  /** Mes 5 tuiles (couleur + position uniquement). */
+  /** Mes 5 etoiles (constellation + position uniquement). */
   myTiles: SecretTileView[];
   opponentName: string;
   onClose: () => void;
@@ -18,7 +18,7 @@ export interface HintDialogProps {
   busy?: boolean;
 }
 
-/** Etape 2 du tour : choisir le type d'indice pour la tuile selectionnee. */
+/** Etape 2 du tour : choisir le type d'indice pour l'etoile selectionnee. */
 export function HintDialog({
   open,
   tileNumber,

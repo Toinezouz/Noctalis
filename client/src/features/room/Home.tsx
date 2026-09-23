@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react';
-import { NAME_MAX_LENGTH, NAME_MIN_LENGTH, ROOM_CODE_LENGTH, validateName } from '@gotfive/shared';
+import { NAME_MAX_LENGTH, NAME_MIN_LENGTH, ROOM_CODE_LENGTH, validateName } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Field } from '../../components/ui/Field.js';
 import { LanguageSwitch } from '../../components/ui/LanguageSwitch.js';
 import { ThemeSwitch } from '../../components/ui/ThemeSwitch.js';
+import { BrandMark } from '../../components/ui/BrandMark.js';
 import type { ThemePreference } from '../../lib/theme.js';
 import { errorMessageKey, useGame } from '../../app/GameContext.js';
 
@@ -66,9 +67,7 @@ export function Home({
     <div className="home">
       <div className="home__hero">
         <div className="home__rays" aria-hidden="true" />
-        <h1 className="brand brand--xl">
-          GOT <em>FIVE!</em>
-        </h1>
+        <BrandMark size="xl" as="h1" />
         <p className="home__tagline">{t('home.tagline')}</p>
         <p className="home__sub muted">{t('home.pitch')}</p>
       </div>

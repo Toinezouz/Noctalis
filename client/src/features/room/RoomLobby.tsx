@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import type { RoomState } from '@gotfive/shared';
+import type { RoomState } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Panel } from '../../components/ui/Panel.js';
+import { BrandMark } from '../../components/ui/BrandMark.js';
 
 export interface RoomLobbyProps {
   room: RoomState;
@@ -33,9 +34,7 @@ export function RoomLobby({ room, myId, onStart, onLeave, busy = false }: RoomLo
 
   return (
     <div className="lobby">
-      <h1 className="brand brand--xl center">
-        GOT <em>FIVE!</em>
-      </h1>
+      <BrandMark size="xl" as="h1" className="center" />
 
       <Panel className="lobby__card">
         <p className="center" style={{ fontWeight: 800 }}>

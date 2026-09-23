@@ -22,26 +22,26 @@ const TEXT = {
     step1: 'Étape 1 / 2',
     choosingColor: (name: string) => `${name} choisit une couleur`,
     logTurn1: (name: string) => `Tour 1 : au tour de ${name}`,
-    logRevealed: 'a révélé la tuile',
+    logRevealed: 'a révélé l’étoile',
     logAnswers: 'répond',
-    classifyAsk: 'te demande de CLASSER la tuile',
+    classifyAsk: 'te demande de SITUER l’étoile',
     classifyChoose: 'Choisis une position',
     classifyConfirm: 'Valider',
-    compareAsk: 'te demande de COMPARER',
+    compareAsk: 'te demande de JAUGER',
   },
   es: {
     name: 'Bruno',
     yourTurn: '¡TE TOCA!',
     turnOf: (name: string) => `Turno de ${name}`,
     step1: 'Paso 1 / 2',
-    choosingColor: (name: string) => `${name} está eligiendo un color`,
+    choosingColor: (name: string) => `${name} está eligiendo una constelación`,
     logTurn1: (name: string) => `Turno 1: le toca a ${name}`,
-    logRevealed: 'ha revelado la ficha',
+    logRevealed: 'ha revelado la estrella',
     logAnswers: 'responde',
-    classifyAsk: 'te pide ORDENAR la ficha',
+    classifyAsk: 'te pide SITUAR la estrella',
     classifyChoose: 'Elige una posición',
     classifyConfirm: 'Confirmar',
-    compareAsk: 'te pide COMPARAR',
+    compareAsk: 'te pide MEDIR',
   },
 } as const;
 
@@ -76,8 +76,8 @@ async function startBilingualGame(browser: Browser): Promise<BilingualGame> {
   await expect(spanish.getByTestId('waiting-host')).toBeVisible();
 
   await french.getByTestId('start-game').click();
-  await expect(french.getByTestId('got-five-button')).toBeVisible();
-  await expect(spanish.getByTestId('got-five-button')).toBeVisible();
+  await expect(french.getByTestId('announce-button')).toBeVisible();
+  await expect(spanish.getByTestId('announce-button')).toBeVisible();
 
   // L'annonce du tirage au sort, puis le tutoriel.
   for (const page of [french, spanish]) {
@@ -118,7 +118,7 @@ test.describe('Traduction espagnole', () => {
     await expect(spanish.getByTestId('menu-create')).toHaveText('Crear una partida');
     await expect(spanish.getByTestId('menu-join')).toHaveText('Unirse a una partida');
     await expect(spanish.getByTestId('menu-help')).toHaveText('¿Cómo se juega?');
-    await expect(spanish).toHaveTitle(/lógica y deducción/);
+    await expect(spanish).toHaveTitle(/constelación/);
 
     const french = await openHome(browser, 'fr-FR');
     await expect(french.locator('html')).toHaveAttribute('lang', 'fr');
@@ -160,7 +160,7 @@ test.describe('Traduction espagnole', () => {
     );
 
     // Zone publique et panneaux lateraux.
-    await expect(spanish.locator('.pool__head')).toContainText('Fichas reveladas');
+    await expect(spanish.locator('.pool__head')).toContainText('Registro común');
     await expect(spanish.locator('.table__side')).toContainText('Jugadores');
     await expect(spanish.locator('.table__side')).toContainText('Historial');
 
@@ -179,20 +179,20 @@ test.describe('Traduction espagnole', () => {
     await expect(spanish.locator('.game-log')).toContainText(`Sorteo: empieza ${activeName}`);
   });
 
-  test('les dialogues CLASSER et COMPARER sont traduits des deux cotes', async ({ browser }) => {
+  test('les dialogues SITUER et JAUGER sont traduits des deux cotes', async ({ browser }) => {
     const { active, waiting, activeLang, waitingLang } = await startBilingualGame(browser);
 
-    // Tour du joueur tire au sort : CLASSER.
+    // Tour du joueur tire au sort : SITUER.
     await active.getByTestId('reveal-blue').click();
     await expect(active.getByTestId('hint-instruction')).toBeVisible();
     await active.locator('.pool__tiles button.tile').first().click();
 
     // Cote demandeur : les deux actions, dans SA langue.
     await expect(active.getByTestId('choose-classify')).toContainText(
-      activeLang === 'fr' ? 'CLASSER' : 'ORDENAR',
+      activeLang === 'fr' ? 'SITUER' : 'SITUAR',
     );
     await expect(active.getByTestId('choose-compare')).toContainText(
-      activeLang === 'fr' ? 'COMPARER' : 'COMPARAR',
+      activeLang === 'fr' ? 'JAUGER' : 'MEDIR',
     );
     await active.getByTestId('choose-classify').click();
 
@@ -207,7 +207,7 @@ test.describe('Traduction espagnole', () => {
     );
     await waiting.getByTestId('confirm-classify').click();
 
-    // Le tour passe a l'autre joueur : COMPARER, dans l'autre langue.
+    // Le tour passe a l'autre joueur : JAUGER, dans l'autre langue.
     await expect(waiting.locator('.turn-indicator')).toContainText(TEXT[waitingLang].yourTurn);
     await waiting.getByTestId('reveal-red').click();
     await expect(waiting.getByTestId('hint-instruction')).toBeVisible();
@@ -227,13 +227,13 @@ test.describe('Traduction espagnole', () => {
 
     // Fiche cote espagnol.
     await spanish.getByTestId('open-sheet').click();
-    await expect(spanish.getByTestId('deduction-sheet')).toContainText('Mi hoja de deducción');
+    await expect(spanish.getByTestId('deduction-sheet')).toContainText('Mi carta celeste');
     await expect(spanish.getByTestId('crossed-count')).toContainText('tachados');
     await spanish.getByTestId('sheet-cell-17').click();
     // Le libelle porte un suffixe si la tuile est deja revelee au centre :
     // on verifie donc le debut du libelle.
     await expect(spanish.getByTestId('sheet-cell-17')).toHaveAccessibleName(
-      /^Número 17, rosa, 1 punto, eliminado/,
+      /^Número 17, Aurora, 1 brillo, eliminado/,
     );
     await spanish.getByTestId('close-sheet').click();
 
@@ -242,9 +242,9 @@ test.describe('Traduction espagnole', () => {
       .locator('.player-zone--opponent .rack__column > .tile')
       .evaluateAll((nodes) => nodes.map((n) => Number(n.getAttribute('data-tile'))));
 
-    await french.getByTestId('got-five-button').click();
+    await french.getByTestId('announce-button').click();
     for (const [index, number] of aliceSecrets.entries()) {
-      await french.getByTestId(`got-five-input-${String(index)}`).fill(String(number));
+      await french.getByTestId(`announce-input-${String(index)}`).fill(String(number));
     }
     await french.getByTestId('submit-guess').click();
     await french.getByTestId('confirm-guess').click();

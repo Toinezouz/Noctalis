@@ -1,18 +1,18 @@
-import type { ClassifyResult, CompareResult, Tile as TileData, TileColor } from '@gotfive/shared';
+import type { ClassifyResult, CompareResult, Tile as TileData, TileColor } from '@noctalis/shared';
 import { Paravent } from './Paravent.js';
 import { Rack } from './Rack.js';
 
 export interface OpponentRackProps {
   name: string;
   colors: TileColor[];
-  /** Les tuiles de l'adversaire : je vois leurs numeros. */
+  /** Les etoiles de l'adversaire : je vois leurs numeros. */
   faces: TileData[] | null;
   classifications: ClassifyResult[];
   comparisons: CompareResult[];
   connected?: boolean;
 }
 
-/** Le support d'en face : ses tuiles sont visibles, les miennes ne le sont pas. */
+/** Le support d'en face : ses etoiles sont visibles, les miennes ne le sont pas. */
 export function OpponentRack({
   name,
   colors,

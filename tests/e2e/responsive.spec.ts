@@ -34,7 +34,7 @@ test.describe('Responsive', () => {
       ).toBeLessThanOrEqual(metrics.clientWidth + 1);
 
       // Les actions principales restent accessibles et cliquables.
-      await expect(alice.getByTestId('got-five-button')).toBeVisible();
+      await expect(alice.getByTestId('announce-button')).toBeVisible();
       const sheetButton = alice.getByTestId('open-sheet');
       await expect(sheetButton).toBeVisible();
       const box = await sheetButton.boundingBox();
@@ -62,6 +62,6 @@ test.describe('Responsive', () => {
 
     await alice.getByTestId('close-sheet').click();
     await expect(alice.getByTestId('deduction-sheet')).toHaveCount(0);
-    await expect(alice.getByTestId('got-five-button')).toBeVisible();
+    await expect(alice.getByTestId('announce-button')).toBeVisible();
   });
 });

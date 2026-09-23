@@ -27,7 +27,7 @@ import {
   validateNumberList,
   validateRoomCode,
   validateTileNumber,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { RateLimiter, RATE_LIMITS } from '../security/rateLimit.js';
 import type { JoinError, Room, RoomManager } from '../rooms/RoomManager.js';
 

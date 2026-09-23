@@ -1,23 +1,23 @@
-import type { Tile as TileData } from '@gotfive/shared';
+import type { Tile as TileData } from '@noctalis/shared';
 import { Tile } from './Tile.js';
 
 export interface TileStackProps {
   tiles: TileData[];
-  /** Tuiles inclinees (reponse NON), reperees par numero. */
+  /** Etoiles inclinees (reponse NON), reperees par numero. */
   tiltedNumbers?: number[];
   size?: 'xs' | 'sm' | 'md';
   label?: string;
 }
 
 /**
- * Au-dela de ce nombre de tuiles, la pile se resserre pour qu'une encoche tres
+ * Au-dela de ce nombre de etoiles, la pile se resserre pour qu'une encoche tres
  * chargee ne fasse pas grandir le support indefiniment.
  */
 const LOOSE_STACK_LIMIT = 5;
 
 /**
- * Empilement de tuiles : plusieurs tuiles peuvent etre classees dans la meme
- * encoche, ou comparees a la meme position secrete. Les tuiles se superposent
+ * Empilement de etoiles : plusieurs etoiles peuvent etre situees dans la meme
+ * encoche, ou jaugees a la meme position secrete. Les etoiles se superposent
  * verticalement, chaque numero restant lisible.
  */
 export function TileStack({

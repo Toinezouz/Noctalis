@@ -1,4 +1,4 @@
-import { SECRET_TILE_COUNT, getTileByNumber, isValidTileNumber } from '@gotfive/shared';
+import { SECRET_TILE_COUNT, getTileByNumber, isValidTileNumber } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface DeductionGuessRowProps {

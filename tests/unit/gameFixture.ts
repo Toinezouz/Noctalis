@@ -1,4 +1,4 @@
-import { type GameState, type PlayerSeed, type Rng, createGame, createSeededRng } from '@gotfive/shared';
+import { type GameState, type PlayerSeed, type Rng, createGame, createSeededRng } from '@noctalis/shared';
 
 /** Les deux joueurs des scenarios de test : Alice est l'hote. */
 export const PLAYER_SEEDS: PlayerSeed[] = [

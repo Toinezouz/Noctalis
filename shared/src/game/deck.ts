@@ -2,7 +2,7 @@ import { COLOR_ORDER, TILES, getTileByNumber } from '../data/tiles.js';
 import type { Tile, TileColor } from '../types/tiles.js';
 import { randomInt, type Rng } from './rng.js';
 
-/** Cree le paquet complet des 60 tuiles, dans l'ordre croissant. */
+/** Cree le paquet complet des 60 etoiles, dans l'ordre croissant. */
 export function createDeck(): Tile[] {
   return TILES.map((t) => t);
 }
@@ -19,12 +19,12 @@ export function shuffleDeck<T>(deck: readonly T[], rng: Rng): T[] {
   return out;
 }
 
-/** Numeros d'une couleur presents dans une reserve donnee. */
+/** Numeros d'une constellation presents dans une reserve donnee. */
 export function reserveOfColor(reserve: readonly number[], color: TileColor): number[] {
   return reserve.filter((n) => getTileByNumber(n).color === color);
 }
 
-/** Compte des tuiles restantes par couleur. */
+/** Compte des etoiles restantes par constellation. */
 export function countReserveByColor(reserve: readonly number[]): Record<TileColor, number> {
   const counts = Object.fromEntries(COLOR_ORDER.map((c) => [c, 0])) as Record<TileColor, number>;
   for (const n of reserve) {

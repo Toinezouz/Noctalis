@@ -1,4 +1,4 @@
-import { getTileByNumber, type CompareResult } from '@gotfive/shared';
+import { getTileByNumber, type CompareResult } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Tile } from './Tile.js';
 
@@ -10,7 +10,7 @@ export interface CompareAreaProps {
 }
 
 /**
- * Zone COMPARER : les tuiles comparees sont posees devant le paravent, en face
+ * Zone JAUGER : les etoiles jaugees sont posees devant le paravent, en face
  * de la position visee. Droites si la reponse est OUI, inclinees si NON.
  */
 export function CompareArea({ results, position, ownerName }: CompareAreaProps): JSX.Element | null {

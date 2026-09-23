@@ -1,4 +1,4 @@
-import { COLOR_ORDER, type RevealedTile, type TileColor } from '@gotfive/shared';
+import { COLOR_ORDER, type RevealedTile, type TileColor } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Tile } from './Tile.js';
 
@@ -8,11 +8,11 @@ export interface PublicTilePoolProps {
   onSelect?: (tileNumber: number) => void;
   selectable: boolean;
   reserveByColor: Record<TileColor, number>;
-  /** Numero de la derniere tuile revelee (mise en avant). */
+  /** Numero de la derniere etoile revelee (mise en avant). */
   lastRevealed?: number | null;
 }
 
-/** La zone publique : toutes les tuiles revelees, visibles jusqu'a la fin. */
+/** La releve commun : toutes les etoiles revelees, visibles jusqu'a la fin. */
 export function PublicTilePool({
   tiles,
   selectedNumber,
@@ -22,8 +22,8 @@ export function PublicTilePool({
   lastRevealed = null,
 }: PublicTilePoolProps): JSX.Element {
   const { t, color: colorName } = useI18n();
-  // Une tuile utilisee pour un indice a rejoint un support : elle disparait du
-  // centre. L'historique complet reste disponible pour la fiche de deduction.
+  // Une etoile utilisee pour un indice a rejoint un support : elle disparait du
+  // centre. L'historique complet reste disponible pour la carte du ciel.
   const available = tiles.filter((entry) => !entry.used);
   const sorted = [...available].sort((a, b) => a.tile.number - b.tile.number);
   const total = COLOR_ORDER.reduce((sum, color) => sum + reserveByColor[color], 0);

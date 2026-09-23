@@ -63,7 +63,7 @@ export function validateRoomCode(raw: unknown): Validated<string> {
   return { ok: true, value: code };
 }
 
-/** Valide une couleur recue du reseau. */
+/** Valide une constellation recue du reseau. */
 export function validateColor(raw: unknown): Validated<TileColor> {
   if (typeof raw === 'string' && (COLOR_ORDER as readonly string[]).includes(raw)) {
     return { ok: true, value: raw as TileColor };
@@ -71,7 +71,7 @@ export function validateColor(raw: unknown): Validated<TileColor> {
   return { ok: false, reason: 'Couleur invalide.' };
 }
 
-/** Valide un numero de tuile recu du reseau. */
+/** Valide un numero de etoile recu du reseau. */
 export function validateTileNumber(raw: unknown): Validated<number> {
   if (Number.isInteger(raw) && (raw as number) >= 1 && (raw as number) <= TILE_COUNT) {
     return { ok: true, value: raw as number };
@@ -87,7 +87,7 @@ export function validateIndex(raw: unknown, max: number): Validated<number> {
   return { ok: false, reason: 'Valeur hors limites.' };
 }
 
-/** Valide une liste de numeros pour GOT FIVE! (forme brute, avant regles). */
+/** Valide une liste de numeros d'etoiles (forme brute, avant regles). */
 export function validateNumberList(raw: unknown, length: number): Validated<number[]> {
   if (!Array.isArray(raw) || raw.length !== length) {
     return { ok: false, reason: `Il faut exactement ${String(length)} numeros.` };

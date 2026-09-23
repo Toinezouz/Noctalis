@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * ---------------------------------------------------------------------------
- * GOT FIVE! — partie à distance, en une commande
+ * NOCTALIS — observation à distance, en une commande
  * ---------------------------------------------------------------------------
  * Construit le jeu si besoin, ouvre un tunnel public temporaire (Cloudflare),
  * puis démarre le serveur en n'autorisant que l'adresse de ce tunnel.
@@ -35,7 +35,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const IS_WINDOWS = process.platform === 'win32';
-const BIN_DIR = path.join(ROOT, 'node_modules', '.cache', 'gotfive');
+const BIN_DIR = path.join(ROOT, 'node_modules', '.cache', 'noctalis');
 const BIN_PATH = path.join(BIN_DIR, IS_WINDOWS ? 'cloudflared.exe' : 'cloudflared');
 const RELEASE_BASE = 'https://github.com/cloudflare/cloudflared/releases/latest/download';
 const TUNNEL_URL_PATTERN = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/i;
@@ -61,7 +61,7 @@ const readOption = (flag, fallback) => {
 
 if (hasFlag('--help') || hasFlag('-h')) {
   console.log(`
-GOT FIVE! — jouer à distance avec un ami
+NOCTALIS — observer à distance avec un ami
 
   npm run share                     Construit le jeu, ouvre un tunnel Cloudflare
                                     et démarre le serveur. Partage le lien.
@@ -75,7 +75,7 @@ GOT FIVE! — jouer à distance avec un ami
 Ctrl+C arrête le serveur et ferme le tunnel.
 
 Le binaire cloudflared est cherché dans le PATH, sinon téléchargé une fois dans
-node_modules/.cache/gotfive/. Pour imposer un binaire précis :
+node_modules/.cache/noctalis/. Pour imposer un binaire précis :
   CLOUDFLARED_BIN=/chemin/vers/cloudflared npm run share
 
 Si ton réseau filtre le nom trycloudflare.com, le script le résout par un DNS
@@ -174,7 +174,7 @@ function releaseAsset() {
   return null;
 }
 
-/** Télécharge le binaire officiel dans node_modules/.cache/gotfive/. */
+/** Télécharge le binaire officiel dans node_modules/.cache/noctalis/. */
 async function downloadCloudflared() {
   const asset = releaseAsset();
   if (!asset) {
@@ -556,7 +556,7 @@ async function verifyPublicLink(url) {
       return {
         ok: false,
         kind: 'wrong-service',
-        detail: "quelque chose répond à cette adresse, mais ce n'est pas le serveur GOT FIVE!",
+        detail: "quelque chose répond à cette adresse, mais ce n'est pas le serveur NOCTALIS",
         via: reachable.via,
       };
     }

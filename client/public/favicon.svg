@@ -1,6 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GOT FIVE!">
-  <rect width="64" height="64" rx="14" fill="#6A2BAE" />
-  <circle cx="32" cy="32" r="22" fill="#FFF4E2" />
-  <text x="32" y="43" font-family="Verdana, sans-serif" font-size="30" font-weight="bold"
-        text-anchor="middle" fill="#C2158A">5</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NOCTALIS">
+  <!-- Disque de nuit -->
+  <defs>
+    <radialGradient id="sky" cx="38%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#2a3568" />
+      <stop offset="100%" stop-color="#0b1022" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#sky)" />
+  <!-- Lignes de constellation -->
+  <path d="M17 41 L26 24 L39 32 L47 19 M26 24 L34 45"
+        fill="none" stroke="#8aa2ff" stroke-width="1.6" stroke-linecap="round" opacity="0.7" />
+  <!-- Les cinq etoiles -->
+  <g fill="#f4f7ff">
+    <circle cx="17" cy="41" r="2.6" />
+    <circle cx="26" cy="24" r="3.4" />
+    <circle cx="39" cy="32" r="2.6" />
+    <circle cx="47" cy="19" r="2.2" />
+    <circle cx="34" cy="45" r="3" />
+  </g>
+  <!-- Eclat de l'etoile principale -->
+  <path d="M26 17.5 L27.1 22.9 L32.5 24 L27.1 25.1 L26 30.5 L24.9 25.1 L19.5 24 L24.9 22.9 Z"
+        fill="#ffc94a" />
 </svg>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { COLOR_ORDER, SHEET_GRID, TILE_COUNT } from '@gotfive/shared';
+import { COLOR_ORDER, SHEET_GRID, TILE_COUNT } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { IconButton } from '../../components/ui/IconButton.js';
@@ -14,21 +14,21 @@ export interface DeductionSheetProps {
   revealedNumbers: number[];
   /** Fermeture (panneau lateral sur desktop, plein ecran sur mobile). */
   onClose?: () => void;
-  /** Propose de reporter les 5 hypotheses dans la tentative GOT FIVE!. */
-  onUseForGotFive?: () => void;
+  /** Propose de reporter les 5 hypotheses dans l'annonce. */
+  onUseForAnnounce?: () => void;
   fullscreen?: boolean;
 }
 
 /**
  * Fiche de deduction : reproduction du principe de la fiche officielle.
  * 5 cases d'hypotheses, fleche croissante, puis la grille 1-60 en 5 lignes de
- * couleur et 12 colonnes. Tout est prive et persistant localement.
+ * constellation et 12 colonnes. Tout est prive et persistant localement.
  */
 export function DeductionSheet({
   sheet,
   revealedNumbers,
   onClose,
-  onUseForGotFive,
+  onUseForAnnounce,
   fullscreen = false,
 }: DeductionSheetProps): JSX.Element {
   const { t, color: colorName } = useI18n();
@@ -94,9 +94,9 @@ export function DeductionSheet({
           <span className="badge badge--muted" data-testid="crossed-count">
             {t('sheet.crossedCount', { count: sheet.crossedCount, total: TILE_COUNT })}
           </span>
-          {onUseForGotFive ? (
-            <Button size="sm" variant="gold" onClick={onUseForGotFive}>
-              {t('sheet.useForGotFive')}
+          {onUseForAnnounce ? (
+            <Button size="sm" variant="gold" onClick={onUseForAnnounce}>
+              {t('sheet.useForAnnounce')}
             </Button>
           ) : null}
           <Button

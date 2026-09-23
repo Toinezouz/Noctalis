@@ -1,4 +1,4 @@
-import type { ClassifyResult, CompareResult, Tile as TileData, TileColor } from '@gotfive/shared';
+import type { ClassifyResult, CompareResult, Tile as TileData, TileColor } from '@noctalis/shared';
 import { Paravent } from './Paravent.js';
 import { Rack } from './Rack.js';
 
@@ -15,8 +15,8 @@ export interface PlayerRackProps {
 }
 
 /**
- * Mon support : mes 5 tuiles restent face cachee (leur numero n'existe pas
- * cote client), entourees des 6 encoches et des tuiles comparees.
+ * Mon support : mes 5 etoiles restent face cachee (leur numero n'existe pas
+ * cote client), entourees des 6 encoches et des etoiles jaugees.
  */
 export function PlayerRack({
   name,

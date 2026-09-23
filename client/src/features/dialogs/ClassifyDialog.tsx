@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getTileByNumber } from '@gotfive/shared';
+import { getTileByNumber } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
@@ -17,7 +17,7 @@ export interface ClassifyDialogProps {
 }
 
 /**
- * Reponse a CLASSER. Le joueur designe l'encoche ; le serveur calcule et
+ * Reponse a SITUER. Le joueur designe l'encoche ; le serveur calcule et
  * applique de toute facon la position exacte.
  */
 export function ClassifyDialog({

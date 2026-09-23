@@ -9,7 +9,7 @@ import {
   validateNumberList,
   validateRoomCode,
   validateTileNumber,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 
 describe('validation et nettoyage des entrees', () => {
   it('nettoie les pseudos', () => {

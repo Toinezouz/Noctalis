@@ -1,18 +1,18 @@
-import { getTileByNumber } from '@gotfive/shared';
+import { getTileByNumber } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 
 export interface DeductionCellProps {
-  /** Seule donnee necessaire : le numero. Couleur et points viennent de la
+  /** Seule donnee necessaire : le numero. Constellation et eclats viennent de la
    * source de verite partagee (aucune valeur codee en dur ici). */
   number: number;
   crossed: boolean;
   onToggle: (n: number) => void;
-  /** La tuile est-elle deja visible au centre de la table ? */
+  /** L'etoile est-elle deja visible au centre de la table ? */
   revealed?: boolean;
 }
 
 /**
- * Une case de la fiche : fond colore, gros numero, points sous le numero,
+ * Une case de la fiche : fond colore, gros numero, eclats sous le numero,
  * et, si elle est barree, une croix au feutre volontairement irreguliere.
  */
 export function DeductionCell({

@@ -20,7 +20,7 @@ export interface CreateServerOptions {
   env?: string;
 }
 
-export interface GotFiveServer {
+export interface NoctalisServer {
   httpServer: HttpServer;
   io: GameServer;
   rooms: RoomManager;
@@ -28,7 +28,7 @@ export interface GotFiveServer {
   close: () => Promise<void>;
 }
 
-export function createGotFiveServer(options: CreateServerOptions = {}): GotFiveServer {
+export function createNoctalisServer(options: CreateServerOptions = {}): NoctalisServer {
   const env = options.env ?? process.env['NODE_ENV'] ?? 'development';
   const origins = options.origins ?? true;
   const strictLeakCheck = options.strictLeakCheck ?? env !== 'production';

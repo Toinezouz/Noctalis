@@ -7,6 +7,8 @@ import { HowToPlay } from '../features/room/HowToPlay.js';
 import { Onboarding } from '../features/room/Onboarding.js';
 import { GameTable } from '../features/game/GameTable.js';
 import { StartRoulette } from '../features/game/StartRoulette.js';
+import { AboutDialog } from '../features/room/AboutDialog.js';
+import { SiteFooter } from '../components/ui/SiteFooter.js';
 import { loadPreferences, savePreferences } from '../lib/storage.js';
 import { setSoundEnabled } from '../lib/audio.js';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
@@ -35,6 +37,7 @@ export function App(): JSX.Element {
   const { t } = useI18n();
   const [prefs, setPrefs] = useState(() => loadPreferences());
   const [helpOpen, setHelpOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   /**
    * Le tutoriel est *demande* a la premiere partie, mais il ne s'affiche que
    * lorsque rien de plus urgent n'occupe l'ecran : l'annonce du tirage au sort
@@ -130,6 +133,22 @@ export function App(): JSX.Element {
           onDone={dismissStartingDraw}
         />
       ) : null}
+
+      {/* Pied de page : hors partie seulement, pour ne rien encombrer. */}
+      {!inGame ? (
+        <SiteFooter
+          onOpenAbout={() => {
+            setAboutOpen(true);
+          }}
+        />
+      ) : null}
+
+      <AboutDialog
+        open={aboutOpen}
+        onClose={() => {
+          setAboutOpen(false);
+        }}
+      />
 
       <HowToPlay
         open={helpOpen}

@@ -80,20 +80,20 @@ export function getOpponent(state: GameState, playerId: string): PlayerState | u
 }
 
 /**
- * La tuile est-elle disponible dans la zone commune ?
- * Une tuile deja utilisee pour un indice a rejoint un support : elle n'est
+ * L'etoile est-elle disponible dans la releve commun ?
+ * Une etoile deja utilisee pour un indice a rejoint un support : elle n'est
  * plus choisissable.
  */
 export function isPublicTile(state: GameState, tileNumber: number): boolean {
   return state.publicTiles.some((t) => t.tile.number === tileNumber && !t.used);
 }
 
-/** Tuiles encore disponibles au centre. */
+/** Etoiles encore disponibles au centre. */
 export function availablePublicTiles(state: GameState): RevealedTile[] {
   return state.publicTiles.filter((t) => !t.used);
 }
 
-/** Marque une tuile comme consommee : elle quitte la zone commune. */
+/** Marque une etoile comme consommee : elle quitte la releve commun. */
 function consumePublicTile(state: GameState, tileNumber: number): void {
   const entry = state.publicTiles.find((t) => t.tile.number === tileNumber);
   if (entry) {
@@ -102,18 +102,18 @@ function consumePublicTile(state: GameState, tileNumber: number): void {
 }
 
 /**
- * Cree une partie complete : melange, distribution des 5 tuiles secretes
- * (une par couleur, triees par ordre croissant), mise en place des 5 tuiles
- * publiques initiales (une par couleur) et tirage au sort du joueur qui ouvre
+ * Cree une partie complete : melange, distribution des 5 etoiles secretes
+ * (une par constellation, triees par ordre croissant), mise en place des 5 etoiles
+ * publiques initiales (une par constellation) et tirage au sort du joueur qui ouvre
  * la partie.
  */
 export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
   if (seeds.length !== 2) {
-    throw new RangeError('Cette version de GOT FIVE! se joue exactement a 2 joueurs.');
+    throw new RangeError('NOCTALIS se joue exactement a 2 observateurs.');
   }
 
   const deck = shuffleDeck(createDeck(), rng);
-  /** Pioche par couleur : on retire les tuiles au fur et a mesure. */
+  /** Pioche par constellation : on retire les etoiles au fur et a mesure. */
   const byColor = new Map<TileColor, number[]>();
   for (const color of COLOR_ORDER) {
     byColor.set(
@@ -142,12 +142,12 @@ export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
     eliminated: false,
   }));
 
-  // 1 tuile de chaque couleur par joueur, puis tri croissant.
+  // 1 etoile de chaque constellation par joueur, puis tri croissant.
   for (const player of players) {
     player.secret = COLOR_ORDER.map((color) => takeColor(color)).sort((a, b) => a - b);
   }
 
-  // 5 tuiles publiques initiales : une de chaque couleur.
+  // 5 etoiles publiques initiales : une de chaque constellation.
   const publicNumbers = COLOR_ORDER.map((color) => takeColor(color));
 
   // Qui commence ? Tirage au sort, exactement comme on tire a la courte paille
@@ -192,7 +192,7 @@ export function createGame(seeds: readonly PlayerSeed[], rng: Rng): GameState {
   return state;
 }
 
-/** Tire au hasard une tuile encore disponible d'une couleur donnee. */
+/** Tire au hasard une etoile encore disponible d'une constellation donnee. */
 export function drawTileByColor(state: GameState, color: TileColor, rng: Rng): number | null {
   const pool = reserveOfColor(state.reserve, color);
   if (pool.length === 0) {
@@ -212,7 +212,7 @@ function guardActive(state: GameState, playerId: string): EngineResult | null {
     return engineError('PLAYER_NOT_FOUND', "Tu n'es pas dans cette partie.");
   }
   if (player.eliminated) {
-    return engineError('PLAYER_ELIMINATED', 'Tu as deja utilise ta tentative GOT FIVE!.');
+    return engineError('PLAYER_ELIMINATED', 'Tu as deja fait ton annonce.');
   }
   if (state.activePlayerId !== playerId) {
     return engineError('NOT_YOUR_TURN', "Ce n'est pas ton tour.");
@@ -220,7 +220,7 @@ function guardActive(state: GameState, playerId: string): EngineResult | null {
   return null;
 }
 
-/** PHASE 1 du tour : reveler une tuile de la couleur choisie. */
+/** PHASE 1 du tour : reveler une etoile de la constellation choisie. */
 export function revealTile(
   state: GameState,
   playerId: string,
@@ -241,7 +241,7 @@ export function revealTile(
   if (number === null) {
     return engineError(
       'COLOR_EXHAUSTED',
-      `Il ne reste plus aucune tuile ${COLOR_LABELS[color]} dans la reserve.`,
+      `La constellation ${COLOR_LABELS[color]} n'a plus aucune etoile au ciel.`,
     );
   }
 
@@ -267,7 +267,7 @@ export function revealTile(
   return { ok: true, events: [{ type: 'tile-revealed', tile, byPlayerId: playerId }] };
 }
 
-/** PHASE 2a : demander a l'adversaire de CLASSER une tuile publique. */
+/** PHASE 2a : demander a l'adversaire de SITUER une etoile publique. */
 export function requestClassify(
   state: GameState,
   playerId: string,
@@ -294,7 +294,7 @@ export function requestClassify(
     askerId: playerId,
     responderId: opponent.id,
   };
-  // La tuile quitte le centre des qu'elle est choisie : elle rejoint le
+  // L'etoile quitte le centre des qu'elle est choisie : elle rejoint le
   // support du demandeur et ne peut plus servir a un autre indice.
   consumePublicTile(state, tileNumber);
   state.phase = 'WAITING_FOR_CLASSIFY';
@@ -311,7 +311,7 @@ export function requestClassify(
   return { ok: true, events: [{ type: 'hint-requested', hint: state.pendingHint }] };
 }
 
-/** PHASE 2a (reponse) : l'adversaire classe la tuile. Le serveur tranche. */
+/** PHASE 2a (reponse) : l'adversaire situe l'etoile. Le serveur tranche. */
 export function submitClassify(state: GameState, playerId: string, slot: number): EngineResult {
   if (state.phase !== 'WAITING_FOR_CLASSIFY' || !state.pendingHint) {
     return engineError('WRONG_PHASE', 'Aucune demande CLASSER en cours.');
@@ -365,7 +365,7 @@ export function submitClassify(state: GameState, playerId: string, slot: number)
   return { ok: true, events };
 }
 
-/** PHASE 2b : demander une COMPARAISON de points avec l'une de mes positions. */
+/** PHASE 2b : demander une COMPARAISON de eclats avec l'une de mes positions. */
 export function requestCompare(
   state: GameState,
   playerId: string,
@@ -418,8 +418,8 @@ export function requestCompare(
 }
 
 /**
- * Reponse veritable a une demande COMPARER, calculee par le serveur.
- * Renvoie `null` si aucune demande COMPARER n'est en cours.
+ * Reponse veritable a une demande JAUGER, calculee par le serveur.
+ * Renvoie `null` si aucune demande JAUGER n'est en cours.
  */
 export function getCompareTruth(state: GameState): boolean | null {
   const hint = state.pendingHint;
@@ -566,7 +566,7 @@ export function forfeit(state: GameState, playerId: string): EngineResult {
   return { ok: true, events: finishGame(state, opponent?.id ?? null, 'forfeit') };
 }
 
-/** Tentative GOT FIVE! : possible a tout moment, une seule fois par joueur. */
+/** Annonce CONSTELLATION : possible a tout moment, une seule fois par joueur. */
 export function submitGuess(
   state: GameState,
   playerId: string,
@@ -580,7 +580,7 @@ export function submitGuess(
     return engineError('PLAYER_NOT_FOUND', "Tu n'es pas dans cette partie.");
   }
   if (player.guessUsed) {
-    return engineError('GUESS_ALREADY_USED', 'Tu as deja utilise ta tentative GOT FIVE!.');
+    return engineError('GUESS_ALREADY_USED', 'Tu as deja fait ton annonce.');
   }
   const shape = validateGuessShape(numbers);
   if (!shape.ok) {
@@ -602,7 +602,7 @@ export function submitGuess(
   const events: GameEvent[] = [{ type: 'guess-result', playerId, numbers: shape.numbers, correct }];
 
   if (correct) {
-    events.push(...finishGame(state, playerId, 'got-five'));
+    events.push(...finishGame(state, playerId, 'constellation'));
     return { ok: true, events };
   }
 

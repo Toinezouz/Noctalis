@@ -107,30 +107,56 @@ textarea {
 
 /* --- Titre de marque ------------------------------------------------------ */
 
+/* Marque : le disque de nuit, puis le nom grave. Pas d'ombre portee : on
+   cherche la planche d'atlas, pas l'affiche. */
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  margin: 0;
   font-family: var(--font-title);
   font-weight: 600;
-  line-height: 0.92;
-  color: var(--c-violet);
+  line-height: 1;
+  color: var(--c-ink);
   text-transform: uppercase;
-  letter-spacing: -0.02em;
-  text-shadow:
-    0 3px 0 var(--c-magenta),
-    0 6px 0 rgba(var(--shadow-rgb), 0.22);
+  letter-spacing: 0.14em;
+}
+
+.brand__glyph {
+  width: 1.5em;
+  height: 1.5em;
+  flex: none;
+}
+
+.brand__disc {
+  fill: var(--c-violet-dark);
+}
+
+.brand__lines {
+  stroke: var(--c-violet);
+  stroke-width: 2.4;
+}
+
+.brand__stars {
+  fill: #f4f7ff;
+}
+
+.brand__nova {
+  fill: var(--c-gold);
+}
+
+.brand__word {
+  /* Le nom respire : c'est lui qui porte l'identite. */
+  padding-top: 0.06em;
 }
 
 .brand--xl {
-  font-size: var(--fs-3xl);
+  font-size: calc(var(--fs-3xl) * 0.66);
 }
 
 .brand--sm {
   font-size: var(--fs-lg);
-  text-shadow: 0 2px 0 var(--c-magenta);
-}
-
-.brand em {
-  font-style: normal;
-  color: var(--c-magenta);
+  letter-spacing: 0.1em;
 }
 
 /* --- Animations ----------------------------------------------------------- */

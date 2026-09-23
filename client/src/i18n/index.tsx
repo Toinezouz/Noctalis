@@ -7,8 +7,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { COLOR_LABELS } from '@gotfive/shared';
-import type { TileColor } from '@gotfive/shared';
+import { COLOR_LABELS } from '@noctalis/shared';
+import type { TileColor } from '@noctalis/shared';
 import { fr, type MessageKey, type Messages } from './fr.js';
 import { es } from './es.js';
 
@@ -28,11 +28,11 @@ export interface I18nApi {
   setLang: (lang: Language) => void;
   /** Traduit une cle, en remplacant les variables {…}. */
   t: (key: MessageKey, params?: TranslateParams) => string;
-  /** Nom localise d'une couleur de tuile. */
+  /** Nom localise d'une constellation de etoile. */
   color: (color: TileColor) => string;
-  /** Libelle localise d'une des 6 encoches de CLASSER. */
+  /** Libelle localise d'une des 6 encoches de SITUER. */
   slot: (slot: number) => string;
-  /** "1 point" / "2 points" dans la langue courante. */
+  /** "1 point" / "2 eclats" dans la langue courante. */
   points: (count: number) => string;
 }
 

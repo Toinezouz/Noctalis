@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { LogEntry, LogKind } from '@gotfive/shared';
+import type { LogEntry, LogKind } from '@noctalis/shared';
 import { useI18n, type MessageKey } from '../../i18n/index.js';
 
 const ICONS: Record<LogKind, string> = {

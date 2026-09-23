@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SECRET_TILE_COUNT, TILE_COUNT } from '@gotfive/shared';
+import { SECRET_TILE_COUNT, TILE_COUNT } from '@noctalis/shared';
 import {
   clearDeduction,
   deductionKey,
@@ -20,7 +20,7 @@ export interface DeductionApi {
   /** Efface tout : numeros barres et hypotheses. */
   reset: () => void;
   crossedCount: number;
-  /** Les hypotheses forment-elles une proposition GOT FIVE! valide ? */
+  /** Les hypotheses forment-elles une annonce valide ? */
   guessNumbers: number[] | null;
 }
 

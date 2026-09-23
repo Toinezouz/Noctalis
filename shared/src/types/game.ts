@@ -9,33 +9,33 @@ export type GamePhase =
   | 'WAITING_FOR_PLAYER'
   /** Les deux joueurs sont la, la partie peut etre lancee. */
   | 'LOBBY_READY'
-  /** Distribution des tuiles (etat transitoire, cote serveur uniquement). */
+  /** Distribution des etoiles (etat transitoire, cote serveur uniquement). */
   | 'SETUP'
-  /** Le joueur actif doit reveler une tuile en choisissant une couleur. */
+  /** Le joueur actif doit reveler une etoile en choisissant une constellation. */
   | 'TURN_REVEAL'
-  /** Le joueur actif doit demander un indice (CLASSER ou COMPARER). */
+  /** Le joueur actif doit demander un indice (SITUER ou JAUGER). */
   | 'TURN_HINT'
-  /** L'adversaire doit classer la tuile choisie. */
+  /** L'adversaire doit situer l'etoile choisie. */
   | 'WAITING_FOR_CLASSIFY'
-  /** L'adversaire doit confirmer la reponse de la comparaison. */
+  /** L'adversaire doit confirmer la reponse de la mesure. */
   | 'WAITING_FOR_COMPARE'
   /** Partie terminee. */
   | 'GAME_OVER';
 
 export type HintType = 'classify' | 'compare';
 
-/** Demande CLASSER en attente de reponse. */
+/** Demande SITUER en attente de reponse. */
 export interface ClassifyHint {
   type: 'classify';
-  /** Tuile publique choisie par le demandeur. */
+  /** Etoile publique choisie par le demandeur. */
   tileNumber: number;
-  /** Joueur dont on classe les tuiles secretes (le joueur actif). */
+  /** Joueur dont on situe les etoiles secretes (le joueur actif). */
   askerId: string;
   /** Joueur qui doit repondre (il voit les vrais numeros du demandeur). */
   responderId: string;
 }
 
-/** Demande COMPARER en attente de reponse. */
+/** Demande JAUGER en attente de reponse. */
 export interface CompareHint {
   type: 'compare';
   tileNumber: number;
@@ -47,10 +47,10 @@ export interface CompareHint {
 
 export type PendingHint = ClassifyHint | CompareHint;
 
-/** Resultat d'un CLASSER : la tuile se range dans l'une des 6 encoches. */
+/** Resultat d'un SITUER : l'etoile se range dans l'une des 6 encoches. */
 export interface ClassifyResult {
   id: string;
-  /** Joueur dont le support recoit la tuile classee. */
+  /** Joueur dont le support recoit l'etoile situee. */
   ownerId: string;
   tileNumber: number;
   /** Encoche 0 (avant la 1re) a 5 (apres la 5e). */
@@ -58,19 +58,19 @@ export interface ClassifyResult {
   turn: number;
 }
 
-/** Resultat d'un COMPARER : OUI (meme nombre de points) ou NON. */
+/** Resultat d'un JAUGER : OUI (meme nombre d'eclats) ou NON. */
 export interface CompareResult {
   id: string;
   ownerId: string;
   tileNumber: number;
-  /** Position secrete comparee, 0 a 4. */
+  /** Position secrete jaugee, 0 a 4. */
   position: number;
-  /** `true` = OUI (memes points), `false` = NON. */
+  /** `true` = OUI (memes eclats), `false` = NON. */
   match: boolean;
   turn: number;
 }
 
-/** Une tentative GOT FIVE! (une seule par joueur). */
+/** Une annonce CONSTELLATION (une seule par joueur). */
 export interface GuessRecord {
   playerId: string;
   numbers: number[];
@@ -123,7 +123,7 @@ export interface LogEntry {
   code: LogCode;
   params: LogParams;
   playerId?: string;
-  /** Numero de tuile eventuellement concerne (toujours une tuile publique). */
+  /** Numero de etoile eventuellement concerne (toujours une etoile publique). */
   tileNumber?: number;
 }
 
@@ -149,7 +149,7 @@ export interface GameState {
   activePlayerId: string | null;
   /** Joueur tire au sort pour ouvrir la partie (fixe des la distribution). */
   startingPlayerId: string;
-  /** Numeros de tuiles encore dans la reserve. */
+  /** Numeros de etoiles encore dans le ciel. */
   reserve: number[];
   publicTiles: RevealedTile[];
   pendingHint: PendingHint | null;
@@ -160,7 +160,7 @@ export interface GameState {
   winnerId: string | null;
   /** Numero du tour courant (1 = premier tour). */
   turn: number;
-  /** Une tuile a-t-elle deja ete revelee pendant ce tour ? */
+  /** Une etoile a-t-elle deja ete revelee pendant ce tour ? */
   revealedThisTurn: boolean;
   startedAt: number | null;
   endedAt: number | null;
@@ -174,7 +174,7 @@ export interface PublicPlayer {
   isHost: boolean;
   guessUsed: boolean;
   eliminated: boolean;
-  /** Couleurs des 5 tuiles secretes, dans l'ordre des positions. */
+  /** Constellations des 5 etoiles secretes, dans l'ordre des positions. */
   tileColors: TileColor[];
 }
 
@@ -191,7 +191,7 @@ export interface PublicGameState {
   startingPlayerId: string;
   publicTiles: RevealedTile[];
   reserveCount: number;
-  /** Nombre de tuiles encore disponibles par couleur (info publique). */
+  /** Nombre de etoiles encore disponibles par constellation (info publique). */
   reserveByColor: Record<TileColor, number>;
   pendingHint: PendingHint | null;
   classifications: ClassifyResult[];
@@ -211,7 +211,7 @@ export interface PublicGameState {
 export interface PendingResponse {
   hint: PendingHint;
   /**
-   * Pour COMPARER uniquement : la reponse veritable, calculee par le serveur.
+   * Pour JAUGER uniquement : la reponse veritable, calculee par le serveur.
    * Le repondeur voit de toute facon les vrais numeros du demandeur : cette
    * valeur ne lui apprend rien, elle empeche simplement de repondre faux.
    */
@@ -225,9 +225,9 @@ export interface PendingResponse {
  */
 export interface PrivatePlayerState {
   playerId: string;
-  /** Mes tuiles : couleur + position, jamais le numero ni les points. */
+  /** Mes etoiles : constellation + position, jamais le numero ni les eclats. */
   myTiles: SecretTileView[];
-  /** Les tuiles de l'adversaire, face visible, triees par numero croissant. */
+  /** Les etoiles de l'adversaire, face visible, triees par numero croissant. */
   opponentTiles: Tile[];
   opponentId: string | null;
   guessUsed: boolean;

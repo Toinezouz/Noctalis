@@ -1,4 +1,4 @@
-import { getTileByNumber } from '@gotfive/shared';
+import { getTileByNumber } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
@@ -18,7 +18,7 @@ export interface CompareDialogProps {
 }
 
 /**
- * Reponse a COMPARER. L'interface ne propose que la reponse juste : le
+ * Reponse a JAUGER. L'interface ne propose que la reponse juste : le
  * repondeur ne peut pas mentir, et le serveur recalcule de toute facon.
  */
 export function CompareDialog({

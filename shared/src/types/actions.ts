@@ -10,7 +10,7 @@ export type GameAction =
   | { type: 'submit-compare'; answer: boolean }
   | { type: 'guess'; numbers: number[] };
 
-export type GameOverReason = 'got-five' | 'all-eliminated' | 'reserve-empty' | 'forfeit';
+export type GameOverReason = 'constellation' | 'all-eliminated' | 'reserve-empty' | 'forfeit';
 
 /** Evenement produit par le moteur, diffuse aux clients (animations, log). */
 export type GameEvent =

@@ -26,7 +26,7 @@ test.describe('Fiche de deduction', () => {
       Array.from({ length: 60 }, (_, i) => i + 1),
     );
 
-    // Couleurs et points : la fiche lit la meme source de verite que les tuiles.
+    // Constellations et eclats : la carte lit la meme source que les etoiles.
     const samples: [number, string, number][] = [
       [1, 'green', 1],
       [2, 'pink', 1],
@@ -82,7 +82,7 @@ test.describe('Fiche de deduction', () => {
 
     // La fiche survit aussi a un rechargement de page (reconnexion).
     await alice.reload();
-    await expect(alice.getByTestId('got-five-button')).toBeVisible();
+    await expect(alice.getByTestId('announce-button')).toBeVisible();
     await alice.getByTestId('open-sheet').click();
     await expect(alice.getByTestId('sheet-cell-17')).toHaveAttribute('aria-pressed', 'true');
     await expect(alice.getByTestId('guess-input-1')).toHaveValue('24');
@@ -98,11 +98,11 @@ test.describe('Fiche de deduction', () => {
     }
   });
 
-  test('la fiche ne barre jamais automatiquement une tuile revelee', async ({ browser }) => {
+  test('la carte ne barre jamais automatiquement une etoile revelee', async ({ browser }) => {
     const { alice } = await startGame(browser, ['Anna', 'Boris']);
     await alice.getByTestId('open-sheet').click();
 
-    // Les 5 tuiles publiques initiales portent un repere, mais aucune n'est barree.
+    // Les 5 etoiles initiales du releve portent un repere, aucune n'est barree.
     const revealed = alice.locator('.sheet-cell.is-revealed');
     await expect(revealed).toHaveCount(5);
     await expect(alice.locator('.sheet-cell.is-crossed')).toHaveCount(0);
@@ -114,13 +114,13 @@ test.describe('Fiche de deduction', () => {
     await alice.getByTestId('open-sheet').click();
 
     const cell = alice.getByTestId('sheet-cell-37');
-    // Idem : la tuile 37 peut faire partie des 5 tuiles publiques initiales,
+    // Idem : l'etoile 37 peut faire partie des 5 etoiles initiales du releve,
     // ce qui ajoute une precision a la fin du libelle.
-    await expect(cell).toHaveAccessibleName(/^Numéro 37, rose, 2 points, non éliminé/);
+    await expect(cell).toHaveAccessibleName(/^Numéro 37, Aurore, 2 éclats, non éliminé/);
     await cell.focus();
     await expect(cell).toBeFocused();
     await alice.keyboard.press('Enter');
-    await expect(cell).toHaveAccessibleName(/^Numéro 37, rose, 2 points, éliminé/);
+    await expect(cell).toHaveAccessibleName(/^Numéro 37, Aurore, 2 éclats, éliminé/);
     await expect(cell).toBeFocused();
     await alice.keyboard.press('Enter');
     await expect(cell).toHaveAccessibleName(/non éliminé/);

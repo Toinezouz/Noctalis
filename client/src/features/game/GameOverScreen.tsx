@@ -1,7 +1,8 @@
-import { getTileByNumber, type PublicGameState } from '@gotfive/shared';
+import { getTileByNumber, type PublicGameState } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Tile } from '../../components/game/Tile.js';
+import { BrandMark } from '../../components/ui/BrandMark.js';
 
 export interface GameOverScreenProps {
   state: PublicGameState;
@@ -12,7 +13,7 @@ export interface GameOverScreenProps {
   opponentPresent: boolean;
 }
 
-/** Ecran de fin : vainqueur, revelation des 10 tuiles secretes, rejouer. */
+/** Ecran de fin : vainqueur, revelation des 10 etoiles secretes, rejouer. */
 export function GameOverScreen({
   state,
   myId,
@@ -47,9 +48,7 @@ export function GameOverScreen({
       ) : null}
 
       <div className="game-over__card panel">
-        <p className="brand brand--xl game-over__title">
-          GOT <em>FIVE!</em>
-        </p>
+        <BrandMark size="xl" as="p" className="game-over__title" />
         <p className="game-over__result" data-testid="game-over-result">
           {winner
             ? iWon

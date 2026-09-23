@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/index.js';
 import { IconButton } from '../ui/IconButton.js';
 import { Button } from '../ui/Button.js';
 import { LanguageSwitch } from '../ui/LanguageSwitch.js';
+import { BrandMark } from '../ui/BrandMark.js';
 import { ThemeSwitch } from '../ui/ThemeSwitch.js';
 import type { ThemePreference } from '../../lib/theme.js';
 
@@ -14,14 +15,14 @@ export interface GameHeaderProps {
   onOpenHelp: () => void;
   onOpenSheet: () => void;
   onLeave: () => void;
-  /** Bouton GOT FIVE! : toujours accessible pendant la partie. */
-  onGotFive?: () => void;
-  gotFiveDisabled?: boolean;
+  /** Bouton d'annonce : toujours accessible pendant l'observation. */
+  onAnnounce?: () => void;
+  announceDisabled?: boolean;
   showSheetButton: boolean;
   online: boolean;
 }
 
-/** Bandeau de jeu : identite, code de partie, outils, GOT FIVE!. */
+/** Bandeau de jeu : marque, code d'observation, outils, annonce. */
 export function GameHeader({
   roomCode,
   soundEnabled,
@@ -31,8 +32,8 @@ export function GameHeader({
   onOpenHelp,
   onOpenSheet,
   onLeave,
-  onGotFive,
-  gotFiveDisabled = false,
+  onAnnounce,
+  announceDisabled = false,
   showSheetButton,
   online,
 }: GameHeaderProps): JSX.Element {
@@ -41,9 +42,7 @@ export function GameHeader({
   return (
     <header className="game-header">
       <div className="game-header__brand">
-        <span className="brand brand--sm">
-          GOT <em>FIVE!</em>
-        </span>
+        <BrandMark size="sm" />
         <span className="game-header__code">
           <span className="visually-hidden">{t('header.roomCode')}</span>
           {roomCode}
@@ -54,14 +53,14 @@ export function GameHeader({
       </div>
 
       <div className="game-header__tools">
-        {onGotFive ? (
+        {onAnnounce ? (
           <Button
             variant="gold"
-            onClick={onGotFive}
-            disabled={gotFiveDisabled}
-            data-testid="got-five-button"
+            onClick={onAnnounce}
+            disabled={announceDisabled}
+            data-testid="announce-button"
           >
-            🖐 {t('header.gotFive')}
+            🖐 {t('header.announce')}
           </Button>
         ) : null}
         {showSheetButton ? (

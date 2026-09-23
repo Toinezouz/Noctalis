@@ -30,8 +30,8 @@ function toPublicPlayer(player: PlayerState): PublicPlayer {
     isHost: player.isHost,
     guessUsed: player.guessUsed,
     eliminated: player.eliminated,
-    // Seules les couleurs sont publiques : elles sont visibles sur le dos des
-    // tuiles posees sur le support, exactement comme sur la table physique.
+    // Seules les constellations sont publiques : elles sont visibles sur le dos des
+    // etoiles posees sur le support, exactement comme sur la table physique.
     tileColors: player.secret.map((n) => getTileByNumber(n).color),
   };
 }
@@ -69,9 +69,9 @@ export function toPublicGameState(state: GameState): PublicGameState {
 
 /**
  * Vue privee d'un joueur.
- * - Ses propres tuiles : couleur + position uniquement (ni numero, ni points,
- *   car les points reduiraient le champ des possibles a 12 numeros sur 60).
- * - Les tuiles de l'adversaire : face visible, avec numero et points.
+ * - Ses propres etoiles : constellation + position uniquement (ni numero, ni eclats,
+ *   car les eclats reduiraient le champ des possibles a 12 numeros sur 60).
+ * - Les etoiles de l'adversaire : face visible, avec numero et eclats.
  */
 export function toPlayerPrivateState(
   state: GameState,
@@ -115,13 +115,13 @@ export function toPlayerPrivateState(
  * ---------------------------------------------------------------------------
  * Parcourt une charge utile destinee a `playerId` et cherche un de ses numeros
  * secrets. Le parcours est conscient des cles : les champs dont le domaine
- * numerique n'a rien a voir avec un numero de tuile (`position` 0-4, `points`
+ * numerique n'a rien a voir avec un numero de etoile (`position` 0-4, `eclats`
  * 1-3, `slot` 0-5, compteurs, horodatages...) sont ignores, sans quoi un
  * secret comme "3" declencherait une fausse alerte a chaque position.
  *
  * Les chaines de caracteres (textes de l'historique) sont egalement inspectees :
- * seuls y sont tolerés les nombres deja publics (tuiles revelees, numero de
- * tour, ordinaux des 6 encoches, tentatives GOT FIVE! annoncees a voix haute).
+ * seuls y sont tolerés les nombres deja publics (etoiles revelees, numero de
+ * tour, ordinaux des 6 encoches, annonces faites a voix haute).
  *
  * Utilise par les tests et, en developpement, par le serveur avant chaque
  * emission.
@@ -133,7 +133,7 @@ export interface SecretLeak {
   path: string;
 }
 
-/** Cles dont les valeurs numeriques ne sont jamais des numeros de tuile. */
+/** Cles dont les valeurs numeriques ne sont jamais des numeros de etoile. */
 const NON_TILE_NUMBER_KEYS = new Set([
   'position',
   'points',
@@ -161,7 +161,7 @@ const IDENTIFIER_KEYS = new Set(['id', 'code', 'token', 'name']);
 
 /**
  * Une cle designe-t-elle un identifiant ou un pseudo ? Les chiffres qu'ils
- * contiennent ("p_sszHPTWCDh7i", "Bob37") ne sont jamais des numeros de tuile.
+ * contiennent ("p_sszHPTWCDh7i", "Bob37") ne sont jamais des numeros de etoile.
  */
 function isIdentifierKey(key: string): boolean {
   return IDENTIFIER_KEYS.has(key) || key.endsWith('Id') || key.endsWith('By');
@@ -185,8 +185,8 @@ export function findSecretLeak(
 
   /**
    * Nombres devenus legitimement publics :
-   * - les tuiles revelees au centre (jamais des tuiles secretes) ;
-   * - les tentatives GOT FIVE!, annoncees a voix haute par leur auteur ;
+   * - les etoiles revelees au centre (jamais des etoiles secretes) ;
+   * - les annonces CONSTELLATION, faites a voix haute par leur auteur ;
    * - l'integralite des secrets une fois la partie terminee (revelation finale).
    */
   const publiclyKnown = new Set<number>();

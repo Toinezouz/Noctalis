@@ -54,8 +54,8 @@ test.describe('Protection des informations secretes', () => {
     await bobPage.getByTestId('code-input').fill(code);
     await bobPage.getByTestId('submit-room').click();
     await alicePage.getByTestId('start-game').click();
-    await expect(alicePage.getByTestId('got-five-button')).toBeVisible();
-    await expect(bobPage.getByTestId('got-five-button')).toBeVisible();
+    await expect(alicePage.getByTestId('announce-button')).toBeVisible();
+    await expect(bobPage.getByTestId('announce-button')).toBeVisible();
 
     const aliceSecrets = await readOpponentTiles(bobPage);
     const bobSecrets = await readOpponentTiles(alicePage);

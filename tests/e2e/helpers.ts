@@ -82,8 +82,8 @@ export async function startGame(
   await expect(bob.getByTestId('waiting-host')).toBeVisible();
 
   await alice.getByTestId('start-game').click();
-  await expect(alice.getByTestId('got-five-button')).toBeVisible();
-  await expect(bob.getByTestId('got-five-button')).toBeVisible();
+  await expect(alice.getByTestId('announce-button')).toBeVisible();
+  await expect(bob.getByTestId('announce-button')).toBeVisible();
   if (!options.keepDraw) {
     // L'annonce du tirage au sort passe avant le tutoriel.
     await dismissRoulette(alice);

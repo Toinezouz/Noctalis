@@ -5,7 +5,7 @@ import {
   type CompareResult,
   type Tile as TileData,
   type TileColor,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
 import { ClassifySlot } from './ClassifySlots.js';
 import { CompareArea } from './CompareArea.js';
@@ -14,24 +14,24 @@ import { TileBack } from './TileBack.js';
 
 export interface RackProps {
   ownerName: string;
-  /** Couleurs des 5 tuiles, dans l'ordre des positions (donnee publique). */
+  /** Constellations des 5 etoiles, dans l'ordre des positions (donnee publique). */
   colors: TileColor[];
   /**
-   * Faces visibles des 5 tuiles. Fournies pour l'adversaire (que je vois) ou
-   * a la revelation finale. `null` pour mes propres tuiles pendant la partie.
+   * Faces visibles des 5 etoiles. Fournies pour l'adversaire (que je vois) ou
+   * a la revelation finale. `null` pour mes propres etoiles pendant la partie.
    */
   faces: TileData[] | null;
   classifications: ClassifyResult[];
   comparisons: CompareResult[];
-  /** Position selectionnee (choix d'une position pour COMPARER). */
+  /** Position selectionnee (choix d'une position pour JAUGER). */
   selectedPosition?: number | null;
   onSelectPosition?: (position: number) => void;
   compact?: boolean;
 }
 
 /**
- * Support de jeu : 5 tuiles encadrees par les 6 encoches de CLASSER, avec la
- * fleche de l'ordre croissant et, sous chaque tuile, les tuiles COMPAREES.
+ * Support de jeu : 5 etoiles encadrees par les 6 encoches de SITUER, avec la
+ * fleche de l'ordre croissant et, sous chaque etoile, les etoiles COMPAREES.
  */
 export function Rack({
   ownerName,
@@ -102,7 +102,7 @@ export function Rack({
   );
 }
 
-/** Convertit une liste de numeros en tuiles completes. */
+/** Convertit une liste de numeros en etoiles completes. */
 export function facesFromNumbers(numbers: number[] | undefined | null): TileData[] | null {
   return numbers ? numbers.map((n) => getTileByNumber(n)) : null;
 }

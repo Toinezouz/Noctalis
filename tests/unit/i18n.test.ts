@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fr } from '../../client/src/i18n/fr.js';
 import { es } from '../../client/src/i18n/es.js';
 import { detectLanguage, interpolate, LANGUAGES } from '../../client/src/i18n/index.js';
-import { COLOR_ORDER, CLASSIFY_SLOT_COUNT } from '@gotfive/shared';
+import { COLOR_ORDER, CLASSIFY_SLOT_COUNT } from '@noctalis/shared';
 
 /** Variables {…} presentes dans un message. */
 function placeholders(text: string): string[] {

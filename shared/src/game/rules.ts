@@ -1,10 +1,10 @@
 import { COLOR_ORDER, SECRET_TILE_COUNT, TILE_COUNT, getTileByNumber } from '../data/tiles.js';
 import type { Tile } from '../types/tiles.js';
 
-/** Nombre d'encoches de la zone CLASSER : avant la 1re ... apres la 5e. */
+/** Nombre d'encoches de la zone SITUER : avant la 1re ... apres la 5e. */
 export const CLASSIFY_SLOT_COUNT = SECRET_TILE_COUNT + 1;
 
-/** Libelles francais des 6 encoches de CLASSER. */
+/** Libelles francais des 6 encoches de SITUER. */
 export const CLASSIFY_SLOT_LABELS: readonly string[] = Object.freeze([
   'Avant la 1re',
   'Entre la 1re et la 2e',
@@ -15,7 +15,7 @@ export const CLASSIFY_SLOT_LABELS: readonly string[] = Object.freeze([
 ]);
 
 /**
- * Position exacte d'une tuile publique parmi 5 numeros secrets tries.
+ * Position exacte d'une etoile publique parmi 5 numeros secrets tries.
  * Renvoie un entier de 0 (avant la 1re) a 5 (apres la 5e).
  */
 export function getClassifyPosition(secret: readonly number[], tileNumber: number): number {
@@ -29,7 +29,7 @@ export function getClassifyPosition(secret: readonly number[], tileNumber: numbe
 }
 
 /**
- * Verifie la reponse d'un joueur a une demande CLASSER.
+ * Verifie la reponse d'un joueur a une demande SITUER.
  * Le serveur reste seul juge : cette fonction sert a savoir si le repondeur
  * s'est trompe (simple retour d'information), pas a fixer le resultat.
  */
@@ -42,12 +42,12 @@ export function validateClassify(
   return { correctSlot, wasCorrect: correctSlot === proposedSlot };
 }
 
-/** COMPARER : seul le nombre de points compte, jamais la couleur. */
+/** JAUGER : seul le nombre d'eclats compte, jamais la constellation. */
 export function comparePoints(a: Tile, b: Tile): boolean {
   return a.points === b.points;
 }
 
-/** COMPARER a partir des numeros. */
+/** JAUGER a partir des numeros. */
 export function comparePointsByNumber(aNumber: number, bNumber: number): boolean {
   return comparePoints(getTileByNumber(aNumber), getTileByNumber(bNumber));
 }
@@ -60,7 +60,7 @@ export type GuessValidation =
   | { ok: false; issue: GuessIssue; reason: string };
 
 /**
- * Valide la *forme* d'une tentative GOT FIVE! : 5 entiers distincts entre 1
+ * Valide la *forme* d'une annonce : 5 entiers distincts entre 1
  * et 60, en ordre strictement croissant (l'ordre du support).
  */
 export function validateGuessShape(numbers: readonly unknown[]): GuessValidation {

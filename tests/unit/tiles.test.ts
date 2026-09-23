@@ -11,7 +11,7 @@ import {
   isValidTileNumber,
   pointsForNumber,
   tilesOfColor,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 
 /** Mapping officiel de la fiche : couleur attendue pour chaque numero. */
 const EXPECTED_COLORS: Record<string, number[]> = {

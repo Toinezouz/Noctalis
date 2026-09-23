@@ -13,7 +13,7 @@ import {
   submitGuess,
   toPlayerPrivateState,
   toPublicGameState,
-} from '@gotfive/shared';
+} from '@noctalis/shared';
 import { gameStartedByAlice } from './gameFixture.js';
 
 /** Partie reproductible dans laquelle Alice ouvre le jeu. */

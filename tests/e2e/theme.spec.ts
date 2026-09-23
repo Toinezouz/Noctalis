@@ -61,9 +61,9 @@ test.describe('Theme clair et sombre', () => {
   test('la barre du navigateur suit aussi le theme', async ({ browser }) => {
     const page = await openHome(browser, 'light');
     const meta = page.locator('meta[name="theme-color"]');
-    await expect(meta).toHaveAttribute('content', /#fff4e2/i);
+    await expect(meta).toHaveAttribute('content', /#f3efe6/i);
     await page.getByTestId('theme-dark').click();
-    await expect(meta).toHaveAttribute('content', /#191029/i);
+    await expect(meta).toHaveAttribute('content', /#0b1022/i);
   });
 
   test('le theme se change aussi en pleine partie, sans la perturber', async ({ browser }) => {
@@ -85,7 +85,7 @@ test.describe('Theme clair et sombre', () => {
     await expect(first.locator('.pool__tiles .tile')).toHaveCount(5);
     const ink = await first.evaluate(() => getComputedStyle(document.body).color);
     expect(brightness(ink)).toBeGreaterThan(0.75);
-    await expect(first.getByTestId('got-five-button')).toBeVisible();
+    await expect(first.getByTestId('announce-button')).toBeVisible();
   });
 
   test('la fiche de deduction reste lisible en sombre', async ({ browser }) => {

@@ -7,14 +7,14 @@ import type {
   PlayerCredentials,
   StatePayload,
   TileColor,
-} from '@gotfive/shared';
-import { createGotFiveServer, type GotFiveServer } from '../../server/src/createServer.js';
+} from '@noctalis/shared';
+import { createNoctalisServer, type NoctalisServer } from '../../server/src/createServer.js';
 
-let server: GotFiveServer;
+let server: NoctalisServer;
 let url = '';
 
 beforeAll(async () => {
-  server = createGotFiveServer({ env: 'test', strictLeakCheck: true });
+  server = createNoctalisServer({ env: 'test', strictLeakCheck: true });
   await new Promise<void>((resolve) => {
     server.httpServer.listen(0, () => {
       resolve();
@@ -430,7 +430,7 @@ describe('multijoueur temps reel', () => {
     closeAll(session);
   });
 
-  it('joue une partie jusqu a la victoire GOT FIVE! et propose une revanche', async () => {
+  it('joue une observation jusqu a la victoire et propose une revanche', async () => {
     const session = await startSession();
     const { alice, bob } = session;
     // Bob voit les vrais numeros d'Alice : on les utilise pour une tentative

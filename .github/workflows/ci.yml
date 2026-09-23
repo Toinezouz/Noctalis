@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Une seule execution par branche : un nouveau push annule la precedente.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Types, style, contrat, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Verifier les types
+        run: npm run typecheck
+
+      - name: Verifier le style
+        run: npm run lint
+
+      - name: Verifier le contrat
+        run: npm run check:contract
+
+      - name: Tests unitaires et d'integration
+        run: npm test
+
+      - name: Construire
+        run: npm run build
+
+  e2e:
+    name: Bout en bout (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: verify
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Jouer les scenarios
+        run: npm run test:e2e
+        env:
+          CI: 'true'
+
+      - name: Conserver le rapport en cas d'echec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

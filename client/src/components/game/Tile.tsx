@@ -1,16 +1,16 @@
-import type { Tile as TileData } from '@gotfive/shared';
+import type { Tile as TileData } from '@noctalis/shared';
 import { useI18n } from '../../i18n/index.js';
-import { Character } from './Character.js';
+import { StarGlyph } from './StarGlyph.js';
 
 export type TileSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export interface TileProps {
   tile: TileData;
   size?: TileSize;
-  /** Tuile inclinee : reponse NON a une comparaison. */
+  /** Etoile inclinee : reponse NON a une mesure. */
   tilted?: boolean;
   selected?: boolean;
-  /** Rend la tuile cliquable (choix d'une tuile publique, par exemple). */
+  /** Rend l'etoile cliquable (choix d'une etoile publique, par exemple). */
   onClick?: () => void;
   disabled?: boolean;
   /** Suffixe ajoute au libelle accessible. */
@@ -20,7 +20,7 @@ export interface TileProps {
   className?: string;
 }
 
-/** Les points, affiches sous le numero, comme sur le materiel physique. */
+/** Les eclats, affiches sous le numero, comme sur le materiel physique. */
 export function TilePoints({ points }: { points: number }): JSX.Element {
   return (
     <span className="tile__points" aria-hidden="true">
@@ -71,7 +71,7 @@ export function Tile({
     <>
       <span className="tile__number">{tile.number}</span>
       <TilePoints points={tile.points} />
-      {size !== 'xs' ? <Character seed={tile.number} color={tile.color} size={size === 'lg' ? 28 : 20} /> : null}
+      {size !== 'xs' ? <StarGlyph seed={tile.number} color={tile.color} size={size === 'lg' ? 28 : 20} /> : null}
       <span className="visually-hidden">{label}</span>
     </>
   );

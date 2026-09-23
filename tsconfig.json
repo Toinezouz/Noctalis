@@ -6,7 +6,7 @@
     "types": ["node"],
     "noEmit": true,
     "paths": {
-      "@gotfive/shared": ["./shared/src/index.ts"]
+      "@noctalis/shared": ["./shared/src/index.ts"]
     }
   },
   "include": ["tests/**/*.ts", "tests/**/*.tsx", "*.config.ts", "eslint.config.js"]

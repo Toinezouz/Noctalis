@@ -447,3 +447,107 @@
   box-shadow: 0 3px 0 var(--c-violet-dark);
 }
 
+
+/* --- Pied de page, soutien et A propos ------------------------------------ */
+/* Discret par construction : le soutien est propose, jamais impose. */
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--c-ink-soft);
+}
+
+.site-footer__name {
+  font-family: var(--font-title);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-footer a,
+.site-footer__about {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.site-footer a:hover,
+.site-footer__about:hover,
+.support-link:hover {
+  color: var(--c-violet);
+}
+
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.support-link--button {
+  align-self: flex-start;
+  padding: 0.55em 1.1em;
+  min-height: 44px;
+  border: 2px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: var(--c-paper);
+  color: var(--c-ink);
+  font-family: var(--font-title);
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--c-cream-shadow);
+}
+
+.support-link--button:hover {
+  transform: translateY(-2px);
+  color: var(--c-violet);
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.about__version {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about__list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-2) var(--sp-4);
+  margin: 0;
+}
+
+.about__list dt {
+  font-weight: 700;
+  color: var(--c-ink-soft);
+}
+
+.about__list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.about__support {
+  margin: 0;
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--c-wash);
+  font-size: var(--fs-sm);
+}

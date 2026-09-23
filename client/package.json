@@ -1,5 +1,5 @@
 {
-  "name": "@gotfive/client",
+  "name": "@noctalis/client",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -12,9 +12,10 @@
   "dependencies": {
     "@fontsource-variable/fredoka": "^5.3.0",
     "@fontsource-variable/nunito": "^5.3.0",
-    "@gotfive/shared": "*",
+    "@noctalis/shared": "*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "socket.io-client": "^4.8.0"
-  }
+  },
+  "license": "AGPL-3.0-or-later"
 }

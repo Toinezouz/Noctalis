@@ -15,7 +15,7 @@ export type ResolvedTheme = 'light' | 'dark';
 export const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
 
 /** Cle de la preference dans le stockage local (cf. `storage.ts`). */
-export const THEME_STORAGE_KEY = 'gotfive:prefs';
+export const THEME_STORAGE_KEY = 'noctalis:prefs';
 
 export function isThemePreference(value: unknown): value is ThemePreference {
   return (
@@ -40,10 +40,10 @@ export function nextThemePreference(preference: ThemePreference): ThemePreferenc
   return THEME_PREFERENCES[(index + 1) % THEME_PREFERENCES.length]!;
 }
 
-/** Couleur de la barre de navigateur (mobile), par theme. */
+/** Constellation de la barre de navigateur (mobile), par theme. */
 export const THEME_COLORS: Record<ResolvedTheme, string> = {
-  light: '#fff4e2',
-  dark: '#191029',
+  light: '#f3efe6',
+  dark: '#0b1022',
 };
 
 /**
