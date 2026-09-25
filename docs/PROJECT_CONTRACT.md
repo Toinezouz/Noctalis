@@ -359,6 +359,8 @@ function AboutDialog(props: AboutDialogProps): JSX.Element | null;
 function SiteFooter(props: SiteFooterProps): JSX.Element;
 function Asterism(props: AsterismProps): JSX.Element;
 function SkyChart(): JSX.Element;
+function Celebration(props: CelebrationProps): JSX.Element;
+function useFreshIds(ids: readonly string[], durationMs?: number): ReadonlySet<string>;
 function Icon(props: IconProps): JSX.Element;
 
 interface GameActions {

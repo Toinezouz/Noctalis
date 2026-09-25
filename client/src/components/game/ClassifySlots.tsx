@@ -2,6 +2,7 @@ import { getTileByNumber, type ClassifyResult } from '@umbrastra/shared';
 import { useI18n } from '../../i18n/index.js';
 import { TileStack } from './TileStack.js';
 import { Tile } from './Tile.js';
+import { useFreshIds } from '../../hooks/useFreshIds.js';
 
 export interface ClassifySlotProps {
   slot: number;
@@ -13,6 +14,9 @@ export interface ClassifySlotProps {
 export function ClassifySlot({ slot, results, ownerName }: ClassifySlotProps): JSX.Element {
   const { t, slot: slotLabel } = useI18n();
   const tiles = results.map((r) => getTileByNumber(r.tileNumber));
+  // A star that has just been placed here lands with a flash of light.
+  const freshIds = useFreshIds(results.map((r) => r.id));
+  const freshNumbers = results.filter((r) => freshIds.has(r.id)).map((r) => r.tileNumber);
   const label =
     tiles.length === 0
       ? t('rack.slotEmpty', { slot: slotLabel(slot), name: ownerName })
@@ -25,13 +29,19 @@ export function ClassifySlot({ slot, results, ownerName }: ClassifySlotProps): J
 
   return (
     <div
-      className={`classify-slot ${tiles.length > 0 ? 'classify-slot--filled' : ''}`}
+      className={[
+        'classify-slot',
+        tiles.length > 0 ? 'classify-slot--filled' : '',
+        freshNumbers.length > 0 ? 'classify-slot--fresh' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       data-slot={slot}
       role="group"
       aria-label={label}
     >
       <span className="classify-slot__notch" aria-hidden="true" />
-      <TileStack tiles={tiles} size="xs" />
+      <TileStack tiles={tiles} size="xs" freshNumbers={freshNumbers} />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { MIN_PLAYERS, getTileByNumber, type PublicGameState } from '@umbrastra/s
 import { useI18n } from '../../i18n/index.js';
 import { Button } from '../../components/ui/Button.js';
 import { Tile } from '../../components/game/Tile.js';
-import { BrandMark } from '../../components/ui/BrandMark.js';
+import { Celebration } from './Celebration.js';
 
 export interface GameOverScreenProps {
   state: PublicGameState;
@@ -13,9 +13,6 @@ export interface GameOverScreenProps {
   /** Ids of the players still in the room. */
   seated: string[];
 }
-
-/** Soft colours of the celebration sparks, one per constellation. */
-const SPARK_COLORS = ['green', 'pink', 'blue', 'red', 'orange'] as const;
 
 /** End screen: the result, everybody's five stars, and another round. */
 export function GameOverScreen({
@@ -33,33 +30,23 @@ export function GameOverScreen({
   const readyCount = rematchReady.filter((id) => seated.includes(id)).length;
   const enoughPlayers = seated.length >= MIN_PLAYERS;
   const othersWaiting = readyCount > 0 && !iAskedRematch;
+  const winnerStars = winner ? (state.finalReveal?.[winner.id] ?? []) : [];
+  const resultText = winner
+    ? iWon
+      ? t('over.winnerYou', { name: winner.name })
+      : t('over.winnerOther', { name: winner.name })
+    : t('over.draw');
 
   return (
-    <div className="game-over" data-testid="game-over">
-      {iWon ? (
-        <div className="game-over__sparks" aria-hidden="true">
-          {Array.from({ length: 28 }, (_, i) => (
-            <span
-              key={i}
-              data-color={SPARK_COLORS[i % SPARK_COLORS.length]}
-              style={{
-                left: `${String((i * 37) % 100)}%`,
-                top: `${String((i * 53) % 90)}%`,
-                animationDelay: `${String((i % 7) * 0.22)}s`,
-              }}
-            />
-          ))}
-        </div>
-      ) : null}
+    <div className={`game-over ${winner ? 'has-winner' : 'no-winner'}`} data-testid="game-over">
+      <Celebration
+        stars={winnerStars}
+        title={winner ? t('header.announce') : t('over.drawTitle')}
+      />
 
       <div className="game-over__card panel">
-        <BrandMark size="xl" as="p" className="game-over__title" />
         <p className="game-over__result" data-testid="game-over-result">
-          {winner
-            ? iWon
-              ? t('over.winnerYou', { name: winner.name })
-              : t('over.winnerOther', { name: winner.name })
-            : t('over.draw')}
+          {resultText}
         </p>
 
         <div className="game-over__reveal">

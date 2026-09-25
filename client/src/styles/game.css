@@ -351,6 +351,81 @@
   border-radius: calc(var(--r-pill));
 }
 
+/* A star just placed: the gap flares in sunlight yellow and pulses a few
+   times, and the star lands in it from above, bright as it arrives. */
+.classify-slot--fresh {
+  border-style: solid;
+  border-color: var(--c-gold-bright);
+  background: rgba(240, 180, 41, 0.16);
+  animation: gf-slot-flare 900ms var(--ease-out) 3;
+  z-index: 2;
+}
+
+.classify-slot--fresh .classify-slot__notch {
+  background:
+    linear-gradient(var(--c-gold-bright), var(--c-gold-bright)) center / 100% 2px no-repeat,
+    linear-gradient(var(--c-gold-bright), var(--c-gold-bright)) center / 2px 100% no-repeat;
+  opacity: 1;
+}
+
+.tile--landing {
+  animation: gf-star-land 1100ms var(--ease-bounce) both;
+}
+
+/* A shock wave of light spreading from the star as it lands. */
+.tile--landing::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #ffd873;
+  pointer-events: none;
+  animation: gf-landing-wave 900ms var(--ease-out) 2 both;
+  animation-delay: 350ms;
+}
+
+@keyframes gf-landing-wave {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+@keyframes gf-slot-flare {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(240, 180, 41, 0.7),
+      0 0 16px 2px rgba(240, 180, 41, 0.45);
+  }
+  100% {
+    box-shadow:
+      0 0 0 10px rgba(240, 180, 41, 0),
+      0 0 16px 2px rgba(240, 180, 41, 0.2);
+  }
+}
+
+@keyframes gf-star-land {
+  0% {
+    opacity: 0;
+    transform: translateY(-34px) scale(1.9);
+    filter: brightness(2.4) drop-shadow(0 0 12px #ffd873);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(3px) scale(0.94);
+    filter: brightness(1.6) drop-shadow(0 0 10px #ffd873);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
 /* A small crosshair marks each gap, like a reference mark on a chart. */
 .classify-slot__notch {
   position: absolute;

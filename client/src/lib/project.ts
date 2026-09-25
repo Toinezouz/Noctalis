@@ -6,7 +6,7 @@
 export const PROJECT_NAME = 'UMBRASTRA';
 
 /** Displayed version. Follows `package.json`. */
-export const PROJECT_VERSION = '1.5.0';
+export const PROJECT_VERSION = '1.6.0';
 
 export const GITHUB_OWNER = 'Toinezouz';
 export const GITHUB_REPO = 'Umbrastra';

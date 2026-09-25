@@ -7,6 +7,8 @@ export interface TileStackProps {
   tiltedNumbers?: number[];
   size?: 'xs' | 'sm' | 'md';
   label?: string;
+  /** Stars that just arrived, by number: they land with a flash. */
+  freshNumbers?: number[];
 }
 
 /**
@@ -25,6 +27,7 @@ export function TileStack({
   tiltedNumbers = [],
   size = 'sm',
   label,
+  freshNumbers = [],
 }: TileStackProps): JSX.Element | null {
   if (tiles.length === 0) {
     return null;
@@ -45,7 +48,12 @@ export function TileStack({
           key={tile.id}
           style={{ '--stack-index': index } as React.CSSProperties}
         >
-          <Tile tile={tile} size={size} tilted={tiltedNumbers.includes(tile.number)} />
+          <Tile
+            tile={tile}
+            size={size}
+            tilted={tiltedNumbers.includes(tile.number)}
+            className={freshNumbers.includes(tile.number) ? 'tile--landing' : ''}
+          />
         </span>
       ))}
     </span>

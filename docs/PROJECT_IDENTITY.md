@@ -166,6 +166,23 @@ matters for colour-blind players.
 The home screen shows a **sky chart** turning slowly around the celestial
 pole: circles of declination, hour circles, and the five constellations.
 
+## Moments
+
+- **A star is placed** — it lands in its gap from above, bright as it
+  arrives, with a shock wave of light around it, and the gap pulses in
+  sun-like yellow for a few seconds. Everyone at the table sees it, on
+  whichever row it happens. Only what happens while the page is open is
+  animated: opening or reloading the page replays nothing.
+- **Someone wins** — the end screen opens on a total eclipse. The corona
+  grows, the diamond ring flashes over the whole sky, then the winner's five
+  stars light up one by one around the Moon and join into their
+  constellation under a shower of shooting stars, before
+  **CONSTELLATION!** appears and the results rise. When nobody wins, the
+  eclipse stays alone: *the sky kept its secrets*.
+
+Both respect the device's "reduce motion" setting: the final state shows at
+once, without movement.
+
 ## Positioning
 
 UMBRASTRA is an **independent open-source project**. It is not affiliated with

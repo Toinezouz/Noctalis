@@ -280,6 +280,7 @@ export const es: Messages = {
   'over.winnerYou': '¡Enhorabuena, {name}: has encontrado tu constelación!',
   'over.winnerOther': '¡Victoria para {name}, que ha encontrado su constelación!',
   'over.draw': 'Esta vez no gana nadie. El cielo ha guardado sus secretos.',
+  'over.drawTitle': 'El cielo guarda sus secretos',
   'over.guessLineOk': 'Anuncio de {name}: {numbers}, en el blanco.',
   'over.guessLineKo': 'Anuncio de {name}: {numbers}, no era eso.',
   'over.replay': 'Jugar otra vez',

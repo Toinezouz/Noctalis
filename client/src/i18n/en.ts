@@ -283,6 +283,7 @@ export const en = {
   'over.winnerYou': 'You found your constellation, {name}!',
   'over.winnerOther': '{name} found their constellation!',
   'over.draw': 'Nobody wins this one. The sky kept its secrets.',
+  'over.drawTitle': 'The sky kept its secrets',
   'over.guessLineOk': '{name} called {numbers}: spot on.',
   'over.guessLineKo': '{name} called {numbers}: not quite.',
   'over.replay': 'Play again',
